@@ -1,0 +1,12 @@
+stk1[0064FEB0](OK) at CPU.cpp, LINE - 11 
+{                           
+    canary_open  = badded       
+    canary_close = dedbad       
+    hash         = 0       
+    size_stk     = 0       
+    capacity_stk = 0       
+                            
+    buffer_stk[00000000]          
+    {                       
+    }                       
+}                           
