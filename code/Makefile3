@@ -1,0 +1,16 @@
+all: square
+
+square: DASM.o lines_handle.o input_output.o
+	g++ DASM.o lines_handle.o input_output.o
+
+main.o: DASM.cpp
+	g++ -c DASM.cpp
+
+lines_handle.o: lines_handle.cpp
+	g++ -c lines_handle.cpp
+
+input_output.o: input_output.cpp
+	g++ -c input_output.cpp
+
+clean:
+	rm -rf *.o

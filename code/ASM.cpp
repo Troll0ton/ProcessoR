@@ -7,7 +7,7 @@
 void assembler ()
 {
     FILE *file_in = fopen ("../files/file1.txt", "rb");
-    FILE *code_file = fopen ("../files/code.txt", "w+");
+    FILE *code_file = fopen ("../files/code.txt", "wb");
 
     struct File *File_input = file_reader (file_in);
     struct Line *Text = lines_separator   (File_input);
@@ -35,6 +35,11 @@ void assembler ()
         else if(stricmp(cmd, "add") == 0)
         {
             fwrite (&CMD_ADD, sizeof(int), 1, code_file);
+        }
+
+        else if(stricmp(cmd, "sub") == 0)
+        {
+            fwrite (&CMD_SUB, sizeof(int), 1, code_file);
         }
 
         else if(stricmp(cmd, "mul") == 0)

@@ -1,22 +1,19 @@
-#include "../include/CPU.h"
-#include "../include/stack.h"
+#include "../include/ASM.h"
 #include "../include/lines_handle.h"
 #include "../include/input_output.h"
 
 //-----------------------------------------------------------------------------
 
-void processor ()
+void assembler ()
 {
-    Stack stk1;
-    stack_ctor (&stk1, 2);
-
     FILE *code_file = fopen ("../files/code.txt", "rb");
+    FILE *file_out = fopen ("../files/file2.txt", "wb");
 
     int flag_stop = 0;
     double num = 0;
     int cmd = -1;
 
-    while(flag_stop == 0)
+    while(!flag_stop)
     {
         fread (&cmd, sizeof(int), 1, code_file);
 
@@ -24,7 +21,7 @@ void processor ()
         {
             case CMD_PUSH:
                 fread (&num, sizeof(double), 1, code_file);
-                stack_push (&stk1, num);
+                fprintf ("push ");
                 break;
             case CMD_ADD:
                 stack_push (&stk1, stack_pop (&stk1) + stack_pop (&stk1));

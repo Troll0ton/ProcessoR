@@ -1,20 +1,17 @@
-#include "../include/CPU.h"
-#include "../include/stack.h"
+#include "../include/DASM.h"
 #include "../include/lines_handle.h"
 #include "../include/input_output.h"
 
 //-----------------------------------------------------------------------------
 
-void processor ()
+void disassembler ()
 {
-    Stack stk1;
-    stack_ctor (&stk1, 2);
-
     FILE *code_file = fopen ("../files/code.txt", "rb");
+    FILE *file_out = fopen ("../files/file2.txt", "wb");
 
-    int flag_stop = 0;
     double num = 0;
     int cmd = -1;
+    int flag_stop = 0;
 
     while(flag_stop == 0)
     {
@@ -24,36 +21,34 @@ void processor ()
         {
             case CMD_PUSH:
                 fread (&num, sizeof(double), 1, code_file);
-                stack_push (&stk1, num);
+                fprintf (file_out, "push %lg\n", num);
                 break;
             case CMD_ADD:
-                stack_push (&stk1, stack_pop (&stk1) + stack_pop (&stk1));
+                fprintf (file_out, "add\n");
                 break;
             case CMD_SUB:
-                stack_push (&stk1, stack_pop (&stk1) - stack_pop (&stk1));
+                fprintf (file_out, "sub\n");
                 break;
             case CMD_MUL:
-                stack_push (&stk1, stack_pop (&stk1) * stack_pop (&stk1));
+                fprintf (file_out, "mul\n");
                 break;
             case CMD_DIV:
-                stack_push (&stk1, stack_pop (&stk1) / stack_pop (&stk1));
+                fprintf (file_out, "div\n");
                 break;
             case CMD_HLT:
+                fprintf (file_out, "hlt\n");
                 flag_stop++;
                 break;
             case CMD_OUT:
-                printf ("result: %lg", stack_pop (&stk1));
+                fprintf (file_out, "out\n");
                 break;
             default:
-                printf ("????");
+                fprintf (file_out, "????\n");
                 break;
         }
-
-        stack_dump_ (&stk1);
     }
 
-    stack_dtor (&stk1);
-
+    fclose (file_out);
     fclose (code_file);
 }
 
@@ -61,7 +56,7 @@ void processor ()
 
 int main()
 {
-    processor ();
+    disassembler ();
 
     return 0;
 }
