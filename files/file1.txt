@@ -22,7 +22,14 @@ add
 
 :5
 
+push 100
+sub
 
+push 333
+mul
+
+push 5
+div
 
 out
 

@@ -5,6 +5,10 @@
 
 //-----------------------------------------------------------------------------
 
+#include "../include/stack.h"
+
+//-----------------------------------------------------------------------------
+
 #define num_sup_cmd 11
 #define ARG_REG   0x10
 #define ARG_IMMED 0x20
@@ -74,6 +78,12 @@ const Cmd_got Cmd_cpu[] =
 void processor ();
 
 void code_dump (double *code, int size);
+
+void read_label_file (FILE *label_file_, int **labels_);
+
+void read_code_file (FILE *code_file_, double **code_);
+
+void calculator (Stack *stk_, double *code_, int *regs_, double *ram_, int *labels_);
 
 //-----------------------------------------------------------------------------
 

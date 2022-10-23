@@ -75,6 +75,8 @@ void processor ();
 
 void code_dump (double *code, int size);
 
+void read_label_file (FILE *label_file_, int **labels_);
+
 //-----------------------------------------------------------------------------
 
 #endif //CPU_H

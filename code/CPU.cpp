@@ -3,144 +3,35 @@
 
 //-----------------------------------------------------------------------------
 
+int main()
+{
+    processor ();
+
+    return 0;
+}
+
+//-----------------------------------------------------------------------------
+
 void processor ()
 {
+    int regs[5] = {99, 98, 97, 96, 95};
+    double ram[3] = {999,999,999};
+
     Stack stk1;
     stack_ctor (&stk1, 2);
 
     FILE *code_file  = fopen ("../files/code.txt", "rb");
     FILE *label_file = fopen ("../files/labels.txt", "rb");
 
-    //-----------------------------------------------------------------------------
+    int *labels = NULL;
 
-    int regs[5] = {99, 98, 97, 96, 95};
+    double *code = NULL;
 
-    //-----------------------------------------------------------------------------
+    read_label_file (label_file, &labels);
 
-    double ram[3] = {999,999,999};
+    read_code_file (code_file, &code);
 
-    //-----------------------------------------------------------------------------
-
-    int res_lab = 0;
-    fseek (label_file, 0, SEEK_SET);
-    fread (&res_lab, sizeof(int), 1, label_file);
-
-    int *labels = (int*) calloc (res_lab, sizeof (int));
-
-    int val1 = -1;
-
-    for(int i = 1; i <= res_lab; i++)
-    {
-        fread (&val1, sizeof(int), 1, label_file);
-        labels[i - 1] = val1;
-    }
-
-    //-----------------------------------------------------------------------------
-
-    int res_sum = -1;
-
-    fread (&res_sum, sizeof(int), 1, code_file);
-
-    double *code = (double*) calloc (res_sum, sizeof (double));
-
-    int cmd = -1;
-
-    for(int ib = 0; ib < res_sum; ib++)
-    {
-        fread (&cmd, sizeof(int), 1, code_file);
-
-        code[ib] = (double) cmd;
-
-        for(int num_cmd = 0; num_cmd < num_sup_cmd; num_cmd++)
-        {
-            if(Cmd_cpu[num_cmd].num == cmd && Cmd_cpu[num_cmd].par == 1)
-            {
-                ib++;
-                double val = 0;
-                fread (&val, sizeof(double), 1, code_file);
-
-                code[ib] = val;
-            }
-
-            else if(Cmd_cpu[num_cmd].num == cmd && Cmd_cpu[num_cmd].par > 1)
-            {
-                ib++;
-                int val2 = 0;
-                fread (&val2, sizeof(int), 1, code_file);
-
-                code[ib] = (double) val2;
-            }
-        }
-    }
-
-    code_dump (code, res_sum);
-
-    //-----------------------------------------------------------------------------
-
-    for(int ip = 0; ip < res_sum; ip++)
-    {
-        int cmd_d = code[ip];
-        double arg_d = -1;
-
-        if(cmd_d & ARG_REG) arg_d = regs[(int)code[ip + 1]];
-
-        else if(cmd_d & ARG_RAM) arg_d = ram[(int)code[ip + 1]];
-
-        //if(cmd_d & ARG_IMMED)
-        else arg_d = code[ip + 1];
-
-        switch(cmd_d)
-        {
-            case CMD_PUSH_:
-                stack_push (&stk1, arg_d);
-                ip++;
-                break;
-            case CMD_RG_PUSH_:
-                stack_push (&stk1, arg_d);
-                ip++;
-                break;
-            case CMD_RM_PUSH_:
-                stack_push (&stk1, arg_d);
-                ip++;
-                break;
-            case CMD_ADD_:
-                stack_push (&stk1, stack_pop (&stk1) + stack_pop (&stk1));
-                break;
-            case CMD_SUB_:
-                stack_push (&stk1, stack_pop (&stk1) - stack_pop (&stk1));
-                break;
-            case CMD_MUL_:
-                stack_push (&stk1, stack_pop (&stk1) * stack_pop (&stk1));
-                break;
-            case CMD_DIV_:
-                stack_push (&stk1, stack_pop (&stk1) / stack_pop (&stk1));
-                break;
-            case CMD_HLT_:
-                break;
-            case CMD_OUT_:
-                printf ("result: %lg\n", stack_pop (&stk1));
-                break;
-            case CMD_DUMP_:
-                printf ("|dump|\n");
-                break;
-            case CMD_JUMP_:
-                if(arg_d > 0)
-                {
-                    int pos_ch = arg_d;
-                    code[ip + 1] = -1000;
-                    ip = labels[pos_ch - 1] - 1;
-                }
-                else ip++;
-                break;
-            default:
-                printf ("?%d ", cmd_d);
-                break;
-        }
-
-        stack_dump_ (&stk1);
-    }
-
-    //-----------------------------------------------------------------------------
+    calculator (&stk1, code, regs, ram, labels);
 
     stack_dtor (&stk1);
 
@@ -181,11 +72,132 @@ void code_dump (double *code, int size)
 
 //-----------------------------------------------------------------------------
 
-int main()
+void read_label_file (FILE *label_file_, int **labels_)
 {
-    processor ();
+    int res_lab = 0;
 
-    return 0;
+    fread (&res_lab, sizeof(int), 1, label_file_);
+
+    *labels_ = (int*) calloc (res_lab, sizeof (int));
+
+    int val1 = -1;
+
+    for(int i = 1; i <= res_lab; i++)
+    {
+        fread (&val1, sizeof(int), 1, label_file_);
+        (*labels_)[i - 1] = val1;
+    }
+}
+
+//-----------------------------------------------------------------------------
+
+void read_code_file (FILE *code_file_, double **code_)
+{
+    int res_sum = -1;
+    int cmd     = -1;
+
+    fread (&res_sum, sizeof(int), 1, code_file_);
+
+    *code_ = (double*) calloc (res_sum + 1, sizeof (double));
+
+    (*code_)[0] = res_sum;
+
+    for(int ib = 1; ib <= res_sum; ib++)
+    {
+        fread (&cmd, sizeof(int), 1, code_file_);
+
+        (*code_)[ib] = (double) cmd;
+
+        for(int num_cmd = 0; num_cmd < num_sup_cmd; num_cmd++)
+        {
+            if(Cmd_cpu[num_cmd].num == cmd && Cmd_cpu[num_cmd].par == 1)
+            {
+                ib++;
+                double val = 0;
+                fread (&val, sizeof(double), 1, code_file_);
+
+                (*code_)[ib] = val;
+            }
+
+            else if(Cmd_cpu[num_cmd].num == cmd && Cmd_cpu[num_cmd].par > 1)
+            {
+                ib++;
+                int val2 = 0;
+                fread (&val2, sizeof(int), 1, code_file_);
+
+                (*code_)[ib] = (double) val2;
+            }
+        }
+    }
+
+    code_dump ((*code_), res_sum);
+}
+
+//-----------------------------------------------------------------------------
+
+void calculator (Stack *stk_, double *code_, int *regs_, double *ram_, int *labels_)
+{
+    for(int ip = 1; ip < (int) code_[0]; ip++)
+    {
+        int cmd_d = code_[ip];
+        double arg_d = -1;
+
+        if(cmd_d & ARG_REG) arg_d = regs_[(int) code_[ip + 1]];
+
+        else if(cmd_d & ARG_RAM) arg_d = ram_[(int) code_[ip + 1]];
+
+        else arg_d = code_[ip + 1];
+
+        switch(cmd_d)
+        {
+            case CMD_PUSH_:
+                stack_push (stk_, arg_d);
+                ip++;
+                break;
+            case CMD_RG_PUSH_:
+                stack_push (stk_, arg_d);
+                ip++;
+                break;
+            case CMD_RM_PUSH_:
+                stack_push (stk_, arg_d);
+                ip++;
+                break;
+            case CMD_ADD_:
+                stack_push (stk_, stack_pop (stk_) + stack_pop (stk_));
+                break;
+            case CMD_SUB_:
+                stack_push (stk_, -(stack_pop (stk_) - stack_pop (stk_)));
+                break;
+            case CMD_MUL_:
+                stack_push (stk_, stack_pop (stk_) * stack_pop (stk_));
+                break;
+            case CMD_DIV_:
+                stack_push (stk_, 1 / stack_pop (stk_) * stack_pop (stk_));
+                break;
+            case CMD_HLT_:
+                break;
+            case CMD_OUT_:
+                printf ("result: %lg\n", stack_pop (stk_));
+                break;
+            case CMD_DUMP_:
+                printf ("|dump|\n");
+                break;
+            case CMD_JUMP_:
+                if(arg_d > 0)
+                {
+                    int pos_ch = arg_d;
+                    code_[ip + 1] = -1000;
+                    ip = labels_[pos_ch - 1] - 1;
+                }
+                else ip++;
+                break;
+            default:
+                printf ("?%d ", cmd_d);
+                break;
+        }
+
+        stack_dump_ (stk_);
+    }
 }
 
 //-----------------------------------------------------------------------------
