@@ -40,6 +40,20 @@ typedef struct Cmd
 
 //-----------------------------------------------------------------------------
 
+typedef struct Asm_data_
+{
+    FILE *file_in;
+    FILE *code_file;
+    FILE *label_file;
+
+    Line Cur_line;
+
+    int res_sum;
+    int num_of_labels;
+} Asm_data_;
+
+//-----------------------------------------------------------------------------
+
 const Cmd Cmd_asm[] =
 {
     {"hlt",  CMD_HLT,  0},
@@ -57,7 +71,29 @@ const Cmd Cmd_asm[] =
 
 //-----------------------------------------------------------------------------
 
-void assembler ();
+void assembler         ();
+
+void label_utility     (Asm_data_ *data, char *cmd_);
+
+void handle_label      (Asm_data_ *data);
+
+void handle_jump       (Asm_data_ *data);
+
+bool found_label       (Asm_data_ *data);
+
+bool found_arg_funct   (char *cmd_);
+
+void handle_arg_functs (Asm_data_ *data);
+
+void handle_regs       (Asm_data_ *data, char *arg_);
+
+void handle_ram_args   (Asm_data_ *data, char *arg_);
+
+void handle_com_functs (Asm_data_ *data, char *cmd_);
+
+void Asm_data_ctor     (Asm_data_ *data);
+
+void codefile_ctor     (Asm_data_ *data);
 
 //-----------------------------------------------------------------------------
 

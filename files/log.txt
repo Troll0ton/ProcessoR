@@ -6,7 +6,7 @@ stk1[0064FE48](OK) at CPU.cpp, LINE - 9
     size_stk     = 0       
     capacity_stk = 1       
                             
-    buffer_stk[00CD0D68]          
+    buffer_stk[00BC0D68]          
     {                       
           [0] = 0        
     }                       
