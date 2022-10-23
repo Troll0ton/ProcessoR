@@ -17,6 +17,10 @@ void processor ()
 
     //-----------------------------------------------------------------------------
 
+    double ram[3] = {999,999,999};
+
+    //-----------------------------------------------------------------------------
+
     int res_lab = 0;
     fseek (label_file, 0, SEEK_SET);
     fread (&res_lab, sizeof(int), 1, label_file);
@@ -64,7 +68,7 @@ void processor ()
                 int val2 = 0;
                 fread (&val2, sizeof(int), 1, code_file);
 
-                code[ib] = val2;
+                code[ib] = (double) val2;
             }
         }
     }
@@ -76,39 +80,53 @@ void processor ()
     for(int ip = 0; ip < res_sum; ip++)
     {
         int cmd_d = code[ip];
+        double arg_d = -1;
+
+        if(cmd_d & ARG_REG) arg_d = regs[(int)code[ip + 1]];
+
+        else if(cmd_d & ARG_RAM) arg_d = ram[(int)code[ip + 1]];
+
+        //if(cmd_d & ARG_IMMED)
+        else arg_d = code[ip + 1];
 
         switch(cmd_d)
         {
-            case CMD_PUSH:
-                stack_push (&stk1, code[++ip]);
+            case CMD_PUSH_:
+                stack_push (&stk1, arg_d);
+                ip++;
                 break;
-            case CMD_RPUSH:
-                stack_push (&stk1, regs[(int)code[++ip]]);
+            case CMD_RG_PUSH_:
+                stack_push (&stk1, arg_d);
+                ip++;
                 break;
-            case CMD_ADD:
+            case CMD_RM_PUSH_:
+                stack_push (&stk1, arg_d);
+                ip++;
+                break;
+            case CMD_ADD_:
                 stack_push (&stk1, stack_pop (&stk1) + stack_pop (&stk1));
                 break;
-            case CMD_SUB:
+            case CMD_SUB_:
                 stack_push (&stk1, stack_pop (&stk1) - stack_pop (&stk1));
                 break;
-            case CMD_MUL:
+            case CMD_MUL_:
                 stack_push (&stk1, stack_pop (&stk1) * stack_pop (&stk1));
                 break;
-            case CMD_DIV:
+            case CMD_DIV_:
                 stack_push (&stk1, stack_pop (&stk1) / stack_pop (&stk1));
                 break;
-            case CMD_HLT:
+            case CMD_HLT_:
                 break;
-            case CMD_OUT:
+            case CMD_OUT_:
                 printf ("result: %lg\n", stack_pop (&stk1));
                 break;
-            case CMD_DUMP:
+            case CMD_DUMP_:
                 printf ("|dump|\n");
                 break;
-            case CMD_JUMP:
-                if(code[ip + 1] > 0)
+            case CMD_JUMP_:
+                if(arg_d > 0)
                 {
-                    int pos_ch = code[ip + 1];
+                    int pos_ch = arg_d;
                     code[ip + 1] = -1000;
                     ip = labels[pos_ch - 1] - 1;
                 }

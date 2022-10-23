@@ -1,5 +1,8 @@
 push 108
-push 2
+push [2]
+
+push rbx
+add
 
 :2
 push 100
@@ -19,8 +22,7 @@ add
 
 :5
 
-push rbx
-add
+
 
 out
 

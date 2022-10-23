@@ -15,6 +15,7 @@ void assembler ()
 
     int res_sum = 0;
     int num_of_labels = 0;
+    double val = 0;
 
     fseek (code_file, sizeof(int), SEEK_SET);
 
@@ -37,6 +38,7 @@ void assembler ()
                 if(sscanf (Text[i].begin_line + 5, "%d:", &ind) != 0)
                 {
                     fwrite (&ind, sizeof(int), 1, code_file);
+
                     res_sum += 2;
                 }
 
@@ -68,26 +70,61 @@ void assembler ()
 
         //-----------------------------------------------------------------------------
 
+        else if(stricmp (cmd, "push") == 0)
+        {
+            char arg[100] = "";
+
+            if(sscanf (Text[i].begin_line + 5, "%lg", &val))
+            {
+                fwrite (&Cmd_asm[CMD_PUSH].num, sizeof(int), 1, code_file);
+                fwrite (&val, sizeof(double), 1, code_file);
+            }
+
+            else
+            {
+                sscanf (Text[i].begin_line + 5, "%s", arg);
+
+                if(arg[0] == 'r' && arg[2] == 'x')
+                {
+                    int num_of_reg = arg[1] - 97;
+
+                    fwrite (&Cmd_asm[CMD_RG_PUSH].num, sizeof(int), 1, code_file);
+                    fwrite (&num_of_reg, sizeof(int), 1, code_file);
+                }
+
+                else if(arg[0] = '[')
+                {
+                    if(sscanf (Text[i].begin_line + 6, "%lg", &val))
+                    {
+                        fwrite (&Cmd_asm[CMD_RM_RPUSH].num, sizeof(int), 1, code_file);
+                        fwrite (&val, sizeof(double), 1, code_file);
+                    }
+                }
+
+                else printf ("ERROR");
+            }
+
+            res_sum += 2;
+        }
+
+        //-----------------------------------------------------------------------------
+
         else
         {
             for(int num_cmd = 0; num_cmd < num_sup_cmd; num_cmd++)
             {
-                double val = 0;
-
-                if(stricmp(Cmd_asm[num_cmd].name, cmd) == 0 && stricmp (cmd, "push") != 0)
+                if(stricmp (cmd, Cmd_asm[num_cmd].name) == 0)
                 {
                     fwrite (&Cmd_asm[num_cmd].num, sizeof(int), 1, code_file);
                     res_sum++;
 
-                    if(Cmd_asm[num_cmd].par)
+                    /*if(Cmd_asm[num_cmd].par)
                     {
                         sscanf (Text[i].begin_line + 5, "%lg", &val);
                         fwrite (&val, sizeof(double), 1, code_file);
                         res_sum++;
-                    }
+                    } */
                 }
-
-                
             }
         }
 
