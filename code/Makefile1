@@ -3,7 +3,7 @@ all: square
 square: ASM.o lines_handle.o input_output.o
 	g++ ASM.o lines_handle.o input_output.o
 
-main.o: ASM.cpp
+ASM.o: ASM.cpp
 	g++ -c ASM.cpp
 
 lines_handle.o: lines_handle.cpp

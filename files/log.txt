@@ -1,12 +1,13 @@
-stk1[0064FEB0](OK) at CPU.cpp, LINE - 11 
+stk1[0064FE68](ERROR) at CPU.cpp, LINE - 9 
 {                           
     canary_open  = badded       
     canary_close = dedbad       
     hash         = 0       
-    size_stk     = 0       
-    capacity_stk = 0       
+    size_stk     = -3       
+    capacity_stk = 1       
                             
-    buffer_stk[00000000]          
+    buffer_stk[00C61330]          
     {                       
+          [0] = 0        
     }                       
 }                           

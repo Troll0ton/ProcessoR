@@ -1,16 +1,10 @@
-all: square
+all: procm
 
-square: CPU.o lines_handle.o input_output.o stack.o
-	g++ CPU.o lines_handle.o input_output.o stack.o
+procm: CPU.o stack.o
+	g++ CPU.o stack.o
 
-main.o: CPU.cpp
+CPU.o: CPU.cpp
 	g++ -c CPU.cpp
-
-lines_handle.o: lines_handle.cpp
-	g++ -c lines_handle.cpp
-
-input_output.o: input_output.cpp
-	g++ -c input_output.cpp
 
 stack.o: stack.cpp
 	g++ -c stack.cpp

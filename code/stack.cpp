@@ -78,9 +78,11 @@ void stack_resize (struct Stack *stk, int opt_resize)
 
     else if (opt_resize == stk_decrease)
     {
-        stk->capacity_stk /= 2;
-
-        stk->buffer_stk = (double*) recalloc (stk->buffer_stk, stk->capacity_stk, stk->size_stk);
+        if(stk->capacity_stk >= 2)
+        {
+            stk->capacity_stk /= 2;
+            stk->buffer_stk = (double*) recalloc (stk->buffer_stk, stk->capacity_stk, stk->size_stk);
+        }
     }
 
     stk->hash = calculate_hash (stk);
