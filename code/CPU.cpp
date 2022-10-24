@@ -7,6 +7,8 @@ void processor ()
     int regs[5] = {99, 98, 97, 96, 95};
     double ram[3] = {999,999,999};
 
+    //-----------------------------------------------------------------------------
+
     Stack stk1;
     stack_ctor (&stk1, 2);
 
@@ -124,7 +126,6 @@ void read_label_file (FILE *label_file__, int **labels_)
 void read_code_file (FILE *code_file_, double **code_)
 {
     int res_sum    = -1;
-    int cmd        = -1;
     int32_t code_sgntr = -1;
 
     fread (&res_sum, sizeof(int), 1, code_file_);
@@ -132,37 +133,9 @@ void read_code_file (FILE *code_file_, double **code_)
 
     *code_ = (double*) calloc (res_sum + 1, sizeof (double));
 
-    (*code_)[0] = res_sum;
-
     if(code_sgntr == Cor_signature)
     {
-        for(int ib = 1; ib <= res_sum; ib++)
-        {
-            fread (&cmd, sizeof(int), 1, code_file_);
-
-            (*code_)[ib] = (double) cmd;
-
-            for(int num_cmd = 0; num_cmd < Num_sup_cmd; num_cmd++)
-            {
-                if(Cmd_cpu[num_cmd].num == cmd && Cmd_cpu[num_cmd].par == 1)
-                {
-                    ib++;
-                    double val = 0;
-                    fread (&val, sizeof(double), 1, code_file_);
-
-                    (*code_)[ib] = val;
-                }
-
-                else if(Cmd_cpu[num_cmd].num == cmd && Cmd_cpu[num_cmd].par > 1)
-                {
-                    ib++;
-                    int val2 = 0;
-                    fread (&val2, sizeof(int), 1, code_file_);
-
-                    (*code_)[ib] = (double) val2;
-                }
-            }
-        }
+        fill_code_array (code_file_, res_sum, *code_);
 
         code_dump ((*code_), res_sum);
     }
@@ -241,3 +214,41 @@ void calculator (Stack *stk_, double *code_, int *regs_, double *ram_, int *labe
 }
 
 //-----------------------------------------------------------------------------
+
+void fill_code_array (FILE *code_file_, int res_sum_, double *code_)
+{
+    int cmd = -1;
+
+    code_[0] = res_sum_;
+
+    for(int ib = 1; ib <= res_sum_; ib++)
+    {
+        fread (&cmd, sizeof(int), 1, code_file_);
+
+        code_[ib] = (double) cmd;
+
+        for(int num_cmd = 0; num_cmd < Num_sup_cmd; num_cmd++)
+        {
+            if(Cmd_cpu[num_cmd].num == cmd && Cmd_cpu[num_cmd].par == 1)
+            {
+                ib++;
+                double val = 0;
+                fread (&val, sizeof(double), 1, code_file_);
+
+                code_[ib] = val;
+            }
+
+            else if(Cmd_cpu[num_cmd].num == cmd && Cmd_cpu[num_cmd].par > 1)
+            {
+                ib++;
+                int val2 = 0;
+                fread (&val2, sizeof(int), 1, code_file_);
+
+                code_[ib] = (double) val2;
+            }
+        }
+    }
+}
+
+//-----------------------------------------------------------------------------
+
