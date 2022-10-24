@@ -13,6 +13,8 @@ void assembler ()
     fclose (Asm_data->file_in);
     fclose (Asm_data->code_file);
     fclose (Asm_data->label_file);
+
+    free (Asm_data);
 }
 
 //-----------------------------------------------------------------------------
@@ -69,6 +71,8 @@ void files_ctor (Asm_data_ *data)
 
     fseek  (data->label_file, 0, SEEK_SET);
     fwrite (&data->num_of_labels, sizeof(int), 1, data->label_file);
+
+    clear_mem (Text, File_input);
 }
 
 //-----------------------------------------------------------------------------

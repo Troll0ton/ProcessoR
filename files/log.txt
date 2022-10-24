@@ -6,7 +6,7 @@ stk1[0064FE84](ERROR) at CPU.cpp, LINE - 11
     size_stk     = -2       
     capacity_stk = 1       
                             
-    buffer_stk[00B657A8]          
+    buffer_stk[00AD2ED0]          
     {                       
           [0] = 0        
     }                       

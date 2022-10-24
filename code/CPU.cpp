@@ -29,6 +29,9 @@ void processor ()
 
     fclose (code_file_);
     fclose (label_file_);
+
+    free (labels);
+    free (code);
 }
 
 //-----------------------------------------------------------------------------
