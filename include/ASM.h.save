@@ -14,7 +14,11 @@
 
 //-----------------------------------------------------------------------------
 
-#define Num_sup_cmd 11
+#define Num_sup_cmd 10
+
+//-----------------------------------------------------------------------------
+
+#define Num_sup_jmps 6
 
 //-----------------------------------------------------------------------------
 
@@ -33,9 +37,14 @@ enum CMD_CODES
     CMD_DIV,
     CMD_OUT,
     CMD_DUMP,
-    CMD_JUMP,
     CMD_RG_PUSH,
     CMD_RM_PUSH,
+    CMD_JB,
+    CMD_JBE,
+    CMD_JA,
+    CMD_JAE,
+    CMD_JE,
+    CMD_JNE,
 };
 
 //-----------------------------------------------------------------------------
@@ -72,9 +81,14 @@ const Cmd Cmd_asm[] =
     {"div",  CMD_DIV,  0},
     {"out",  CMD_OUT,  0},
     {"dump", CMD_DUMP, 0},
-    {"jump", CMD_JUMP, 2},
-    {"push", 0x11    , 3},
-    {"push", 0x41    , 4},
+    {"push", 0x11,     3},
+    {"push", 0x41,     4},
+    {"jb",   CMD_JUMP  5},
+    {"jbe",  CMD_JUMP  5},
+    {"ja",   CMD_JUMP  5},
+    {"jae",  CMD_JUMP  5},
+    {"je",   CMD_JUMP  5},
+    {"jne",  CMD_JUMP  5},
 };
 
 //-----------------------------------------------------------------------------
@@ -101,7 +115,7 @@ void handle_com_functs (Asm_data_ *data, char *cmd_);
 
 void Asm_data_ctor     (Asm_data_ *data);
 
-void files_ctor     (Asm_data_ *data);
+void files_ctor        (Asm_data_ *data);
 
 //-----------------------------------------------------------------------------
 

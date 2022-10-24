@@ -14,6 +14,7 @@ void processor ()
 
     FILE *code_file_  = fopen ("../files/code.txt", "rb");
     FILE *label_file_ = fopen ("../files/labels.txt", "rb");
+    FILE *log_file    = fopen ("../files/log.txt", "w+");
 
     int *labels = NULL;
 
@@ -25,12 +26,13 @@ void processor ()
 
     read_code_file (code_file_, &code);
 
-    calculator (&stk1, code, regs, ram, labels);
+    calculator (&stk1, code, regs, ram, labels, log_file);
 
     stack_dtor (&stk1);
 
     fclose (code_file_);
     fclose (label_file_);
+    fclose (log_file);
 
     free (labels);
     free (code);
@@ -148,12 +150,16 @@ void read_code_file (FILE *code_file_, double **code_)
 
 //-----------------------------------------------------------------------------
 
-void calculator (Stack *stk_, double *code_, int *regs_, double *ram_, int *labels_)
+void calculator (Stack *stk_, double *code_, int *regs_, double *ram_, int *labels_, FILE *file_log)
 {
     for(int ip = 1; ip <= (int) code_[0]; ip++)
     {
         int cmd_d = code_[ip];
         double arg_d = -1;
+        double f1 = -1;
+        double f2 = -1;
+
+        stack_dumps (stk_, file_log);
 
         if(cmd_d & ARG_REG) arg_d = regs_[(int) code_[ip + 1]];
 
@@ -195,21 +201,82 @@ void calculator (Stack *stk_, double *code_, int *regs_, double *ram_, int *labe
             case CMD_DUMP_:
                 printf ("|dump|\n");
                 break;
-            case CMD_JUMP_:
-                if(arg_d > 0)
+            case CMD_JB_:
+                f2 = stack_pop (stk_);
+                f1 = stack_pop (stk_);
+                if(f1 < f2)
                 {
                     int pos_ch = arg_d;
-                    code_[ip + 1] = -1000;
-                    ip = labels_[pos_ch] - 1;
+                    ip = labels_[pos_ch];
                 }
                 else ip++;
+                stack_push (stk_, f1);
+                stack_push (stk_, f2);
+                break;
+            case CMD_JBE_:
+                f2 = stack_pop (stk_);
+                f1 = stack_pop (stk_);
+                if(f1 <= f2)
+                {
+                    int pos_ch = arg_d;
+                    ip = labels_[pos_ch];
+                }
+                else ip++;
+                stack_push (stk_, f1);
+                stack_push (stk_, f2);
+                break;
+            case CMD_JA_:
+                f2 = stack_pop (stk_);
+                f1 = stack_pop (stk_);
+                if(f1 > f2)
+                {
+                    int pos_ch = arg_d;
+                    ip = labels_[pos_ch];
+                }
+                else ip++;
+                stack_push (stk_, f1);
+                stack_push (stk_, f2);
+                break;
+            case CMD_JAE_:
+                f2 = stack_pop (stk_);
+                f1 = stack_pop (stk_);
+                if(f1 >= f2)
+                {
+                    int pos_ch = arg_d;
+                    ip = labels_[pos_ch];
+                }
+                else ip++;
+                stack_push (stk_, f1);
+                stack_push (stk_, f2);
+                break;
+            case CMD_JE_:
+                f2 = stack_pop (stk_);
+                f1 = stack_pop (stk_);
+                if(is_equal(f1,f2))
+                {
+                    int pos_ch = arg_d;
+                    ip = labels_[pos_ch];
+                }
+                else ip++;
+                stack_push (stk_, f1);
+                stack_push (stk_, f2);
+                break;
+            case CMD_JNE_:
+                f2 = stack_pop (stk_);
+                f1 = stack_pop (stk_);
+                if(!is_equal(f1,f2))
+                {
+                    int pos_ch = arg_d;
+                    ip = labels_[pos_ch];
+                }
+                else ip++;
+                stack_push (stk_, f1);
+                stack_push (stk_, f2);
                 break;
             default:
                 printf ("?%d \n", cmd_d);
                 break;
         }
-
-        stack_dump_ (stk_);
     }
 }
 
@@ -227,7 +294,7 @@ void fill_code_array (FILE *code_file_, int res_sum_, double *code_)
 
         code_[ib] = (double) cmd;
 
-        for(int num_cmd = 0; num_cmd < Num_sup_cmd; num_cmd++)
+        for(int num_cmd = 0; num_cmd < Num_sup_cmd + Num_sup_jmps; num_cmd++)
         {
             if(Cmd_cpu[num_cmd].num == cmd && Cmd_cpu[num_cmd].par == 1)
             {
@@ -248,6 +315,15 @@ void fill_code_array (FILE *code_file_, int res_sum_, double *code_)
             }
         }
     }
+}
+
+//-----------------------------------------------------------------------------
+
+bool is_equal (double a, double b)
+{
+    const double EPS = 1e-1;
+
+    return (a - b < EPS && a - b > -EPS);
 }
 
 //-----------------------------------------------------------------------------

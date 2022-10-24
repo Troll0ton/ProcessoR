@@ -12,13 +12,16 @@ void assembler ()
 
     fclose (Asm_data->file_in);
     fclose (Asm_data->code_file);
+    fclose (Asm_data->label_file);
+
+    free (Asm_data);
 }
 
 //-----------------------------------------------------------------------------
 
 void Asm_data_ctor (Asm_data_ *data)
 {
-    data->file_in    = fopen ("../files/file1.txt",  "rb");
+    data->file_in    = fopen ("../files/file3.txt",  "rb");
     data->code_file  = fopen ("../files/code.txt",   "wb");
     data->label_file = fopen ("../files/labels.txt", "wb");
 
@@ -42,7 +45,7 @@ void files_ctor (Asm_data_ *data)
     {
         data->Cur_line = Text[i];
 
-        char cmd[100] = "";
+        char cmd[40] = "";
 
         sscanf (data->Cur_line.begin_line, "%s", cmd);
 
@@ -67,8 +70,9 @@ void files_ctor (Asm_data_ *data)
     fwrite (&data->code_sgntr, sizeof(int32_t), 1, data->code_file);
 
     fseek  (data->label_file, 0, SEEK_SET);
-    printf ("%d A", );
     fwrite (&data->num_of_labels, sizeof(int), 1, data->label_file);
+
+    clear_mem (Text, File_input);
 }
 
 //-----------------------------------------------------------------------------
@@ -97,13 +101,23 @@ void handle_label (Asm_data_ *data)
 
 //-----------------------------------------------------------------------------
 
-void handle_jump (Asm_data_ *data)
+void handle_jump (Asm_data_ *data, char *cmd_)
 {
     int val = -1;
+    int cur_len = -1;
 
-    fwrite (&Cmd_asm[CMD_JUMP].num, sizeof(int), 1, data->code_file);
+    for(int i = 10; i < 10 + Num_sup_jmps; i++)
+    {
+        if(stricmp (cmd_, Cmd_asm[i].name) == 0)
+        {
+            cur_len = Cmd_asm[i].par;
+            fwrite (&Cmd_asm[i].num, sizeof(int), 1, data->code_file);
+            printf ("AAAA");
+            break;
+        }
+    }
 
-    if(sscanf (data->Cur_line.begin_line + 5, "%d:", &val) != 0)
+    if(sscanf (data->Cur_line.begin_line + cur_len, "%d:", &val) != 0)
     {
         fwrite (&val, sizeof(int), 1, data->code_file);
 
@@ -120,9 +134,9 @@ void handle_jump (Asm_data_ *data)
 
 void label_utility (Asm_data_ *data, char *cmd_)
 {
-    if(stricmp (cmd_, "jump") == 0)
+    if(found_label (data))
     {
-        handle_jump (data);
+        handle_jump (data, cmd_);
     }
 
     else

@@ -7,13 +7,13 @@ add
 :2
 push 100
 add
-jump 2:
+jbe 2:
 
 
 add
 :8
 
-jump 5:
+je 5:
 
 push 80
 push 80
@@ -30,6 +30,7 @@ mul
 
 push 5
 div
+
 
 out
 

@@ -14,7 +14,11 @@
 
 //-----------------------------------------------------------------------------
 
-#define Num_sup_cmd 11
+#define Num_sup_cmd 10
+
+//-----------------------------------------------------------------------------
+
+#define Num_sup_jmps 6
 
 //-----------------------------------------------------------------------------
 
@@ -33,9 +37,14 @@ enum CMD_CODES
     CMD_DIV,
     CMD_OUT,
     CMD_DUMP,
-    CMD_JUMP,
     CMD_RG_PUSH,
     CMD_RM_PUSH,
+    CMD_JBE,
+    CMD_JAE,
+    CMD_JA,
+    CMD_JB,
+    CMD_JE,
+    CMD_JNE,
 };
 
 //-----------------------------------------------------------------------------
@@ -72,9 +81,14 @@ const Cmd Cmd_asm[] =
     {"div",  CMD_DIV,  0},
     {"out",  CMD_OUT,  0},
     {"dump", CMD_DUMP, 0},
-    {"jump", CMD_JUMP, 2},
-    {"push", 0x11    , 3},
-    {"push", 0x41    , 4},
+    {"push", 0x11,     3},
+    {"push", 0x41,     4},
+    {"jbe",  CMD_JBE,  3},
+    {"jae",  CMD_JAE,  3},
+    {"ja",   CMD_JB,   2},
+    {"jb",   CMD_JA,   2},
+    {"je",   CMD_JE,   2},
+    {"jne",  CMD_JNE,  3},
 };
 
 //-----------------------------------------------------------------------------
@@ -85,7 +99,7 @@ void label_utility     (Asm_data_ *data, char *cmd_);
 
 void handle_label      (Asm_data_ *data);
 
-void handle_jump       (Asm_data_ *data);
+void handle_jump       (Asm_data_ *data, char *cmd_);
 
 bool found_label       (Asm_data_ *data);
 
@@ -101,7 +115,7 @@ void handle_com_functs (Asm_data_ *data, char *cmd_);
 
 void Asm_data_ctor     (Asm_data_ *data);
 
-void files_ctor     (Asm_data_ *data);
+void files_ctor        (Asm_data_ *data);
 
 //-----------------------------------------------------------------------------
 

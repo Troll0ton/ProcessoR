@@ -171,9 +171,62 @@ void handle_errors (struct Stack *stk)
 
 //-----------------------------------------------------------------------------
 
+void stack_dumps (struct Stack *stk_, FILE *log_file)
+{
+    fprintf (log_file,
+             "%s[%p](%s) at %s, LINE - %d \n"
+             "{                           \n"
+             "    canary_open  = %x       \n"
+             "    canary_close = %x       \n"
+             "    hash         = %x       \n"
+             "    size_stk     = %d       \n"
+             "    capacity_stk = %d       \n"
+             "                            \n"
+             "    buffer_stk[%p]          \n"
+             "    {                       \n",
+             (stk_->Stack_info).name + 1,    stk_,
+             (stk_->Stack_info).cur_status, (stk_->Stack_info).file,
+             (stk_->Stack_info).line,
+             stk_->canary_left,
+             stk_->canary_right,
+             stk_->hash,
+             stk_->size_stk,
+             stk_->capacity_stk,
+             stk_->buffer_stk);
+
+        for(int pos = 0; pos < stk_->capacity_stk; pos++)
+        {
+            fprintf (log_file,
+                 "          [%d] = %lg        \n",
+                 pos, stk_->buffer_stk[pos]);
+        }
+
+        fprintf (log_file,
+             "    }                       \n"
+             "}                           \n\n");
+
+        fprintf (log_file, "_____________________________________________________________\n\n");
+}
+
+//-----------------------------------------------------------------------------
+
+void check_errors (struct Stack *stk, int32_t new_hash)
+{
+    if(stk->canary_left != LEFT_CANARY)    (stk->Stack_info).error_codes |= ERR_CAN_1;
+    if(stk->canary_right != RIGHT_CANARY)  (stk->Stack_info).error_codes |= ERR_CAN_2;
+    if(stk->buffer_stk == NULL)            (stk->Stack_info).error_codes |= ERR_MEMBUF;
+    if(stk->capacity_stk < stk->size_stk)  (stk->Stack_info).error_codes |= ERR_OVERF;
+    if(stk->capacity_stk < 0)              (stk->Stack_info).error_codes |= ERR_CAP;
+    if(stk->size_stk < 0)                  (stk->Stack_info).error_codes |= ERR_SIZE;
+    if(stk == NULL)                        (stk->Stack_info).error_codes |= ERR_MEMSTK;
+    if(stk->hash != new_hash)              (stk->Stack_info).error_codes |= ERR_HASH;
+}
+
+//-----------------------------------------------------------------------------
+
 void stack_dump_ (struct Stack *stk)
 {
-    FILE *log_file = fopen ("../files/log.txt", "w+");
+    FILE *log_file = fopen ("log.txt", "w+");
 
     fprintf (log_file,
              "%s[%p](%s) at %s, LINE - %d \n"
@@ -208,20 +261,6 @@ void stack_dump_ (struct Stack *stk)
              "}                           \n");
 
     fclose (log_file);
-}
-
-//-----------------------------------------------------------------------------
-
-void check_errors (struct Stack *stk, int32_t new_hash)
-{
-    if(stk->canary_left != LEFT_CANARY)    (stk->Stack_info).error_codes |= ERR_CAN_1;
-    if(stk->canary_right != RIGHT_CANARY)  (stk->Stack_info).error_codes |= ERR_CAN_2;
-    if(stk->buffer_stk == NULL)            (stk->Stack_info).error_codes |= ERR_MEMBUF;
-    if(stk->capacity_stk < stk->size_stk)  (stk->Stack_info).error_codes |= ERR_OVERF;
-    if(stk->capacity_stk < 0)              (stk->Stack_info).error_codes |= ERR_CAP;
-    if(stk->size_stk < 0)                  (stk->Stack_info).error_codes |= ERR_SIZE;
-    if(stk == NULL)                        (stk->Stack_info).error_codes |= ERR_MEMSTK;
-    if(stk->hash != new_hash)              (stk->Stack_info).error_codes |= ERR_HASH;
 }
 
 //-----------------------------------------------------------------------------

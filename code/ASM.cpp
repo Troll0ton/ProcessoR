@@ -45,7 +45,7 @@ void files_ctor (Asm_data_ *data)
     {
         data->Cur_line = Text[i];
 
-        char cmd[100] = "";
+        char cmd[40] = "";
 
         sscanf (data->Cur_line.begin_line, "%s", cmd);
 
@@ -92,25 +92,28 @@ void handle_label (Asm_data_ *data)
         fseek  (data->label_file, sizeof(int) * label, SEEK_SET);
         fwrite (&label_adr, sizeof(int), 1, data->label_file);
     }
-
-    else
-    {
-        data->code_sgntr = Incor_signature;
-    }
 }
 
 //-----------------------------------------------------------------------------
 
-void handle_jump (Asm_data_ *data)
+void handle_jump (Asm_data_ *data, char *cmd_)
 {
     int val = -1;
+    int cur_len = -1;
 
-    fwrite (&Cmd_asm[CMD_JUMP].num, sizeof(int), 1, data->code_file);
+    for(int i = 10; i < 10 + Num_sup_jmps; i++)
+    {
+        if(stricmp (cmd_, Cmd_asm[i].name) == 0)
+        {
+            cur_len = Cmd_asm[i].par;
+            fwrite (&Cmd_asm[i].num, sizeof(int), 1, data->code_file);
+            break;
+        }
+    }
 
-    if(sscanf (data->Cur_line.begin_line + 5, "%d:", &val) != 0)
+    if(sscanf (data->Cur_line.begin_line + cur_len, "%d:", &val) != 0)
     {
         fwrite (&val, sizeof(int), 1, data->code_file);
-
         data->res_sum += 2;
     }
 
@@ -124,14 +127,14 @@ void handle_jump (Asm_data_ *data)
 
 void label_utility (Asm_data_ *data, char *cmd_)
 {
-    if(stricmp (cmd_, "jump") == 0)
+    if(cmd_[0] == ':')
     {
-        handle_jump (data);
+        handle_label (data);
     }
 
     else
     {
-        handle_label (data);
+        handle_jump (data, cmd_);
     }
 }
 

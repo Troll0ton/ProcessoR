@@ -105,6 +105,7 @@ double  stack_pop        (struct Stack *stk);
 void    stack_push       (struct Stack *stk, double elem);
 void    stack_resize     (struct Stack *stk, int opt_resize);
 void    stack_dump_      (struct Stack *stk);
+void    stack_dumps      (struct Stack *stk, FILE *log_file);
 void    verificate_stack (struct Stack *stk, int32_t new_hash);
 void    handle_errors    (struct Stack *stk);
 void    debug_stack      (struct Stack *stk);
