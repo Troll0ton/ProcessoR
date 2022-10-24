@@ -10,7 +10,16 @@
 
 //-----------------------------------------------------------------------------
 
-#define num_sup_cmd 11
+#include <stdint.h>
+
+//-----------------------------------------------------------------------------
+
+#define Num_sup_cmd 11
+
+//-----------------------------------------------------------------------------
+
+#define Cor_signature 0xBACAFE
+#define Incor_signature 0xDEADAC
 
 //-----------------------------------------------------------------------------
 
@@ -45,10 +54,9 @@ typedef struct Asm_data_
     FILE *file_in;
     FILE *code_file;
     FILE *label_file;
-
     Line Cur_line;
-
     int res_sum;
+    int32_t code_sgntr;
     int num_of_labels;
 } Asm_data_;
 
@@ -93,7 +101,7 @@ void handle_com_functs (Asm_data_ *data, char *cmd_);
 
 void Asm_data_ctor     (Asm_data_ *data);
 
-void codefile_ctor     (Asm_data_ *data);
+void files_ctor     (Asm_data_ *data);
 
 //-----------------------------------------------------------------------------
 

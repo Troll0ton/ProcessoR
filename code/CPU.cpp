@@ -1,14 +1,4 @@
 #include "../include/CPU.h"
-#include "../include/stack.h"
-
-//-----------------------------------------------------------------------------
-
-int main()
-{
-    processor ();
-
-    return 0;
-}
 
 //-----------------------------------------------------------------------------
 
@@ -20,23 +10,25 @@ void processor ()
     Stack stk1;
     stack_ctor (&stk1, 2);
 
-    FILE *code_file  = fopen ("../files/code.txt", "rb");
-    FILE *label_file = fopen ("../files/labels.txt", "rb");
+    FILE *code_file_  = fopen ("../files/code.txt", "rb");
+    FILE *label_file_ = fopen ("../files/labels.txt", "rb");
 
     int *labels = NULL;
 
     double *code = NULL;
 
-    read_label_file (label_file, &labels);
+    fseek (label_file_, 0, SEEK_SET);
 
-    read_code_file (code_file, &code);
+    read_label_file (label_file_, &labels);
+
+    read_code_file (code_file_, &code);
 
     calculator (&stk1, code, regs, ram, labels);
 
     stack_dtor (&stk1);
 
-    fclose (code_file);
-    fclose (label_file);
+    fclose (code_file_);
+    fclose (label_file_);
 }
 
 //-----------------------------------------------------------------------------
@@ -45,7 +37,7 @@ void code_dump (double *code, int size)
 {
     printf ("\n________________________CODE_DUMP__________________________\n\n");
 
-    for(int i = 0; i < size; i++)
+    for(int i = 0; i <= size; i++)
     {
         int num_nul = 0;
 
@@ -72,72 +64,117 @@ void code_dump (double *code, int size)
 
 //-----------------------------------------------------------------------------
 
-void read_label_file (FILE *label_file_, int **labels_)
+void label_dump (int *label, int size)
 {
-    int res_lab = 0;
+    printf ("\n________________________LABEL_DUMP__________________________\n\n");
 
-    fread (&res_lab, sizeof(int), 1, label_file_);
+    for(int i = 0; i <= size; i++)
+    {
+        int num_nul = 0;
 
-    *labels_ = (int*) calloc (res_lab, sizeof (int));
+        int pow = 1;
+
+        while(i / pow != 0)
+        {
+            pow *= 10;
+            num_nul++;
+        }
+
+        if(num_nul == 0)num_nul++;
+
+        for(int j = 0; j < 5 - num_nul; j++)
+        {
+            printf ("0");
+        }
+
+        printf ("%d || %d\n", i, label[i]);
+    }
+
+    printf ("___________________________________________________________\n\n");
+}
+
+//-----------------------------------------------------------------------------
+
+void read_label_file (FILE *label_file__, int **labels_)
+{
+    int res_lab = -1;
+
+    fread (&res_lab, sizeof(int), 1, label_file__);
+
+    *labels_ = (int*) calloc (res_lab + 1, sizeof (int));
+
+    (*labels_)[0] = res_lab;
 
     int val1 = -1;
 
     for(int i = 1; i <= res_lab; i++)
     {
-        fread (&val1, sizeof(int), 1, label_file_);
-        (*labels_)[i - 1] = val1;
+        fread (&val1, sizeof(int), 1, label_file__);
+        (*labels_)[i] = val1;
     }
+
+    label_dump ((*labels_), res_lab);
 }
 
 //-----------------------------------------------------------------------------
 
 void read_code_file (FILE *code_file_, double **code_)
 {
-    int res_sum = -1;
-    int cmd     = -1;
+    int res_sum    = -1;
+    int cmd        = -1;
+    int32_t code_sgntr = -1;
 
     fread (&res_sum, sizeof(int), 1, code_file_);
+    fread (&code_sgntr, sizeof(int32_t), 1, code_file_);
 
     *code_ = (double*) calloc (res_sum + 1, sizeof (double));
 
     (*code_)[0] = res_sum;
 
-    for(int ib = 1; ib <= res_sum; ib++)
+    if(code_sgntr == Cor_signature)
     {
-        fread (&cmd, sizeof(int), 1, code_file_);
-
-        (*code_)[ib] = (double) cmd;
-
-        for(int num_cmd = 0; num_cmd < num_sup_cmd; num_cmd++)
+        for(int ib = 1; ib <= res_sum; ib++)
         {
-            if(Cmd_cpu[num_cmd].num == cmd && Cmd_cpu[num_cmd].par == 1)
+            fread (&cmd, sizeof(int), 1, code_file_);
+
+            (*code_)[ib] = (double) cmd;
+
+            for(int num_cmd = 0; num_cmd < Num_sup_cmd; num_cmd++)
             {
-                ib++;
-                double val = 0;
-                fread (&val, sizeof(double), 1, code_file_);
+                if(Cmd_cpu[num_cmd].num == cmd && Cmd_cpu[num_cmd].par == 1)
+                {
+                    ib++;
+                    double val = 0;
+                    fread (&val, sizeof(double), 1, code_file_);
 
-                (*code_)[ib] = val;
-            }
+                    (*code_)[ib] = val;
+                }
 
-            else if(Cmd_cpu[num_cmd].num == cmd && Cmd_cpu[num_cmd].par > 1)
-            {
-                ib++;
-                int val2 = 0;
-                fread (&val2, sizeof(int), 1, code_file_);
+                else if(Cmd_cpu[num_cmd].num == cmd && Cmd_cpu[num_cmd].par > 1)
+                {
+                    ib++;
+                    int val2 = 0;
+                    fread (&val2, sizeof(int), 1, code_file_);
 
-                (*code_)[ib] = (double) val2;
+                    (*code_)[ib] = (double) val2;
+                }
             }
         }
+
+        code_dump ((*code_), res_sum);
     }
 
-    code_dump ((*code_), res_sum);
+    else
+    {
+        printf ("|Wrong signature!|\n");
+    }
 }
 
 //-----------------------------------------------------------------------------
 
 void calculator (Stack *stk_, double *code_, int *regs_, double *ram_, int *labels_)
 {
-    for(int ip = 1; ip < (int) code_[0]; ip++)
+    for(int ip = 1; ip <= (int) code_[0]; ip++)
     {
         int cmd_d = code_[ip];
         double arg_d = -1;
@@ -187,12 +224,12 @@ void calculator (Stack *stk_, double *code_, int *regs_, double *ram_, int *labe
                 {
                     int pos_ch = arg_d;
                     code_[ip + 1] = -1000;
-                    ip = labels_[pos_ch - 1] - 1;
+                    ip = labels_[pos_ch] - 1;
                 }
                 else ip++;
                 break;
             default:
-                printf ("?%d ", cmd_d);
+                printf ("?%d \n", cmd_d);
                 break;
         }
 

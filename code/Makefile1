@@ -1,7 +1,7 @@
-all: square
+all: proc
 
-square: ASM.o lines_handle.o input_output.o
-	g++ ASM.o lines_handle.o input_output.o
+proc: ASM.o lines_handle.o input_output.o CPU.o stack.o make_file.o
+	g++ ASM.o lines_handle.o input_output.o CPU.o stack.o make_file.o
 
 ASM.o: ASM.cpp
 	g++ -c ASM.cpp
@@ -11,6 +11,15 @@ lines_handle.o: lines_handle.cpp
 
 input_output.o: input_output.cpp
 	g++ -c input_output.cpp
+
+CPU.o: CPU.cpp
+	g++ -c CPU.cpp
+
+stack.o: stack.cpp
+	g++ -c stack.cpp
+
+make_file.o: make_file.cpp
+	g++ -c make_file.cpp
 
 clean:
 	rm -rf *.o

@@ -1,15 +1,4 @@
 #include "../include/ASM.h"
-#include "../include/lines_handle.h"
-#include "../include/input_output.h"
-
-//-----------------------------------------------------------------------------
-
-int main()
-{
-    assembler ();
-
-    return 0;
-}
 
 //-----------------------------------------------------------------------------
 
@@ -19,10 +8,11 @@ void assembler ()
 
     Asm_data_ctor (Asm_data);
 
-    codefile_ctor (Asm_data);
+    files_ctor (Asm_data);
 
     fclose (Asm_data->file_in);
     fclose (Asm_data->code_file);
+    fclose (Asm_data->label_file);
 }
 
 //-----------------------------------------------------------------------------
@@ -35,17 +25,19 @@ void Asm_data_ctor (Asm_data_ *data)
 
     data->res_sum = 0;
     data->num_of_labels = 0;
+
+    data->code_sgntr = Cor_signature;
 }
 
 //-----------------------------------------------------------------------------
 
-void codefile_ctor (Asm_data_ *data)
+void files_ctor (Asm_data_ *data)
 {
     File *File_input = file_reader (data->file_in);
 
     Line *Text = lines_separator (File_input);
 
-    fseek (data->code_file, sizeof(int), SEEK_SET);
+    fseek (data->code_file, sizeof(int) + sizeof(int32_t), SEEK_SET);
 
     for(int i = 0; i < File_input->num_of_lines; i++)
     {
@@ -73,6 +65,7 @@ void codefile_ctor (Asm_data_ *data)
 
     fseek  (data->code_file, 0, SEEK_SET);
     fwrite (&data->res_sum, sizeof(int), 1, data->code_file);
+    fwrite (&data->code_sgntr, sizeof(int32_t), 1, data->code_file);
 
     fseek  (data->label_file, 0, SEEK_SET);
     fwrite (&data->num_of_labels, sizeof(int), 1, data->label_file);
@@ -98,7 +91,7 @@ void handle_label (Asm_data_ *data)
 
     else
     {
-        printf ("ERROR");
+        data->code_sgntr = Incor_signature;
     }
 }
 
@@ -119,7 +112,7 @@ void handle_jump (Asm_data_ *data)
 
     else
     {
-        printf ("ERROR");
+        data->code_sgntr = Incor_signature;
     }
 }
 
@@ -214,6 +207,11 @@ void handle_ram_args (Asm_data_ *data, char *arg_)
             fwrite (&Cmd_asm[CMD_RM_PUSH].num, sizeof(int), 1, data->code_file);
             fwrite (&num_of_rmarg, sizeof(int), 1, data->code_file);
         }
+
+        else
+        {
+            data->code_sgntr = Incor_signature;
+        }
     }
 }
 
@@ -221,7 +219,7 @@ void handle_ram_args (Asm_data_ *data, char *arg_)
 
 void handle_com_functs (Asm_data_ *data, char *cmd_)
 {
-    for(int num_cmd = 0; num_cmd < num_sup_cmd; num_cmd++)
+    for(int num_cmd = 0; num_cmd < Num_sup_cmd; num_cmd++)
     {
         if(stricmp (cmd_, Cmd_asm[num_cmd].name) == 0)
         {
