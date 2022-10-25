@@ -117,6 +117,8 @@ void Asm_data_ctor     (Asm_data_ *data);
 
 void files_ctor        (Asm_data_ *data);
 
+void write_res_sums    (Asm_data_ *data);
+
 //-----------------------------------------------------------------------------
 
 #endif //ASM_H

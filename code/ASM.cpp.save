@@ -21,7 +21,7 @@ void assembler ()
 
 void Asm_data_ctor (Asm_data_ *data)
 {
-    data->file_in    = fopen ("../files/file3.txt",  "rb");
+    data->file_in    = fopen ("../files/file1.txt",  "rb");
     data->code_file  = fopen ("../files/code.txt",   "wb");
     data->label_file = fopen ("../files/labels.txt", "wb");
 
@@ -64,7 +64,7 @@ void files_ctor (Asm_data_ *data)
             handle_com_functs (data, cmd);
         }
     }
-
+    /////////////////////////////////////////
     fseek  (data->code_file, 0, SEEK_SET);
     fwrite (&data->res_sum, sizeof(int), 1, data->code_file);
     fwrite (&data->code_sgntr, sizeof(int32_t), 1, data->code_file);
@@ -92,11 +92,6 @@ void handle_label (Asm_data_ *data)
         fseek  (data->label_file, sizeof(int) * label, SEEK_SET);
         fwrite (&label_adr, sizeof(int), 1, data->label_file);
     }
-
-    else
-    {
-        data->code_sgntr = Incor_signature;
-    }
 }
 
 //-----------------------------------------------------------------------------
@@ -112,7 +107,6 @@ void handle_jump (Asm_data_ *data, char *cmd_)
         {
             cur_len = Cmd_asm[i].par;
             fwrite (&Cmd_asm[i].num, sizeof(int), 1, data->code_file);
-            printf ("AAAA");
             break;
         }
     }
@@ -120,7 +114,6 @@ void handle_jump (Asm_data_ *data, char *cmd_)
     if(sscanf (data->Cur_line.begin_line + cur_len, "%d:", &val) != 0)
     {
         fwrite (&val, sizeof(int), 1, data->code_file);
-
         data->res_sum += 2;
     }
 
@@ -134,14 +127,14 @@ void handle_jump (Asm_data_ *data, char *cmd_)
 
 void label_utility (Asm_data_ *data, char *cmd_)
 {
-    if(found_label (data))
+    if(cmd_[0] == ':')
     {
-        handle_jump (data, cmd_);
+        handle_label (data);
     }
 
     else
     {
-        handle_label (data);
+        handle_jump (data, cmd_);
     }
 }
 
@@ -244,3 +237,16 @@ void handle_com_functs (Asm_data_ *data, char *cmd_)
 }
 
 //-----------------------------------------------------------------------------
+
+void write_res_sums (Asm_data_ *data)
+{
+    fseek  (data->code_file, 0, SEEK_SET);
+    fwrite (&data->res_sum, sizeof(int), 1, data->code_file);
+    fwrite (&data->code_sgntr, sizeof(int32_t), 1, data->code_file);
+
+    fseek  (data->label_file, 0, SEEK_SET);
+    fwrite (&data->num_of_labels, sizeof(int), 1, data->label_file);
+}
+
+//-----------------------------------------------------------------------------
+

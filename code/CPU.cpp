@@ -40,11 +40,16 @@ void processor ()    //структура
 
 //-----------------------------------------------------------------------------
 
-void code_dump (double *code, int size)
+void code_dump (double *code, int size, int32_t code_sgntr)
 {
-    printf ("\n________________________CODE_DUMP__________________________\n\n");
+    FILE *code_dmp_file  = fopen ("../files/code_dump.txt", "w+");
 
-    for(int i = 0; i <= size; i++)
+    fprintf (code_dmp_file,
+             "\n________________________CODE_DUMP__________________________\n\n"
+             "|RES SUM|   - %lg\n"
+             "|Signature| - %x\n", code[0], code_sgntr);
+
+    for(int i = 1; i <= size; i++)
     {
         int num_nul = 0;
 
@@ -60,22 +65,28 @@ void code_dump (double *code, int size)
 
         for(int j = 0; j < 5 - num_nul; j++)
         {
-            printf ("0");
+            fprintf (code_dmp_file, "0");
         }
 
-        printf ("%d || %lg\n", i, code[i]);
+        fprintf (code_dmp_file, "%d || %lg\n", i, code[i]);
     }
 
-    printf ("___________________________________________________________\n\n");
+    fprintf (code_dmp_file, "___________________________________________________________\n\n");
+
+    fclose (code_dmp_file);
 }
 
 //-----------------------------------------------------------------------------
 
 void label_dump (int *label, int size)
 {
-    printf ("\n________________________LABEL_DUMP__________________________\n\n");
+    FILE *label_dmp_file  = fopen ("../files/label_dump.txt", "w+");
 
-    for(int i = 0; i <= size; i++)
+    fprintf (label_dmp_file,
+             "\n________________________LABEL_DUMP__________________________\n\n"
+             "|RES SUM|   - %d\n", label[0]);
+
+    for(int i = 1; i <= size; i++)
     {
         int num_nul = 0;
 
@@ -91,13 +102,15 @@ void label_dump (int *label, int size)
 
         for(int j = 0; j < 5 - num_nul; j++)
         {
-            printf ("0");
+            fprintf (label_dmp_file, "0");
         }
 
-        printf ("%d || %d\n", i, label[i]);
+        fprintf (label_dmp_file, "%d || %d\n", i, label[i]);
     }
 
-    printf ("___________________________________________________________\n\n");
+    fprintf (label_dmp_file, "____________________________________________________________\n\n");
+
+    fclose (label_dmp_file);
 }
 
 //-----------------------------------------------------------------------------
@@ -139,7 +152,7 @@ void read_code_file (FILE *code_file_, double **code_)
     {
         fill_code_array (code_file_, res_sum, *code_);
 
-        code_dump ((*code_), res_sum);
+        code_dump ((*code_), res_sum, code_sgntr);
     }
 
     else
@@ -155,7 +168,7 @@ void calculator (Stack *stk_, double *code_, int *regs_, double *ram_, int *labe
     for(int ip = 1; ip <= (int) code_[0]; ip++)
     {
         int cmd_d = code_[ip];
-        double arg_d = -1;
+        double arg_d = 0;
         double f1 = -1;
         double f2 = -1;
 

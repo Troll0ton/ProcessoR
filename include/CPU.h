@@ -19,14 +19,14 @@
 
 enum CMD_CODES_
 {
-    CMD_HLT_,
+    CMD_HLT_ = 0,
     CMD_PUSH_ = 0x11,
-    CMD_ADD_,
-    CMD_SUB_,
-    CMD_MUL_,
-    CMD_DIV_,
-    CMD_OUT_,
-    CMD_DUMP_,
+    CMD_ADD_ = 2,
+    CMD_SUB_ = 3,
+    CMD_MUL_ = 4,
+    CMD_DIV_ = 5,
+    CMD_OUT_ = 6,
+    CMD_DUMP_ = 7,
     CMD_RG_PUSH_ = 0x21,
     CMD_RM_PUSH_ = 0x41,
     CMD_JBE_ = 10 + 16,
@@ -71,7 +71,7 @@ const Cmd_got Cmd_cpu[] =
 
 void processor       ();
 
-void code_dump       (double *code, int size);
+void code_dump       (double *code, int size, int32_t code_sgntr);
 
 void read_label_file (FILE *label_file_, int **labels_);
 

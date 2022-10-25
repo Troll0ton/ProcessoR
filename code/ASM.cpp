@@ -65,12 +65,7 @@ void files_ctor (Asm_data_ *data)
         }
     }
 
-    fseek  (data->code_file, 0, SEEK_SET);
-    fwrite (&data->res_sum, sizeof(int), 1, data->code_file);
-    fwrite (&data->code_sgntr, sizeof(int32_t), 1, data->code_file);
-
-    fseek  (data->label_file, 0, SEEK_SET);
-    fwrite (&data->num_of_labels, sizeof(int), 1, data->label_file);
+    write_res_sums (data);
 
     clear_mem (Text, File_input);
 }
@@ -237,3 +232,16 @@ void handle_com_functs (Asm_data_ *data, char *cmd_)
 }
 
 //-----------------------------------------------------------------------------
+
+void write_res_sums (Asm_data_ *data)
+{
+    fseek  (data->code_file, 0, SEEK_SET);
+    fwrite (&data->res_sum, sizeof(int), 1, data->code_file);
+    fwrite (&data->code_sgntr, sizeof(int32_t), 1, data->code_file);
+
+    fseek  (data->label_file, 0, SEEK_SET);
+    fwrite (&data->num_of_labels, sizeof(int), 1, data->label_file);
+}
+
+//-----------------------------------------------------------------------------
+
