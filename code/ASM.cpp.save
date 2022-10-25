@@ -5,7 +5,6 @@
 void assembler ()
 {
     Asm_data_ *Asm_data = (Asm_data_*) calloc (1, sizeof (Asm_data_));
-
     Asm_data_ctor (Asm_data);
 
     files_ctor (Asm_data);
@@ -21,9 +20,9 @@ void assembler ()
 
 void Asm_data_ctor (Asm_data_ *data)
 {
-    data->file_in    = fopen ("../files/file1.txt",  "rb");
-    data->code_file  = fopen ("../files/code.txt",   "wb");
-    data->label_file = fopen ("../files/labels.txt", "wb");
+    data->file_in    = fopen ("../files/file4.txt",  "rb");
+    data->code_file  = fopen ("../files/code.bin",   "wb");
+    data->label_file = fopen ("../files/labels.bin", "wb");
 
     data->res_sum = 0;
     data->num_of_labels = 0;
@@ -36,7 +35,6 @@ void Asm_data_ctor (Asm_data_ *data)
 void files_ctor (Asm_data_ *data)
 {
     File *File_input = file_reader (data->file_in);
-
     Line *Text = lines_separator (File_input);
 
     fseek (data->code_file, sizeof(int) + sizeof(int32_t), SEEK_SET);
@@ -64,13 +62,8 @@ void files_ctor (Asm_data_ *data)
             handle_com_functs (data, cmd);
         }
     }
-    /////////////////////////////////////////
-    fseek  (data->code_file, 0, SEEK_SET);
-    fwrite (&data->res_sum, sizeof(int), 1, data->code_file);
-    fwrite (&data->code_sgntr, sizeof(int32_t), 1, data->code_file);
 
-    fseek  (data->label_file, 0, SEEK_SET);
-    fwrite (&data->num_of_labels, sizeof(int), 1, data->label_file);
+    write_res_sums (data);
 
     clear_mem (Text, File_input);
 }

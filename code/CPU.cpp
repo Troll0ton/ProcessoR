@@ -4,17 +4,15 @@
 
 void processor ()    //структура
 {
-    int regs[5] = {99, 98, 97, 96, 95};
+    int regs[5]   = {99, 98, 97, 96, 95};
     double ram[3] = {999,999,999};
-
-    //-----------------------------------------------------------------------------
 
     Stack stk1;
     stack_ctor (&stk1, 2);
 
     FILE *code_file_  = fopen ("../files/code.bin",   "rb");
     FILE *label_file_ = fopen ("../files/labels.bin", "rb");
-    FILE *log_file    = fopen ("../files/log.txt",    "w+");
+    FILE *log_file    = fopen ("../dump/log.txt",    "w+");
 
     int *labels = NULL;
 
@@ -42,7 +40,7 @@ void processor ()    //структура
 
 void code_dump (double *code, int size, int32_t code_sgntr)
 {
-    FILE *code_dmp_file  = fopen ("../files/code_dump.txt", "w+");
+    FILE *code_dmp_file  = fopen ("../dump/code_dump.txt", "w+");
 
     fprintf (code_dmp_file,
              "\n________________________CODE_DUMP__________________________\n\n"
@@ -80,7 +78,7 @@ void code_dump (double *code, int size, int32_t code_sgntr)
 
 void label_dump (int *label, int size)
 {
-    FILE *label_dmp_file  = fopen ("../files/label_dump.txt", "w+");
+    FILE *label_dmp_file  = fopen ("../dump/label_dump.txt", "w+");
 
     fprintf (label_dmp_file,
              "\n________________________LABEL_DUMP__________________________\n\n"
@@ -167,10 +165,8 @@ void calculator (Stack *stk_, double *code_, int *regs_, double *ram_, int *labe
 {
     for(int ip = 1; ip <= (int) code_[0]; ip++)
     {
-        int cmd_d = code_[ip];
+        int cmd_d    = code_[ip];
         double arg_d = 0;
-        double f1 = -1;
-        double f2 = -1;
 
         stack_dumps (stk_, file_log);
 
@@ -180,118 +176,7 @@ void calculator (Stack *stk_, double *code_, int *regs_, double *ram_, int *labe
 
         if(cmd_d & ARG_RAM)   arg_d = ram_[(int) arg_d];
 
-        //handle_cmds (stk_, cmd_d, arg_d);
-
-        switch(cmd_d)
-        {
-            case CMD_PUSH_:
-                stack_push (stk_, arg_d);
-                ip++;
-                break;
-            case CMD_RG_PUSH_:
-                stack_push (stk_, arg_d);
-                ip++;
-                break;
-            case CMD_RM_PUSH_:
-                stack_push (stk_, arg_d);
-                ip++;
-                break;
-            case CMD_ADD_:
-                stack_push (stk_, stack_pop (stk_) + stack_pop (stk_));
-                break;
-            case CMD_SUB_:
-                stack_push (stk_, -(stack_pop (stk_) - stack_pop (stk_)));
-                break;
-            case CMD_MUL_:
-                stack_push (stk_, stack_pop (stk_) * stack_pop (stk_));
-                break;
-            case CMD_DIV_:
-                stack_push (stk_, 1 / stack_pop (stk_) * stack_pop (stk_));
-                break;
-            case CMD_HLT_:
-                break;
-            case CMD_OUT_:
-                printf ("result: %lg\n", stack_pop (stk_));
-                break;
-            case CMD_DUMP_:
-                printf ("|dump|\n");
-                break;
-            case CMD_JB_:
-                f2 = stack_pop (stk_);
-                f1 = stack_pop (stk_);
-                if(f1 < f2)
-                {
-                    int pos_ch = arg_d;
-                    ip = labels_[pos_ch];
-                }
-                else ip++;
-                stack_push (stk_, f1);
-                stack_push (stk_, f2);
-                break;
-            case CMD_JBE_:
-                f2 = stack_pop (stk_);
-                f1 = stack_pop (stk_);
-                if(f1 <= f2)
-                {
-                    int pos_ch = arg_d;
-                    ip = labels_[pos_ch];
-                }
-                else ip++;
-                stack_push (stk_, f1);
-                stack_push (stk_, f2);
-                break;
-            case CMD_JA_:
-                f2 = stack_pop (stk_);
-                f1 = stack_pop (stk_);
-                if(f1 > f2)
-                {
-                    int pos_ch = arg_d;
-                    ip = labels_[pos_ch];
-                }
-                else ip++;
-                stack_push (stk_, f1);
-                stack_push (stk_, f2);
-                break;
-            case CMD_JAE_:
-                f2 = stack_pop (stk_);
-                f1 = stack_pop (stk_);
-                if(f1 >= f2)
-                {
-                    int pos_ch = arg_d;
-                    ip = labels_[pos_ch];
-                }
-                else ip++;
-                stack_push (stk_, f1);
-                stack_push (stk_, f2);
-                break;
-            case CMD_JE_:
-                f2 = stack_pop (stk_);
-                f1 = stack_pop (stk_);
-                if(is_equal(f1,f2))
-                {
-                    int pos_ch = arg_d;
-                    ip = labels_[pos_ch];
-                }
-                else ip++;
-                stack_push (stk_, f1);
-                stack_push (stk_, f2);
-                break;
-            case CMD_JNE_:
-                f2 = stack_pop (stk_);
-                f1 = stack_pop (stk_);
-                if(!is_equal(f1,f2))
-                {
-                    int pos_ch = arg_d;
-                    ip = labels_[pos_ch];
-                }
-                else ip++;
-                stack_push (stk_, f1);
-                stack_push (stk_, f2);
-                break;
-            default:
-                printf ("?%d \n", cmd_d);
-                break;
-        }
+        handle_cmds (stk_, cmd_d, arg_d, &ip, labels_);
     }
 }
 
@@ -344,9 +229,14 @@ bool is_equal (double a, double b)
 
 //-----------------------------------------------------------------------------
 
-void handle_cmds (Stack *stk, int cmd_d, double arg_d)
+void handle_cmds (Stack *stk, int cmd_d, double arg_d, int *ipp, int *labels_)
 {
-    #define CMD_(stk, cmd, arg, code) \
+    int ip = *ipp;
+
+    double f1 = -1;
+    double f2 = -1;
+
+    #define CMD_(stk, cmd, arg, ip, code) \
         case cmd:                     \
             code                      \
             break;
@@ -356,13 +246,13 @@ void handle_cmds (Stack *stk, int cmd_d, double arg_d)
         #include "../include/codegen.h"
 
         default:
-            printf ("SIGILL %d\n");
-            return 1;
+            printf ("?%d \n", cmd_d);
+            break;
     }
 
     #undef DEF_CMD
 
-    return 0;
+    *ipp = ip;
 }
 
 //-----------------------------------------------------------------------------

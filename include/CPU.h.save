@@ -10,25 +10,25 @@
 
 //-----------------------------------------------------------------------------
 
-#define ARG_IMMED 0x10
-#define ARG_REG   0x20
-#define ARG_RAM   0x40
+#define ARG_IMMED 0x20
+#define ARG_REG   0x40
+#define ARG_RAM   0x80
 #define ARG_      0xF
 
 //-----------------------------------------------------------------------------
 
 enum CMD_CODES_
 {
-    CMD_HLT_,
-    CMD_PUSH_ = 0x11,
-    CMD_ADD_,
-    CMD_SUB_,
-    CMD_MUL_,
-    CMD_DIV_,
-    CMD_OUT_,
-    CMD_DUMP_,
-    CMD_RG_PUSH_ = 0x21,
-    CMD_RM_PUSH_ = 0x41,
+    CMD_HLT_ = 0,
+    CMD_PUSH_ = 0x21,
+    CMD_ADD_ = 2,
+    CMD_SUB_ = 3,
+    CMD_MUL_ = 4,
+    CMD_DIV_ = 5,
+    CMD_OUT_ = 6,
+    CMD_DUMP_ = 7,
+    CMD_RG_PUSH_ = 0x41,
+    CMD_RM_PUSH_ = 0x81,
     CMD_JBE_ = 10 + 16,
     CMD_JAE_ = 11 + 16,
     CMD_JA_  = 12 + 16,
@@ -71,7 +71,7 @@ const Cmd_got Cmd_cpu[] =
 
 void processor       ();
 
-void code_dump       (double *code, int size);
+void code_dump       (double *code, int size, int32_t code_sgntr);
 
 void read_label_file (FILE *label_file_, int **labels_);
 
@@ -84,6 +84,8 @@ void label_dump      (int *label, int size);
 void fill_code_array (FILE *code_file_, int res_sum_, double *code_);
 
 bool is_equal        (double a, double b);
+
+void handle_cmds     (Stack *stk, int cmd_d, double arg_d, int *ip, int *labels_);
 
 //-----------------------------------------------------------------------------
 

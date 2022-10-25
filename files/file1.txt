@@ -1,17 +1,9 @@
 push 200
-push 50
-
-:2
-push 100
+push rax
 add
-jbe 2:
 
-
+push [2]
 add
-:8
-
-push 5
-div
 
 
 out

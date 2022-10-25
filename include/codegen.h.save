@@ -1,0 +1,143 @@
+CMD_(stk, CMD_PUSH_, arg_d, ip,
+{
+    stack_push (stk, arg_d);
+    ip++;
+})
+
+CMD_(stk, CMD_RG_PUSH_, arg_d, ip,
+{
+    stack_push (stk, arg_d);
+    ip++;
+})
+
+CMD_(stk, CMD_RM_PUSH_, arg_d, ip,
+{
+    stack_push (stk, arg_d);
+    ip++;
+})
+
+CMD_(stk, CMD_ADD_, arg_d, ip,
+{
+    stack_push (stk, stack_pop (stk) + stack_pop (stk));
+})
+    
+CMD_(stk, CMD_SUB_, arg_d, ip,
+{
+    stack_push (stk, -(stack_pop (stk) - stack_pop (stk)));
+})
+
+CMD_(stk, CMD_MUL_, arg_d, ip,
+{
+    stack_push (stk, stack_pop (stk) * stack_pop (stk));
+})
+
+CMD_(stk, CMD_DIV_, arg_d, ip,
+{
+    stack_push (stk, 1 / stack_pop (stk) * stack_pop (stk));
+})
+
+CMD_(stk, CMD_HLT_, arg_d, ip,
+{
+    ip = -1;
+})
+
+CMD_(stk, CMD_OUT_, arg_d, ip,
+{
+    printf ("result: %lg\n", stack_pop (stk));
+})
+
+CMD_(stk, CMD_DUMP_, arg_d, ip,
+{
+    printf ("|dump|\n");
+})
+
+CMD_(stk, CMD_JB_, arg_d, ip,
+{
+    f2 = stack_pop (stk_);
+    f1 = stack_pop (stk_);
+    if(f1 < f2)
+    {
+        int pos_ch = arg_d;
+        ip = labels_[pos_ch];
+    }
+    else ip++;
+    stack_push (stk_, f1);
+    stack_push (stk_, f2);
+})
+
+CMD_(stk, CMD_JBE_, arg_d, ip,
+{
+    f2 = stack_pop (stk_);
+    f1 = stack_pop (stk_);
+    if(f1 <= f2)
+    {
+        int pos_ch = arg_d;
+        ip = labels_[pos_ch];
+    }
+    else ip++;
+    stack_push (stk_, f1);
+    stack_push (stk_, f2);
+})
+
+CMD_(stk, CMD_JA_, arg_d, ip,
+{
+    f2 = stack_pop (stk_);
+    f1 = stack_pop (stk_);
+    if(f1 > f2)
+    {
+        int pos_ch = arg_d;
+        ip = labels_[pos_ch];
+    }
+    else ip++;
+    stack_push (stk_, f1);
+    stack_push (stk_, f2);
+    break;
+})
+case CMD_JA_:
+    f2 = stack_pop (stk_);
+    f1 = stack_pop (stk_);
+    if(f1 > f2)
+    {
+        int pos_ch = arg_d;
+        ip = labels_[pos_ch];
+    }
+    else ip++;
+    stack_push (stk_, f1);
+    stack_push (stk_, f2);
+    break;
+case CMD_JAE_:
+    f2 = stack_pop (stk_);
+    f1 = stack_pop (stk_);
+    if(f1 >= f2)
+    {
+        int pos_ch = arg_d;
+        ip = labels_[pos_ch];
+    }
+    else ip++;
+    stack_push (stk_, f1);
+    stack_push (stk_, f2);
+    break;
+case CMD_JE_:
+    f2 = stack_pop (stk_);
+    f1 = stack_pop (stk_);
+    if(is_equal(f1,f2))
+    {
+        int pos_ch = arg_d;
+        ip = labels_[pos_ch];
+    }
+    else ip++;
+    stack_push (stk_, f1);
+    stack_push (stk_, f2);
+    break;
+case CMD_JNE_:
+    f2 = stack_pop (stk_);
+    f1 = stack_pop (stk_);
+    if(!is_equal(f1,f2))
+    {
+        int pos_ch = arg_d;
+        ip = labels_[pos_ch];
+    }
+    else ip++;
+    stack_push (stk_, f1);
+    stack_push (stk_, f2);
+    break;

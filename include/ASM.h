@@ -22,7 +22,7 @@
 
 //-----------------------------------------------------------------------------
 
-#define Cor_signature 0xBACAFE
+#define Cor_signature   0xBACAFE
 #define Incor_signature 0xDEADAC
 
 //-----------------------------------------------------------------------------
@@ -74,21 +74,21 @@ typedef struct Asm_data_
 const Cmd Cmd_asm[] =
 {
     {"hlt",  CMD_HLT,  0},
-    {"push", 0x11,     1},
+    {"push", 0x21,     1},
     {"add",  CMD_ADD,  0},
     {"sub",  CMD_SUB,  0},
     {"mul",  CMD_MUL,  0},
     {"div",  CMD_DIV,  0},
     {"out",  CMD_OUT,  0},
     {"dump", CMD_DUMP, 0},
-    {"push", 0x21,     3},
-    {"push", 0x41,     4},
-    {"jbe",  CMD_JBE + 16,  3},
-    {"jae",  CMD_JAE + 16,  3},
-    {"ja",   CMD_JB + 16,   2},
-    {"jb",   CMD_JA + 16,   2},
-    {"je",   CMD_JE + 16,   2},
-    {"jne",  CMD_JNE + 16,  3},
+    {"push", 0x41,     3},
+    {"push", 0x81,     4},
+    {"jbe",  CMD_JBE + 0x20,  3},
+    {"jae",  CMD_JAE + 0x20,  3},
+    {"ja",   CMD_JB + 0x20,   2},
+    {"jb",   CMD_JA + 0x20,   2},
+    {"je",   CMD_JE + 0x20,   2},
+    {"jne",  CMD_JNE + 0x20,  3},
 };
 
 //-----------------------------------------------------------------------------

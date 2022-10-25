@@ -5,7 +5,6 @@
 void assembler ()
 {
     Asm_data_ *Asm_data = (Asm_data_*) calloc (1, sizeof (Asm_data_));
-
     Asm_data_ctor (Asm_data);
 
     files_ctor (Asm_data);
@@ -21,7 +20,7 @@ void assembler ()
 
 void Asm_data_ctor (Asm_data_ *data)
 {
-    data->file_in    = fopen ("../files/file1.txt",  "rb");
+    data->file_in    = fopen ("../files/file4.txt",  "rb");
     data->code_file  = fopen ("../files/code.bin",   "wb");
     data->label_file = fopen ("../files/labels.bin", "wb");
 
@@ -36,7 +35,6 @@ void Asm_data_ctor (Asm_data_ *data)
 void files_ctor (Asm_data_ *data)
 {
     File *File_input = file_reader (data->file_in);
-
     Line *Text = lines_separator (File_input);
 
     fseek (data->code_file, sizeof(int) + sizeof(int32_t), SEEK_SET);
@@ -93,7 +91,7 @@ void handle_label (Asm_data_ *data)
 
 void handle_jump (Asm_data_ *data, char *cmd_)
 {
-    int val = -1;
+    int val     = -1;
     int cur_len = -1;
 
     for(int i = 10; i < 10 + Num_sup_jmps; i++)
