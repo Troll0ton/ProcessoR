@@ -12,9 +12,9 @@ void processor ()    //структура
     Stack stk1;
     stack_ctor (&stk1, 2);
 
-    FILE *code_file_  = fopen ("../files/code.txt", "rb");
-    FILE *label_file_ = fopen ("../files/labels.txt", "rb");
-    FILE *log_file    = fopen ("../files/log.txt", "w+");
+    FILE *code_file_  = fopen ("../files/code.bin",   "rb");
+    FILE *label_file_ = fopen ("../files/labels.bin", "rb");
+    FILE *log_file    = fopen ("../files/log.txt",    "w+");
 
     int *labels = NULL;
 
@@ -180,6 +180,8 @@ void calculator (Stack *stk_, double *code_, int *regs_, double *ram_, int *labe
 
         if(cmd_d & ARG_RAM)   arg_d = ram_[(int) arg_d];
 
+        //handle_cmds (stk_, cmd_d, arg_d);
+
         switch(cmd_d)
         {
             case CMD_PUSH_:
@@ -339,21 +341,22 @@ bool is_equal (double a, double b)
     return (a - b < EPS && a - b > -EPS);
 }
 
+
 //-----------------------------------------------------------------------------
 
-int handle_cmds (Stack* self, const char* code, int* ip, Processor* CpuInfo)
+void handle_cmds (Stack *stk, int cmd_d, double arg_d)
 {
-    #define DEF_CMD(name, len, offset, code) \
-        case name:                   \
-            code                     \
+    #define CMD_(stk, cmd, arg, code) \
+        case cmd:                     \
+            code                      \
             break;
 
-    switch (*code & CMD_BITMASK)
+    switch (cmd_d)
     {
         #include "../include/codegen.h"
 
         default:
-            printf ("SIGILL %d\n", *code);
+            printf ("SIGILL %d\n");
             return 1;
     }
 

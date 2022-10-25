@@ -2,6 +2,10 @@ case CMD_PUSH_:
     stack_push (stk_, arg_d);
     ip++;
     break;
+CMD_(101,
+{
+    printf ("COLL!3");
+})
 case CMD_RG_PUSH_:
     stack_push (stk_, arg_d);
     ip++;

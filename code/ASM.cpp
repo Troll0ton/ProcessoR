@@ -22,8 +22,8 @@ void assembler ()
 void Asm_data_ctor (Asm_data_ *data)
 {
     data->file_in    = fopen ("../files/file1.txt",  "rb");
-    data->code_file  = fopen ("../files/code.txt",   "wb");
-    data->label_file = fopen ("../files/labels.txt", "wb");
+    data->code_file  = fopen ("../files/code.bin",   "wb");
+    data->label_file = fopen ("../files/labels.bin", "wb");
 
     data->res_sum = 0;
     data->num_of_labels = 0;
