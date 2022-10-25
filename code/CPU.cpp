@@ -341,3 +341,27 @@ bool is_equal (double a, double b)
 
 //-----------------------------------------------------------------------------
 
+int handle_cmds (Stack* self, const char* code, int* ip, Processor* CpuInfo)
+{
+    #define DEF_CMD(name, len, offset, code) \
+        case name:                   \
+            code                     \
+            break;
+
+    switch (*code & CMD_BITMASK)
+    {
+        #include "../include/codegen.h"
+
+        default:
+            printf ("SIGILL %d\n", *code);
+            return 1;
+    }
+
+    #undef DEF_CMD
+
+    return 0;
+}
+
+//-----------------------------------------------------------------------------
+
+
