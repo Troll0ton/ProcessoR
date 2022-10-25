@@ -1,0 +1,136 @@
+stk1[0064FE84](OK) at CPU.cpp, LINE - 13 
+{                           
+    canary_open  = badded       
+    canary_close = dedbad       
+    hash         = 0       
+    size_stk     = 0       
+    capacity_stk = 2       
+                            
+    buffer_stk[00D12ED0]          
+    {                       
+          [0] = 0        
+          [1] = 0        
+    }                       
+}                           
+
+_____________________________________________________________
+
+stk1[0064FE84](OK) at CPU.cpp, LINE - 13 
+{                           
+    canary_open  = badded       
+    canary_close = dedbad       
+    hash         = 0       
+    size_stk     = 0       
+    capacity_stk = 2       
+                            
+    buffer_stk[00D12ED0]          
+    {                       
+          [0] = 0        
+          [1] = 0        
+    }                       
+}                           
+
+_____________________________________________________________
+
+stk1[0064FE84](OK) at CPU.cpp, LINE - 13 
+{                           
+    canary_open  = badded       
+    canary_close = dedbad       
+    hash         = 0       
+    size_stk     = 0       
+    capacity_stk = 2       
+                            
+    buffer_stk[00D12ED0]          
+    {                       
+          [0] = 0        
+          [1] = 0        
+    }                       
+}                           
+
+_____________________________________________________________
+
+stk1[0064FE84](OK) at CPU.cpp, LINE - 13 
+{                           
+    canary_open  = badded       
+    canary_close = dedbad       
+    hash         = 0       
+    size_stk     = 0       
+    capacity_stk = 2       
+                            
+    buffer_stk[00D12ED0]          
+    {                       
+          [0] = 0        
+          [1] = 0        
+    }                       
+}                           
+
+_____________________________________________________________
+
+stk1[0064FE84](OK) at CPU.cpp, LINE - 13 
+{                           
+    canary_open  = badded       
+    canary_close = dedbad       
+    hash         = 0       
+    size_stk     = 1       
+    capacity_stk = 2       
+                            
+    buffer_stk[00D12ED0]          
+    {                       
+          [0] = 9.78789e-305        
+          [1] = 0        
+    }                       
+}                           
+
+_____________________________________________________________
+
+stk1[0064FE84](OK) at CPU.cpp, LINE - 13 
+{                           
+    canary_open  = badded       
+    canary_close = dedbad       
+    hash         = ffff8f1c       
+    size_stk     = 2       
+    capacity_stk = 2       
+                            
+    buffer_stk[00D12ED0]          
+    {                       
+          [0] = 9.78789e-305        
+          [1] = -1        
+    }                       
+}                           
+
+_____________________________________________________________
+
+stk1[0064FE84](OK) at CPU.cpp, LINE - 13 
+{                           
+    canary_open  = badded       
+    canary_close = dedbad       
+    hash         = ffff8f1c       
+    size_stk     = 2       
+    capacity_stk = 2       
+                            
+    buffer_stk[00D12ED0]          
+    {                       
+          [0] = 9.78789e-305        
+          [1] = -1        
+    }                       
+}                           
+
+_____________________________________________________________
+
+stk1[0064FE84](OK) at CPU.cpp, LINE - 13 
+{                           
+    canary_open  = badded       
+    canary_close = dedbad       
+    hash         = ffff8f1c       
+    size_stk     = 2       
+    capacity_stk = 2       
+                            
+    buffer_stk[00D12ED0]          
+    {                       
+          [0] = 9.78789e-305        
+          [1] = -1        
+    }                       
+}                           
+
+_____________________________________________________________
+

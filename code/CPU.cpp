@@ -2,7 +2,7 @@
 
 //-----------------------------------------------------------------------------
 
-void processor ()
+void processor ()    //структура
 {
     int regs[5] = {99, 98, 97, 96, 95};
     double ram[3] = {999,999,999};
@@ -161,11 +161,11 @@ void calculator (Stack *stk_, double *code_, int *regs_, double *ram_, int *labe
 
         stack_dumps (stk_, file_log);
 
-        if(cmd_d & ARG_REG) arg_d = regs_[(int) code_[ip + 1]];
+        if(cmd_d & ARG_IMMED) arg_d += code_[ip + 1];
 
-        else if(cmd_d & ARG_RAM) arg_d = ram_[(int) code_[ip + 1]];
+        if(cmd_d & ARG_REG)   arg_d += regs_[(int) code_[ip + 1]];
 
-        else arg_d = code_[ip + 1];
+        if(cmd_d & ARG_RAM)   arg_d = ram_[(int) arg_d];
 
         switch(cmd_d)
         {

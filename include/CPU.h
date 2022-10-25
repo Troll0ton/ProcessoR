@@ -10,8 +10,8 @@
 
 //-----------------------------------------------------------------------------
 
-#define ARG_REG   0x10
-#define ARG_IMMED 0x20
+#define ARG_IMMED 0x10
+#define ARG_REG   0x20
 #define ARG_RAM   0x40
 #define ARG_      0xF
 
@@ -20,21 +20,21 @@
 enum CMD_CODES_
 {
     CMD_HLT_,
-    CMD_PUSH_,
+    CMD_PUSH_ = 0x11,
     CMD_ADD_,
     CMD_SUB_,
     CMD_MUL_,
     CMD_DIV_,
     CMD_OUT_,
     CMD_DUMP_,
-    CMD_RG_PUSH_ = 0x11,
+    CMD_RG_PUSH_ = 0x21,
     CMD_RM_PUSH_ = 0x41,
-    CMD_JBE_ = 10,
-    CMD_JAE_ = 11,
-    CMD_JA_  = 12,
-    CMD_JB_  = 13,
-    CMD_JE_  = 14,
-    CMD_JNE_ = 15,
+    CMD_JBE_ = 10 + 16,
+    CMD_JAE_ = 11 + 16,
+    CMD_JA_  = 12 + 16,
+    CMD_JB_  = 13 + 16,
+    CMD_JE_  = 14 + 16,
+    CMD_JNE_ = 15 + 16,
 };
 
 //-----------------------------------------------------------------------------

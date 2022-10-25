@@ -2,7 +2,7 @@
 
 //-----------------------------------------------------------------------------
 
-void processor ()
+void processor ()    //структура
 {
     int regs[5] = {99, 98, 97, 96, 95};
     double ram[3] = {999,999,999};
@@ -160,12 +160,12 @@ void calculator (Stack *stk_, double *code_, int *regs_, double *ram_, int *labe
         double f2 = -1;
 
         stack_dumps (stk_, file_log);
+        
+        if(cmd_d & ARG_IMMED) arg_d = code_[ip + 1];
 
-        if(cmd_d & ARG_REG) arg_d = regs_[(int) code_[ip + 1]];
+        if(cmd_d & ARG_REG)   arg_d += regs_[(int) code_[ip + 1]];
 
-        else if(cmd_d & ARG_RAM) arg_d = ram_[(int) code_[ip + 1]];
-
-        else arg_d = code_[ip + 1];
+        if(cmd_d & ARG_RAM)   arg_d = ram_[(int) code_[ip + 1]];
 
         switch(cmd_d)
         {
@@ -207,7 +207,6 @@ void calculator (Stack *stk_, double *code_, int *regs_, double *ram_, int *labe
                 if(f1 < f2)
                 {
                     int pos_ch = arg_d;
-                    code_[ip + 1] = -1000;
                     ip = labels_[pos_ch];
                 }
                 else ip++;
@@ -220,7 +219,6 @@ void calculator (Stack *stk_, double *code_, int *regs_, double *ram_, int *labe
                 if(f1 <= f2)
                 {
                     int pos_ch = arg_d;
-                    code_[ip + 1] = -1000;
                     ip = labels_[pos_ch];
                 }
                 else ip++;
@@ -233,7 +231,6 @@ void calculator (Stack *stk_, double *code_, int *regs_, double *ram_, int *labe
                 if(f1 > f2)
                 {
                     int pos_ch = arg_d;
-                    code_[ip + 1] = -1000;
                     ip = labels_[pos_ch];
                 }
                 else ip++;
@@ -246,7 +243,6 @@ void calculator (Stack *stk_, double *code_, int *regs_, double *ram_, int *labe
                 if(f1 >= f2)
                 {
                     int pos_ch = arg_d;
-                    code_[ip + 1] = -1000;
                     ip = labels_[pos_ch];
                 }
                 else ip++;
@@ -259,7 +255,6 @@ void calculator (Stack *stk_, double *code_, int *regs_, double *ram_, int *labe
                 if(is_equal(f1,f2))
                 {
                     int pos_ch = arg_d;
-                    code_[ip + 1] = -1000;
                     ip = labels_[pos_ch];
                 }
                 else ip++;
@@ -269,12 +264,9 @@ void calculator (Stack *stk_, double *code_, int *regs_, double *ram_, int *labe
             case CMD_JNE_:
                 f2 = stack_pop (stk_);
                 f1 = stack_pop (stk_);
-                
-                printf ("");
                 if(!is_equal(f1,f2))
                 {
                     int pos_ch = arg_d;
-                    code_[ip + 1] = -1000;
                     ip = labels_[pos_ch];
                 }
                 else ip++;

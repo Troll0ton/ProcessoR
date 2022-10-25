@@ -39,10 +39,10 @@ enum CMD_CODES
     CMD_DUMP,
     CMD_RG_PUSH,
     CMD_RM_PUSH,
-    CMD_JB,
     CMD_JBE,
-    CMD_JA,
     CMD_JAE,
+    CMD_JA,
+    CMD_JB,
     CMD_JE,
     CMD_JNE,
 };
@@ -74,21 +74,21 @@ typedef struct Asm_data_
 const Cmd Cmd_asm[] =
 {
     {"hlt",  CMD_HLT,  0},
-    {"push", CMD_PUSH, 1},
+    {"push", 0x11,     1},
     {"add",  CMD_ADD,  0},
     {"sub",  CMD_SUB,  0},
     {"mul",  CMD_MUL,  0},
     {"div",  CMD_DIV,  0},
     {"out",  CMD_OUT,  0},
     {"dump", CMD_DUMP, 0},
-    {"push", 0x11,     3},
+    {"push", 0x21,     3},
     {"push", 0x41,     4},
-    {"jb",   CMD_JUMP  5},
-    {"jbe",  CMD_JUMP  5},
-    {"ja",   CMD_JUMP  5},
-    {"jae",  CMD_JUMP  5},
-    {"je",   CMD_JUMP  5},
-    {"jne",  CMD_JUMP  5},
+    {"jbe",  CMD_JBE + 16,  3},
+    {"jae",  CMD_JAE + 16,  3},
+    {"ja",   CMD_JB + 16,   2},
+    {"jb",   CMD_JA + 16,   2},
+    {"je",   CMD_JE + 16,   2},
+    {"jne",  CMD_JNE + 16,  3},
 };
 
 //-----------------------------------------------------------------------------
@@ -99,7 +99,7 @@ void label_utility     (Asm_data_ *data, char *cmd_);
 
 void handle_label      (Asm_data_ *data);
 
-void handle_jump       (Asm_data_ *data);
+void handle_jump       (Asm_data_ *data, char *cmd_);
 
 bool found_label       (Asm_data_ *data);
 

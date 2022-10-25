@@ -4,32 +4,7 @@ push [2]
 push rbx
 add
 
-:2
-push 100
 add
-jbe 2:
-
-
-add
-:8
-
-je 5:
-
-push 80
-push 80
-add
-add
-
-:5
-
-push 100
-sub
-
-push 333
-mul
-
-push 5
-div
 
 
 out
