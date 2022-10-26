@@ -16,9 +16,15 @@
 
 #define Num_sup_cmd 10
 
-//-----------------------------------------------------------------------------
-
 #define Num_sup_jmps 6
+
+#define Max_cmd_size 15
+
+#define Arg_max_len 100
+
+#define Jump_num 10
+
+#define push_len 6
 
 //-----------------------------------------------------------------------------
 
@@ -82,18 +88,18 @@ const Cmd Cmd_asm[] =
     {"out",  CMD_OUT,  0},
     {"dump", CMD_DUMP, 0},
     {"push", 0x41,     3},
-    {"push", 0x81,     4},
-    {"jbe",  CMD_JBE + 16,  3},
-    {"jae",  CMD_JAE + 16,  3},
-    {"ja",   CMD_JB + 16,   2},
-    {"jb",   CMD_JA + 16,   2},
-    {"je",   CMD_JE + 16,   2},
-    {"jne",  CMD_JNE + 16,  3},
+    {"push", 0x81,            4},
+    {"jbe",  CMD_JBE + 0x20,  3},
+    {"jae",  CMD_JAE + 0x20,  3},
+    {"ja",   CMD_JB  + 0x20,  2},
+    {"jb",   CMD_JA  + 0x20,  2},
+    {"je",   CMD_JE  + 0x20,   2},
+    {"jne",  CMD_JNE + 0x20,  3},
 };
 
 //-----------------------------------------------------------------------------
 
-void assembler         ();
+void assembler         (char *argv[]);
 
 void label_utility     (Asm_data_ *data, char *cmd_);
 
@@ -113,11 +119,13 @@ void handle_ram_args   (Asm_data_ *data, char *arg_);
 
 void handle_com_functs (Asm_data_ *data, char *cmd_);
 
-void Asm_data_ctor     (Asm_data_ *data);
+void Asm_data_ctor     (Asm_data_ *data, char *argv[]);
 
 void files_ctor        (Asm_data_ *data);
 
 void write_res_sums    (Asm_data_ *data);
+
+void close_files       (Asm_data_ *data);
 
 //-----------------------------------------------------------------------------
 

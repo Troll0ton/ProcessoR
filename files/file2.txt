@@ -1,9 +1,12 @@
+push 10
 push 1
-push 2
-push 100
-push 100
+
+:13
+push 1
 add
+jae 13:
+
 add
-add
+
 out
 hlt

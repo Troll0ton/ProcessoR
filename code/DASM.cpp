@@ -2,7 +2,7 @@
 
 //-----------------------------------------------------------------------------
 
-void disassembler ()    //структура
+void disassembler ()
 {
     FILE *code_file_  = fopen ("../files/code.bin",     "rb");
     FILE *label_file_ = fopen ("../files/labels.bin",   "rb");
@@ -24,81 +24,6 @@ void disassembler ()    //структура
 
     free (labels);
     free (code);
-}
-
-//-----------------------------------------------------------------------------
-
-void code_dump (double *code, int size, int32_t code_sgntr)
-{
-    FILE *code_dmp_file  = fopen ("../dump/code_dump.txt", "w+");
-
-    fprintf (code_dmp_file,
-             "\n________________________CODE_DUMP__________________________\n\n"
-             "|RES SUM|   - %lg\n"
-             "|Signature| - %x\n", code[0], code_sgntr);
-
-    for(int i = 1; i <= size; i++)
-    {
-        int num_nul = 0;
-
-        int pow = 1;
-
-        while(i / pow != 0)
-        {
-            pow *= 10;
-            num_nul++;
-        }
-
-        if(num_nul == 0)num_nul++;
-
-        for(int j = 0; j < 5 - num_nul; j++)
-        {
-            fprintf (code_dmp_file, "0");
-        }
-
-        fprintf (code_dmp_file, "%d || %lg\n", i, code[i]);
-    }
-
-    fprintf (code_dmp_file, "___________________________________________________________\n\n");
-
-    fclose (code_dmp_file);
-}
-
-//-----------------------------------------------------------------------------
-
-void label_dump (int *label, int size)
-{
-    FILE *label_dmp_file  = fopen ("../dump/label_dump.txt", "w+");
-
-    fprintf (label_dmp_file,
-             "\n________________________LABEL_DUMP__________________________\n\n"
-             "|RES SUM|   - %d\n", label[0]);
-
-    for(int i = 1; i <= size; i++)
-    {
-        int num_nul = 0;
-
-        int pow = 1;
-
-        while(i / pow != 0)
-        {
-            pow *= 10;
-            num_nul++;
-        }
-
-        if(num_nul == 0)num_nul++;
-
-        for(int j = 0; j < 5 - num_nul; j++)
-        {
-            fprintf (label_dmp_file, "0");
-        }
-
-        fprintf (label_dmp_file, "%d || %d\n", i, label[i]);
-    }
-
-    fprintf (label_dmp_file, "____________________________________________________________\n\n");
-
-    fclose (label_dmp_file);
 }
 
 //-----------------------------------------------------------------------------
@@ -259,6 +184,81 @@ void label_input (int ip, int *labels, FILE *file_out)
 
 //-----------------------------------------------------------------------------
 
+void code_dump (double *code, int size, int32_t code_sgntr)
+{
+    FILE *code_dmp_file  = fopen ("../dump/code_dump.txt", "w+");
+
+    fprintf (code_dmp_file,
+             "\n________________________CODE_DUMP__________________________\n\n"
+             "|RES SUM|   - %lg\n"
+             "|Signature| - %x\n", code[0], code_sgntr);
+
+    for(int i = 1; i <= size; i++)
+    {
+        int num_nul = 0;
+
+        int pow = 1;
+
+        while(i / pow != 0)
+        {
+            pow *= 10;
+            num_nul++;
+        }
+
+        if(num_nul == 0)num_nul++;
+
+        for(int j = 0; j < 5 - num_nul; j++)
+        {
+            fprintf (code_dmp_file, "0");
+        }
+
+        fprintf (code_dmp_file, "%d || %lg\n", i, code[i]);
+    }
+
+    fprintf (code_dmp_file, "___________________________________________________________\n\n");
+
+    fclose (code_dmp_file);
+}
+
+//-----------------------------------------------------------------------------
+
+void label_dump (int *label, int size)
+{
+    FILE *label_dmp_file  = fopen ("../dump/label_dump.txt", "w+");
+
+    fprintf (label_dmp_file,
+             "\n________________________LABEL_DUMP__________________________\n\n"
+             "|RES SUM|   - %d\n", label[0]);
+
+    for(int i = 1; i <= size; i++)
+    {
+        int num_nul = 0;
+
+        int pow = 1;
+
+        while(i / pow != 0)
+        {
+            pow *= 10;
+            num_nul++;
+        }
+
+        if(num_nul == 0)num_nul++;
+
+        for(int j = 0; j < 5 - num_nul; j++)
+        {
+            fprintf (label_dmp_file, "0");
+        }
+
+        fprintf (label_dmp_file, "%d || %d\n", i, label[i]);
+    }
+
+    fprintf (label_dmp_file, "____________________________________________________________\n\n");
+
+    fclose (label_dmp_file);
+}
+
+//-----------------------------------------------------------------------------
+
 int main ()
 {
     disassembler ();
@@ -267,5 +267,4 @@ int main ()
 }
 
 //-----------------------------------------------------------------------------
-
 

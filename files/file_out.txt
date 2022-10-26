@@ -1,22 +1,7 @@
 push 200
-push 50
-add
-push 100
-sub
-push 100
-div
-push 20
-mul
-push[2]
-sub
-push rbx
-add
 push rax
 add
-:2
-push 100
-add
-je 2:
+push [2]
 add
 out
 hlt

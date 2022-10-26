@@ -48,7 +48,7 @@ CMD_(stk, CMD_OUT_, arg_d, ip,
 
 CMD_(stk, CMD_DUMP_, arg_d, ip,
 {
-    printf ("|dump|\n");
+    stack_dumps (stk, file_log);
 })
 
 CMD_(stk, CMD_JB_, arg_d, ip,
@@ -58,7 +58,7 @@ CMD_(stk, CMD_JB_, arg_d, ip,
     if(f1 < f2)
     {
         int pos_ch = arg_d;
-        ip = labels_[pos_ch];
+        ip = data.labels[pos_ch];
     }
     else ip++;
     stack_push (stk, f1);
@@ -72,7 +72,7 @@ CMD_(stk, CMD_JBE_, arg_d, ip,
     if(f1 <= f2)
     {
         int pos_ch = arg_d;
-        ip = labels_[pos_ch];
+        ip = data.labels[pos_ch];
     }
     else ip++;
     stack_push (stk, f1);
@@ -86,7 +86,7 @@ CMD_(stk, CMD_JA_, arg_d, ip,
     if(f1 > f2)
     {
         int pos_ch = arg_d;
-        ip = labels_[pos_ch];
+        ip = data.labels[pos_ch];
     }
     else ip++;
     stack_push (stk, f1);
@@ -100,7 +100,7 @@ CMD_(stk, CMD_JAE_, arg_d, ip,
     if(f1 >= f2)
     {
         int pos_ch = arg_d;
-        ip = labels_[pos_ch];
+        ip = data.labels[pos_ch];
     }
     else ip++;
     stack_push (stk, f1);
@@ -114,7 +114,7 @@ CMD_(stk, CMD_JE_, arg_d, ip,
     if(is_equal(f1,f2))
     {
         int pos_ch = arg_d;
-        ip = labels_[pos_ch];
+        ip = data.labels[pos_ch];
     }
     else ip++;
     stack_push (stk, f1);
@@ -128,7 +128,7 @@ CMD_(stk, CMD_JNE_, arg_d, ip,
     if(!is_equal(f1,f2))
     {
         int pos_ch = arg_d;
-        ip = labels_[pos_ch];
+        ip = data.labels[pos_ch];
     }
     else ip++;
     stack_push (stk, f1);

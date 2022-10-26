@@ -16,9 +16,19 @@
 
 #define Num_sup_cmd 10
 
-//-----------------------------------------------------------------------------
-
 #define Num_sup_jmps 6
+
+#define Max_cmd_size 15
+
+#define Arg_max_len 100
+
+#define Jump_num 10
+
+#define push_len 6
+
+#define MASK_IMMED 0x20
+#define MASK_REG   0x40
+#define MASK_RAM   0x80
 
 //-----------------------------------------------------------------------------
 
@@ -73,27 +83,27 @@ typedef struct Asm_data_
 
 const Cmd Cmd_asm[] =
 {
-    {"hlt",  CMD_HLT,  0},
-    {"push", 0x21,     1},
-    {"add",  CMD_ADD,  0},
-    {"sub",  CMD_SUB,  0},
-    {"mul",  CMD_MUL,  0},
-    {"div",  CMD_DIV,  0},
-    {"out",  CMD_OUT,  0},
-    {"dump", CMD_DUMP, 0},
-    {"push", 0x41,     3},
-    {"push", 0x81,     4},
-    {"jbe",  CMD_JBE + 0x20,  3},
-    {"jae",  CMD_JAE + 0x20,  3},
-    {"ja",   CMD_JB + 0x20,   2},
-    {"jb",   CMD_JA + 0x20,   2},
-    {"je",   CMD_JE + 0x20,   2},
-    {"jne",  CMD_JNE + 0x20,  3},
+    {"hlt",  CMD_HLT,                0},
+    {"push", CMD_PUSH + MASK_IMMED,  1},
+    {"add",  CMD_ADD,                0},
+    {"sub",  CMD_SUB,                0},
+    {"mul",  CMD_MUL,                0},
+    {"div",  CMD_DIV,                0},
+    {"out",  CMD_OUT,                0},
+    {"dump", CMD_DUMP,               0},
+    {"push", CMD_PUSH + MASK_REG,    3},
+    {"push", CMD_PUSH + MASK_RAM,    4},
+    {"jbe",  CMD_JBE  + MASK_IMMED,  3},
+    {"jae",  CMD_JAE  + MASK_IMMED,  3},
+    {"ja",   CMD_JB   + MASK_IMMED,  2},
+    {"jb",   CMD_JA   + MASK_IMMED,  2},
+    {"je",   CMD_JE   + MASK_IMMED,  2},
+    {"jne",  CMD_JNE  + MASK_IMMED,  3},
 };
 
 //-----------------------------------------------------------------------------
 
-void assembler         ();
+void assembler         (char *argv[]);
 
 void label_utility     (Asm_data_ *data, char *cmd_);
 
@@ -113,11 +123,13 @@ void handle_ram_args   (Asm_data_ *data, char *arg_);
 
 void handle_com_functs (Asm_data_ *data, char *cmd_);
 
-void Asm_data_ctor     (Asm_data_ *data);
+void Asm_data_ctor     (Asm_data_ *data, char *argv[]);
 
 void files_ctor        (Asm_data_ *data);
 
 void write_res_sums    (Asm_data_ *data);
+
+void close_files       (Asm_data_ *data);
 
 //-----------------------------------------------------------------------------
 

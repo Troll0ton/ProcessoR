@@ -2,25 +2,23 @@
 
 //-----------------------------------------------------------------------------
 
-void assembler ()
+void assembler (char *argv[])
 {
     Asm_data_ *Asm_data = (Asm_data_*) calloc (1, sizeof (Asm_data_));
-    Asm_data_ctor (Asm_data);
+    Asm_data_ctor (Asm_data, argv);
 
     files_ctor (Asm_data);
 
-    fclose (Asm_data->file_in);
-    fclose (Asm_data->code_file);
-    fclose (Asm_data->label_file);
+    close_files (Asm_data);
 
     free (Asm_data);
 }
 
 //-----------------------------------------------------------------------------
 
-void Asm_data_ctor (Asm_data_ *data)
+void Asm_data_ctor (Asm_data_ *data, char *argv[])
 {
-    data->file_in    = fopen ("../files/file4.txt",  "rb");
+    data->file_in    = fopen ((char*) argv[1], "rb");
     data->code_file  = fopen ("../files/code.bin",   "wb");
     data->label_file = fopen ("../files/labels.bin", "wb");
 
@@ -43,7 +41,7 @@ void files_ctor (Asm_data_ *data)
     {
         data->Cur_line = Text[i];
 
-        char cmd[40] = "";
+        char cmd[Max_cmd_size] = "";
 
         sscanf (data->Cur_line.begin_line, "%s", cmd);
 
@@ -72,7 +70,7 @@ void files_ctor (Asm_data_ *data)
 
 void handle_label (Asm_data_ *data)
 {
-    int label = -1;
+    int label     = -1;
     int label_adr = data->res_sum;
 
     if(sscanf (data->Cur_line.begin_line, ":%d", &label) != 0)
@@ -94,7 +92,7 @@ void handle_jump (Asm_data_ *data, char *cmd_)
     int val     = -1;
     int cur_len = -1;
 
-    for(int i = 10; i < 10 + Num_sup_jmps; i++)
+    for(int i = Jump_num; i < Jump_num + Num_sup_jmps; i++)
     {
         if(stricmp (cmd_, Cmd_asm[i].name) == 0)
         {
@@ -159,7 +157,7 @@ bool found_arg_funct (char *cmd_)
 
 void handle_arg_functs (Asm_data_ *data)
 {
-    char arg[100] = "";
+    char arg[Arg_max_len] = "";
 
     double val = -1;
 
@@ -202,7 +200,7 @@ void handle_ram_args (Asm_data_ *data, char *arg_)
     {
         int num_of_rmarg = -1;
 
-        if(sscanf (data->Cur_line.begin_line + 6, "%d", &num_of_rmarg))
+        if(sscanf (data->Cur_line.begin_line + push_len, "%d", &num_of_rmarg))
         {
             fwrite (&Cmd_asm[CMD_RM_PUSH].num, sizeof(int), 1, data->code_file);
             fwrite (&num_of_rmarg, sizeof(int), 1, data->code_file);
@@ -239,6 +237,15 @@ void write_res_sums (Asm_data_ *data)
 
     fseek  (data->label_file, 0, SEEK_SET);
     fwrite (&data->num_of_labels, sizeof(int), 1, data->label_file);
+}
+
+//-----------------------------------------------------------------------------
+
+void close_files (Asm_data_ *data)
+{
+    fclose (data->file_in);
+    fclose (data->code_file);
+    fclose (data->label_file);
 }
 
 //-----------------------------------------------------------------------------
