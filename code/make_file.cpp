@@ -5,7 +5,12 @@
 
 int main (int argc, char *argv[])
 {
-    assembler (argv);
+    if(assembler (argv) == ERROR_ASM)
+    {
+        printf ("-------ERROR ASM-------");
+        return ERROR_ASM;
+    }
+
     processor ();
 
     return 0;

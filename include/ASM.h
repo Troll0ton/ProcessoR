@@ -15,16 +15,13 @@
 //-----------------------------------------------------------------------------
 
 #define Num_sup_cmd 10
-
 #define Num_sup_jmps 6
-
 #define Max_cmd_size 15
-
 #define Arg_max_len 100
-
 #define Jump_num 10
-
 #define push_len 6
+#define FAILED_OPEN 1
+#define ERROR_ASM 1
 
 #define MASK_IMMED 0x20
 #define MASK_REG   0x40
@@ -103,7 +100,7 @@ const Cmd Cmd_asm[] =
 
 //-----------------------------------------------------------------------------
 
-void assembler         (char *argv[]);
+int assembler          (char *argv[]);
 
 void label_utility     (Asm_data_ *data, char *cmd_);
 
@@ -123,13 +120,15 @@ void handle_ram_args   (Asm_data_ *data, char *arg_);
 
 void handle_com_functs (Asm_data_ *data, char *cmd_);
 
-void Asm_data_ctor     (Asm_data_ *data, char *argv[]);
+void Asm_data_ctor     (Asm_data_ *data);
 
 void files_ctor        (Asm_data_ *data);
 
 void write_res_sums    (Asm_data_ *data);
 
 void close_files       (Asm_data_ *data);
+
+int  open_files        (Asm_data_ *data, char *argv[]);
 
 //-----------------------------------------------------------------------------
 

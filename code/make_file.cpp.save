@@ -5,7 +5,7 @@
 
 int main (int argc, char *argv[])
 {
-    assembler (argv);
+    if(assembler (argv) == ERROR_ASM) r;
     processor ();
 
     return 0;

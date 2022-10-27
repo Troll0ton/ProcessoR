@@ -172,7 +172,7 @@ void handle_cmds (Stack *stk, int cmd_d, double arg_d, int *ipp, Cpu_data_ data,
     double f1 = -1;
     double f2 = -1;
 
-    #define CMD_(stk, cmd, arg, ip, code) \
+    #define CMD_(cmd, code) \
         case cmd:                         \
             code                          \
             break;

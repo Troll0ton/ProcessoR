@@ -2,26 +2,29 @@
 
 //-----------------------------------------------------------------------------
 
-void assembler (char *argv[])
+int assembler (char *argv[])
 {
     Asm_data_ *Asm_data = (Asm_data_*) calloc (1, sizeof (Asm_data_));
-    Asm_data_ctor (Asm_data, argv);
+    Asm_data_ctor (Asm_data);
+
+    if(open_files (Asm_data, argv) == FAILED_OPEN)
+    {
+        return ERROR_ASM;
+    }
 
     files_ctor (Asm_data);
 
     close_files (Asm_data);
 
     free (Asm_data);
+
+    return 0;
 }
 
 //-----------------------------------------------------------------------------
 
-void Asm_data_ctor (Asm_data_ *data, char *argv[])
+void Asm_data_ctor (Asm_data_ *data)
 {
-    data->file_in    = fopen ((char*) argv[1], "rb");
-    data->code_file  = fopen ("../files/code.bin",   "wb");
-    data->label_file = fopen ("../files/labels.bin", "wb");
-
     data->res_sum = 0;
     data->num_of_labels = 0;
 
@@ -246,6 +249,21 @@ void close_files (Asm_data_ *data)
     fclose (data->file_in);
     fclose (data->code_file);
     fclose (data->label_file);
+}
+
+//-----------------------------------------------------------------------------
+
+int open_files (Asm_data_ *data, char *argv[])
+{
+    data->file_in    = fopen ((char*) argv[1], "rb");
+    data->code_file  = fopen ("../files/code.bin",   "wb");
+    data->label_file = fopen ("../files/labels.bin", "wb");
+
+    if(data->file_in    == NULL ||
+       data->code_file  == NULL ||
+       data->label_file == NULL   ) return FAILED_OPEN;
+
+    return 0;
 }
 
 //-----------------------------------------------------------------------------

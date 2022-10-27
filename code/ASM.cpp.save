@@ -250,3 +250,18 @@ void close_files (Asm_data_ *data)
 
 //-----------------------------------------------------------------------------
 
+int open_files (Asm_data_ *data)
+{
+    data->file_in    = fopen ((char*) argv[1], "rb");
+    data->code_file  = fopen ("../files/code.bin",   "wb");
+    data->label_file = fopen ("../files/labels.bin", "wb");
+    
+    if(data->file_in    == NULL ||
+       data->code_file  == NULL ||         
+       data->label_file == NULL   ) return FAILED_OPEN;
+       
+    return 0;
+}
+
+//-----------------------------------------------------------------------------
+
