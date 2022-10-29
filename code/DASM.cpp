@@ -89,7 +89,7 @@ void file_maker (double *code_, int *labels_)
 
         label_input (ip, labels_, file_out);
 
-        handle_cmds (cmd_d, arg_d, &ip, labels_, file_out);
+        handle_cmds (cmd_d, arg_d, &ip, file_out);
     }
 
     fclose (file_out);
@@ -144,13 +144,13 @@ bool is_equal (double a, double b)
 
 //-----------------------------------------------------------------------------
 
-void handle_cmds (int cmd_d, double arg_d, int *ipp, int *labels_, FILE *file_out)
+void handle_cmds (int cmd_d, double arg_d, int *ipp, FILE *file_out)
 {
     int ip = *ipp;
 
-    #define CMD_(cmd, arg, ip, code) \
-        case cmd:                     \
-            code                      \
+    #define CMD_(cmd, code) \
+        case cmd:           \
+            code            \
             break;
 
     switch (cmd_d)
@@ -162,7 +162,7 @@ void handle_cmds (int cmd_d, double arg_d, int *ipp, int *labels_, FILE *file_ou
             break;
     }
 
-    #undef DEF_CMD
+    #undef CMD_
 
     *ipp = ip;
 }

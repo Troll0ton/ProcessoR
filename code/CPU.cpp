@@ -7,25 +7,25 @@ void processor ()
     Cpu_data_ *Cpu_data = (Cpu_data_*) calloc (1, sizeof (Cpu_data_));
     Cpu_data_ctor (Cpu_data);
 
-    FILE *code_file_  = fopen ("../files/code.bin",   "rb");
-    FILE *label_file_ = fopen ("../files/labels.bin", "rb");
-    FILE *log_file    = fopen ("../dump/log.txt",     "w+");
+    FILE *code_file  = fopen ("../files/code.bin",   "rb");
+    FILE *label_file = fopen ("../files/labels.bin", "rb");
+    FILE *log_file   = fopen ("../dump/log.txt",     "w+");
 
-    Stack stk1;
+    Stack stk1 = { 0 };
     stack_ctor (&stk1, 2);
 
-    fseek (label_file_, 0, SEEK_SET);
+    fseek (label_file, 0, SEEK_SET);
 
-    read_label_file (label_file_, Cpu_data);
+    read_label_file (label_file, Cpu_data);
 
-    read_code_file  (code_file_,  Cpu_data);
+    read_code_file  (code_file,  Cpu_data);
 
     calculator (&stk1, *Cpu_data, log_file);
 
     stack_dtor (&stk1);
 
-    fclose (code_file_);
-    fclose (label_file_);
+    fclose (code_file);
+    fclose (label_file);
     fclose (log_file);
 }
 
@@ -34,14 +34,16 @@ void processor ()
 void Cpu_data_ctor (Cpu_data_ *data) //?
 {
     data->regs = (int*) calloc (5, sizeof (int));
-    data->regs[0] = 99;
+    // regs[RAX]
+    // rax = 0
+    data->regs[0] = 99;   // 000??
     data->regs[1] = 98;
     data->regs[2] = 97;
     data->regs[3] = 96;
     data->regs[4] = 95;
 
     data->ram =  (double*) calloc (3, sizeof (double));
-    data->ram[0] = 999;
+    data->ram[0] = 999;  // ??
     data->ram[1] = 999;
     data->ram[2] = 999;
 
@@ -59,7 +61,7 @@ void read_label_file (FILE *label_file_, Cpu_data_ *data)
 
     data->labels = (int*) calloc (res_lab + 1, sizeof (int));
 
-    data->labels[0] = res_lab;
+    data->labels[0] = res_lab; // res_label ??
 
     int val1 = -1;
 
@@ -79,7 +81,7 @@ void read_code_file (FILE *code_file_, Cpu_data_ *data)
     int res_sum  = -1;
     int32_t code_sgntr = -1;
 
-    fread (&res_sum, sizeof(int), 1, code_file_);
+    fread (&res_sum,    sizeof(int),     1, code_file_);
     fread (&code_sgntr, sizeof(int32_t), 1, code_file_);
 
     data->code = (double*) calloc (res_sum + 1, sizeof (double));
@@ -99,18 +101,20 @@ void read_code_file (FILE *code_file_, Cpu_data_ *data)
 
 //-----------------------------------------------------------------------------
 
+// 5 + 3 ?
+
 void calculator (Stack *stk_, Cpu_data_ data, FILE *file_log)
 {
     for(int ip = 1; ip <= (int) data.code[0]; ip++)
     {
-        int cmd_d    = data.code[ip];
+        int cmd_d = data.code[ip];
         double arg_d = 0;
 
-        if(cmd_d & ARG_IMMED) arg_d += data.code[ip + 1];
+        if(cmd_d & Arg_immed) arg_d += data.code[ip + 1];  // ??
 
-        if(cmd_d & ARG_REG)   arg_d += data.regs[(int) data.code[ip + 1]];
+        if(cmd_d & Arg_reg)   arg_d += data.regs[(int) data.code[ip + 1]];
 
-        if(cmd_d & ARG_RAM)   arg_d =  data.ram[(int) arg_d];
+        if(cmd_d & Arg_ram)   arg_d =  data.ram[(int) arg_d];
 
         handle_cmds (stk_, cmd_d, arg_d, &ip, data, file_log);
     }
@@ -162,7 +166,6 @@ bool is_equal (double a, double b)
     return (a - b < EPS && a - b > -EPS);
 }
 
-
 //-----------------------------------------------------------------------------
 
 void handle_cmds (Stack *stk, int cmd_d, double arg_d, int *ipp, Cpu_data_ data, FILE *file_log)
@@ -172,9 +175,11 @@ void handle_cmds (Stack *stk, int cmd_d, double arg_d, int *ipp, Cpu_data_ data,
     double f1 = -1;
     double f2 = -1;
 
-    #define CMD_(cmd, code) \
-        case cmd:                         \
-            code                          \
+
+    #define CMD_(cmd, code, ...)   \
+        case cmd:                  \
+            code                   \
+            __VA_ARGS__            \
             break;
 
     switch (cmd_d)
@@ -186,7 +191,7 @@ void handle_cmds (Stack *stk, int cmd_d, double arg_d, int *ipp, Cpu_data_ data,
             break;
     }
 
-    #undef DEF_CMD
+    #undef CMD_
 
     *ipp = ip;
 }
@@ -201,6 +206,8 @@ void free_Cpu_info (Cpu_data_ *data)
     free (data->ram);
 }
 
+
+// BAN!
 //-----------------------------------------------------------------------------
 
 void code_dump (Cpu_data_ data, int size, int32_t code_sgntr)
@@ -224,7 +231,7 @@ void code_dump (Cpu_data_ data, int size, int32_t code_sgntr)
             num_nul++;
         }
 
-        if(num_nul == 0)num_nul++;
+        if(num_nul == 0) num_nul++;
 
         for(int j = 0; j < 5 - num_nul; j++)
         {
@@ -261,7 +268,7 @@ void label_dump (Cpu_data_ data, int size)
             num_nul++;
         }
 
-        if(num_nul == 0)num_nul++;
+        if(num_nul == 0) num_nul++;
 
         for(int j = 0; j < 5 - num_nul; j++)
         {

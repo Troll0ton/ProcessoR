@@ -10,35 +10,36 @@
 
 //-----------------------------------------------------------------------------
 
-#define ARG_IMMED 0x20
-#define ARG_REG   0x40
-#define ARG_RAM   0x80
+// arg_imm
+#define Arg_immed 0x20
+#define Arg_reg   0x40
+#define Arg_ram   0x80
 
 //-----------------------------------------------------------------------------
 
 enum CMD_CODES_
 {
     CMD_HLT_     = 0,
-    CMD_PUSH_    = 1  + ARG_IMMED,
+    CMD_PUSH_    = 1  + Arg_immed,
     CMD_ADD_     = 2,
     CMD_SUB_     = 3,
     CMD_MUL_     = 4,
     CMD_DIV_     = 5,
     CMD_OUT_     = 6,
     CMD_DUMP_    = 7,
-    CMD_RG_PUSH_ = 1  + ARG_REG,
-    CMD_RM_PUSH_ = 1  + ARG_RAM,
-    CMD_JBE_     = 10 + ARG_IMMED,
-    CMD_JAE_     = 11 + ARG_IMMED,
-    CMD_JA_      = 12 + ARG_IMMED,
-    CMD_JB_      = 13 + ARG_IMMED,
-    CMD_JE_      = 14 + ARG_IMMED,
-    CMD_JNE_     = 15 + ARG_IMMED,
+    CMD_RG_PUSH_ = 1  + Arg_reg,  // & |
+    CMD_RM_PUSH_ = 1  + Arg_ram,
+    CMD_JBE_     = 10 + Arg_immed,
+    CMD_JAE_     = 11 + Arg_immed,
+    CMD_JA_      = 12 + Arg_immed,
+    CMD_JB_      = 13 + Arg_immed,
+    CMD_JE_      = 14 + Arg_immed,
+    CMD_JNE_     = 15 + Arg_immed,
 };
 
 //-----------------------------------------------------------------------------
 
-typedef struct Cmd_got
+typedef struct Cmd_got // ??
 {
     int num;
     char par;
@@ -70,10 +71,10 @@ const Cmd_got Cmd_cpu[] =
 
 typedef struct Cpu_data_
 {
-    int *regs;
+    int    *regs;
     double *ram;
 
-    int *labels;
+    int    *labels;
     double *code;
 } Cpu_data_;
 

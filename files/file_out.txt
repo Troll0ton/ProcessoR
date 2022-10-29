@@ -1,7 +1,5 @@
-push 200
-push rax
-add
-push [2]
+push 100
+push 100
 add
 out
 hlt

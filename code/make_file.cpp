@@ -5,10 +5,10 @@
 
 int main (int argc, char *argv[])
 {
-    if(assembler (argv) == ERROR_ASM)
+    if(assembling (argv) == Error_asm)
     {
         printf ("-------ERROR ASM-------");
-        return ERROR_ASM;
+        return Error_asm;
     }
 
     processor ();

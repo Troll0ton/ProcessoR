@@ -1,8 +1,6 @@
-push 200
-push rax
-add
+push 100
+push 100
 
-push [2]
 add
 
 

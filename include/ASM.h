@@ -14,18 +14,23 @@
 
 //-----------------------------------------------------------------------------
 
-#define Num_sup_cmd 10
+#define Num_sup_cmd  10
 #define Num_sup_jmps 6
 #define Max_cmd_size 15
-#define Arg_max_len 100
-#define Jump_num 10
-#define push_len 6
-#define FAILED_OPEN 1
-#define ERROR_ASM 1
+#define Arg_max_len  100
+#define Jump_num     10
+#define Push_len     6
 
-#define MASK_IMMED 0x20
-#define MASK_REG   0x40
-#define MASK_RAM   0x80
+// FAILED_OPEN
+#define Failed_open  1
+#define Error_asm    1
+
+
+// common.h
+
+#define Mask_immed   0x20
+#define Mask_reg     0x40
+#define Mask_ram     0x80
 
 //-----------------------------------------------------------------------------
 
@@ -36,6 +41,7 @@
 
 enum CMD_CODES
 {
+    // #include ???? code generation
     CMD_HLT,
     CMD_PUSH,
     CMD_ADD,
@@ -59,76 +65,79 @@ enum CMD_CODES
 typedef struct Cmd
 {
     char *name;
-    int num;
-    char par;
+    int   num;
+    char  par;
 } Cmd;
 
 //-----------------------------------------------------------------------------
 
-typedef struct Asm_data_
+typedef struct Asm_info_
 {
-    FILE *file_in;
-    FILE *code_file;
-    FILE *label_file;
-    Line Cur_line;
-    int res_sum;
+    FILE   *file_in;     //
+    FILE   *code_file;   //
+    FILE   *label_file;  //
+    Line    Cur_line;
+    int     res_sum;
     int32_t code_sgntr;
-    int num_of_labels;
-} Asm_data_;
+    int     num_of_labels;
+    // Asm_info
+} Asm_info_;  // _
 
 //-----------------------------------------------------------------------------
 
 const Cmd Cmd_asm[] =
 {
     {"hlt",  CMD_HLT,                0},
-    {"push", CMD_PUSH + MASK_IMMED,  1},
+    {"push", CMD_PUSH + Mask_immed,  1},
     {"add",  CMD_ADD,                0},
     {"sub",  CMD_SUB,                0},
     {"mul",  CMD_MUL,                0},
     {"div",  CMD_DIV,                0},
     {"out",  CMD_OUT,                0},
     {"dump", CMD_DUMP,               0},
-    {"push", CMD_PUSH + MASK_REG,    3},
-    {"push", CMD_PUSH + MASK_RAM,    4},
-    {"jbe",  CMD_JBE  + MASK_IMMED,  3},
-    {"jae",  CMD_JAE  + MASK_IMMED,  3},
-    {"ja",   CMD_JB   + MASK_IMMED,  2},
-    {"jb",   CMD_JA   + MASK_IMMED,  2},
-    {"je",   CMD_JE   + MASK_IMMED,  2},
-    {"jne",  CMD_JNE  + MASK_IMMED,  3},
+    {"push", CMD_PUSH + Mask_reg,    3},
+    {"push", CMD_PUSH + Mask_ram,    4},
+    {"jbe",  CMD_JBE  + Mask_immed,  3},
+    {"jae",  CMD_JAE  + Mask_immed,  3},
+    {"ja",   CMD_JB   + Mask_immed,  2},
+    {"jb",   CMD_JA   + Mask_immed,  2},
+    {"je",   CMD_JE   + Mask_immed,  2},
+    {"jne",  CMD_JNE  + Mask_immed,  3},
 };
 
 //-----------------------------------------------------------------------------
 
-int assembler          (char *argv[]);
+int  assembling        (char *argv[]);
 
-void label_utility     (Asm_data_ *data, char *cmd_);
+void label_utility     (Asm_info_ *data, char *cmd);
 
-void handle_label      (Asm_data_ *data);
+void handle_label      (Asm_info_ *data);
 
-void handle_jump       (Asm_data_ *data, char *cmd_);
+void handle_jump       (Asm_info_ *data, char *cmd);
 
-bool found_label       (Asm_data_ *data);
+bool found_label       (Asm_info_ *data);
 
-bool found_arg_funct   (char *cmd_);
+bool found_arg_funct   (char *cmd);
 
-void handle_arg_functs (Asm_data_ *data);
+void handle_arg_functs (Asm_info_ *data);
 
-void handle_regs       (Asm_data_ *data, char *arg_);
+void handle_regs       (Asm_info_ *data, char *arg_);
 
-void handle_ram_args   (Asm_data_ *data, char *arg_);
+void handle_ram_args   (Asm_info_ *data, char *arg_);
 
-void handle_com_functs (Asm_data_ *data, char *cmd_);
+void handle_com_functs (Asm_info_ *data, char *cmd);
 
-void Asm_data_ctor     (Asm_data_ *data);
+void Asm_info_ctor     (Asm_info_ *data); // Asm_info_ctor
 
-void files_ctor        (Asm_data_ *data);
+void files_ctor        (Asm_info_ *data);
 
-void write_res_sums    (Asm_data_ *data);
+void write_res_sums    (Asm_info_ *data);
 
-void close_files       (Asm_data_ *data);
+void close_files       (Asm_info_ *data);
 
-int  open_files        (Asm_data_ *data, char *argv[]);
+int  open_files        (Asm_info_ *data, char *argv[]);
+
+void handle_lines      (Asm_info_ *data, char *cmd);
 
 //-----------------------------------------------------------------------------
 

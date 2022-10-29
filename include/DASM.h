@@ -12,33 +12,32 @@
 #define Num_sup_cmd 10
 #define Num_sup_jmps 6
 
-#define Cor_signature   0xBACAFE
+#define Cor_signature 0xBACAFE
 
-#define ARG_IMMED 0x20
-#define ARG_REG   0x40
-#define ARG_RAM   0x80
-#define ARG_      0xF
+#define Arg_immed 0x20
+#define Arg_reg   0x40
+#define Arg_ram   0x80
 
 //-----------------------------------------------------------------------------
 
 enum CMD_CODES_
 {
     CMD_HLT_     = 0,
-    CMD_PUSH_    = 1  + ARG_IMMED,
+    CMD_PUSH_    = 1  + Arg_immed,
     CMD_ADD_     = 2,
     CMD_SUB_     = 3,
     CMD_MUL_     = 4,
     CMD_DIV_     = 5,
     CMD_OUT_     = 6,
     CMD_DUMP_    = 7,
-    CMD_RG_PUSH_ = 1  + ARG_REG,
-    CMD_RM_PUSH_ = 1  + ARG_RAM,
-    CMD_JBE_     = 10 + ARG_IMMED,
-    CMD_JAE_     = 11 + ARG_IMMED,
-    CMD_JA_      = 12 + ARG_IMMED,
-    CMD_JB_      = 13 + ARG_IMMED,
-    CMD_JE_      = 14 + ARG_IMMED,
-    CMD_JNE_     = 15 + ARG_IMMED,
+    CMD_RG_PUSH_ = 1  + Arg_reg,
+    CMD_RM_PUSH_ = 1  + Arg_ram,
+    CMD_JBE_     = 10 + Arg_immed,
+    CMD_JAE_     = 11 + Arg_immed,
+    CMD_JA_      = 12 + Arg_immed,
+    CMD_JB_      = 13 + Arg_immed,
+    CMD_JE_      = 14 + Arg_immed,
+    CMD_JNE_     = 15 + Arg_immed,
 };
 
 //-----------------------------------------------------------------------------
@@ -89,7 +88,7 @@ void fill_code_array (FILE *code_file_, int res_sum_, double *code_);
 
 bool is_equal        (double a, double b);
 
-void handle_cmds     (int cmd_d, double arg_d, int *ipp, int *labels_, FILE *file_out);
+void handle_cmds     (int cmd_d, double arg_d, int *ipp, FILE *file_out);
 
 void label_input     (int ip, int *labels, FILE *file_out);
 
