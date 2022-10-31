@@ -4,6 +4,16 @@ dump
 add
 
 
+
+
+
+
+
+
+
+
+
+
 push 100
 sub
 

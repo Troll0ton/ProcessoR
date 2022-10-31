@@ -1,18 +1,11 @@
-#include "../include/CPU.h"
+#include "../include/DASM.h"
 
 //-----------------------------------------------------------------------------
 
-void disassembler ()    //структура
+void disassembler ()
 {
-    int regs[5] = {99, 98, 97, 96, 95};
-    double ram[3] = {999,999,999};
-
-    Stack stk1;
-    stack_ctor (&stk1, 2);
-
     FILE *code_file_  = fopen ("../files/code.bin",     "rb");
     FILE *label_file_ = fopen ("../files/labels.bin",   "rb");
-    FILE *log_file    = fopen ("../dump/log.txt",       "w+");
 
     int *labels = NULL;
 
@@ -24,16 +17,169 @@ void disassembler ()    //структура
 
     read_code_file (code_file_, &code);
 
-    calculator (&stk1, code, regs, ram, labels, log_file);
-
-    stack_dtor (&stk1);
+    file_maker (code, labels);
 
     fclose (code_file_);
     fclose (label_file_);
-    fclose (log_file);
 
     free (labels);
     free (code);
+}
+
+//-----------------------------------------------------------------------------
+
+void read_label_file (FILE *label_file__, int **labels_)
+{
+    int res_lab = -1;
+
+    fread (&res_lab, sizeof(int), 1, label_file__);
+
+    *labels_ = (int*) calloc (res_lab + 1, sizeof (int));
+
+    (*labels_)[0] = res_lab;
+
+    int val1 = -1;
+
+    for(int i = 1; i <= res_lab; i++)
+    {
+        fread (&val1, sizeof(int), 1, label_file__);
+        (*labels_)[i] = val1;
+    }
+
+    label_dump ((*labels_), res_lab);
+}
+
+//-----------------------------------------------------------------------------
+
+void read_code_file (FILE *code_file_, double **code_)
+{
+    int res_sum    = -1;
+    int32_t code_sgntr = -1;
+
+    fread (&res_sum, sizeof(int), 1, code_file_);
+    fread (&code_sgntr, sizeof(int32_t), 1, code_file_);
+
+    *code_ = (double*) calloc (res_sum + 1, sizeof (double));
+
+    if(code_sgntr == Cor_signature)
+    {
+        fill_code_array (code_file_, res_sum, *code_);
+
+        code_dump ((*code_), res_sum, code_sgntr);
+    }
+
+    else
+    {
+        printf ("|Wrong signature!|\n");
+    }
+}
+
+//-----------------------------------------------------------------------------
+
+void file_maker (double *code_, int *labels_)
+{
+    FILE *file_out = fopen ("../files/file_out.txt", "w+");
+
+    for(int ip = 1; ip <= (int) code_[0]; ip++)
+    {
+        int cmd_d    = code_[ip];
+        double arg_d = 0;
+
+        arg_d = code_[ip + 1];
+
+        label_input (ip, labels_, file_out);
+
+        handle_cmds (cmd_d, arg_d, &ip, file_out);
+    }
+
+    fclose (file_out);
+}
+
+//-----------------------------------------------------------------------------
+
+void fill_code_array (FILE *code_file_, int res_sum_, double *code_)
+{
+    int cmd = -1;
+
+    code_[0] = res_sum_;
+
+    for(int ib = 1; ib <= res_sum_; ib++)
+    {
+        fread (&cmd, sizeof(int), 1, code_file_);
+
+        code_[ib] = (double) cmd;
+
+        for(int num_cmd = 0; num_cmd < Num_sup_cmd + NUM_OF_JMPS; num_cmd++)
+        {
+            if(Cmd_cpu[num_cmd].num == cmd && Cmd_cpu[num_cmd].par == 1)
+            {
+                ib++;
+                double val = 0;
+                fread (&val, sizeof(double), 1, code_file_);
+
+                code_[ib] = val;
+            }
+
+            else if(Cmd_cpu[num_cmd].num == cmd && Cmd_cpu[num_cmd].par > 1)
+            {
+                ib++;
+                int val2 = 0;
+                fread (&val2, sizeof(int), 1, code_file_);
+
+                code_[ib] = (double) val2;
+            }
+        }
+    }
+}
+
+//-----------------------------------------------------------------------------
+
+bool is_equal (double a, double b)
+{
+    const double EPS = 1e-1;
+
+    return (a - b < EPS && a - b > -EPS);
+}
+
+
+//-----------------------------------------------------------------------------
+
+void handle_cmds (int cmd_d, double arg_d, int *ipp, FILE *file_out)
+{
+    int ip = *ipp;
+
+    #define CMD_(cmd, code) \
+        case cmd:           \
+            code            \
+            break;
+
+    switch (cmd_d)
+    {
+        #include "../include/dsmcodegen.h"
+
+        default:
+            fprintf (file_out, "| %d - ?\n", cmd_d);
+            break;
+    }
+
+    #undef CMD_
+
+    *ipp = ip;
+}
+
+//-----------------------------------------------------------------------------
+
+void label_input (int ip, int *labels, FILE *file_out)
+{
+    int num_of_lbls = labels[0];
+
+    for(int i = 1; i <= num_of_lbls; i++)
+    {
+        if(labels[i] + 1 == ip && labels[i] > 0)
+        {
+            fprintf (file_out, ":%d\n", i);
+        }
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -113,160 +259,11 @@ void label_dump (int *label, int size)
 
 //-----------------------------------------------------------------------------
 
-void read_label_file (FILE *label_file__, int **labels_)
+int main ()
 {
-    int res_lab = -1;
+    disassembler ();
 
-    fread (&res_lab, sizeof(int), 1, label_file__);
-
-    *labels_ = (int*) calloc (res_lab + 1, sizeof (int));
-
-    (*labels_)[0] = res_lab;
-
-    int val1 = -1;
-
-    for(int i = 1; i <= res_lab; i++)
-    {
-        fread (&val1, sizeof(int), 1, label_file__);
-        (*labels_)[i] = val1;
-    }
-
-    label_dump ((*labels_), res_lab);
-}
-
-//-----------------------------------------------------------------------------
-
-void read_code_file (FILE *code_file_, double **code_)
-{
-    int res_sum    = -1;
-    int32_t code_sgntr = -1;
-
-    fread (&res_sum, sizeof(int), 1, code_file_);
-    fread (&code_sgntr, sizeof(int32_t), 1, code_file_);
-
-    *code_ = (double*) calloc (res_sum + 1, sizeof (double));
-
-    if(code_sgntr == Cor_signature)
-    {
-        fill_code_array (code_file_, res_sum, *code_);
-
-        code_dump ((*code_), res_sum, code_sgntr);
-    }
-
-    else
-    {
-        printf ("|Wrong signature!|\n");
-    }
-}
-
-//-----------------------------------------------------------------------------
-
-void file_maker (Stack *stk_, double *code_, int *regs_, double *ram_, int *labels_, FILE *file_log)
-{
-    FILE *file_out = fopen ("../files/file_out.txt", "w+");
-
-    for(int ip = 1; ip <= (int) code_[0]; ip++)
-    {
-        int cmd_d    = code_[ip];
-        double arg_d = 0;
-
-        stack_dumps (stk_, file_log);
-
-        arg_d = code_[ip + 1];
-        
-        label_input (ip, labels_);
-
-        handle_cmds (stk_, cmd_d, arg_d, &ip, labels_);
-    }
-
-    fclose (file_out);
-}
-
-//-----------------------------------------------------------------------------
-
-void fill_code_array (FILE *code_file_, int res_sum_, double *code_)
-{
-    int cmd = -1;
-
-    code_[0] = res_sum_;
-
-    for(int ib = 1; ib <= res_sum_; ib++)
-    {
-        fread (&cmd, sizeof(int), 1, code_file_);
-
-        code_[ib] = (double) cmd;
-
-        for(int num_cmd = 0; num_cmd < Num_sup_cmd + Num_sup_jmps; num_cmd++)
-        {
-            if(Cmd_cpu[num_cmd].num == cmd && Cmd_cpu[num_cmd].par == 1)
-            {
-                ib++;
-                double val = 0;
-                fread (&val, sizeof(double), 1, code_file_);
-
-                code_[ib] = val;
-            }
-
-            else if(Cmd_cpu[num_cmd].num == cmd && Cmd_cpu[num_cmd].par > 1)
-            {
-                ib++;
-                int val2 = 0;
-                fread (&val2, sizeof(int), 1, code_file_);
-
-                code_[ib] = (double) val2;
-            }
-        }
-    }
-}
-
-//-----------------------------------------------------------------------------
-
-bool is_equal (double a, double b)
-{
-    const double EPS = 1e-1;
-
-    return (a - b < EPS && a - b > -EPS);
-}
-
-
-//-----------------------------------------------------------------------------
-
-void handle_cmds (Stack *stk, int cmd_d, double arg_d, int *ipp, int *labels_)
-{
-    int ip = *ipp;
-
-    double f1 = -1;
-    double f2 = -1;
-
-    #define CMD_(stk, cmd, arg, ip, code) \
-        case cmd:                     \
-            code                      \
-            break;
-
-    switch (cmd_d)
-    {
-        #include "../include/dsmcodegen.h"
-
-        default:
-            fprintf (file_out, "| %d - ?\n", cmd_d);
-            break;
-    }
-
-    #undef DEF_CMD
-
-    *ipp = ip;
-}
-
-//-----------------------------------------------------------------------------
-
-label_input (int ip, int *labels)
-{
-    int num_of_lbls = labels[0];
-    
-    for(int i = 1; i < num_of_lbls; i++)
-    {
-        iflabels()
-    }
+    return 0;
 }
 
 //-----------------------------------------------------------------------------

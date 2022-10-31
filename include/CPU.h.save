@@ -11,35 +11,36 @@
 //-----------------------------------------------------------------------------
 
 // arg_imm
-#define Arg_immed 0x20 //
+#define Arg_immed 0x20
 #define Arg_reg   0x40
 #define Arg_ram   0x80
+#define Cmd_mask  0x80
 
 //-----------------------------------------------------------------------------
 
-enum CMD_CODES_
+enum CMD_CODES
 {
-    CMD_HLT_     = 0,
-    CMD_PUSH_    = 1  + Arg_immed,
-    CMD_ADD_     = 2,
-    CMD_SUB_     = 3,
-    CMD_MUL_     = 4,
-    CMD_DIV_     = 5,
-    CMD_OUT_     = 6,
-    CMD_DUMP_    = 7,
-    CMD_RG_PUSH_ = 1  + Arg_reg,
-    CMD_RM_PUSH_ = 1  + Arg_ram,
-    CMD_JBE_     = 10 + Arg_immed,
-    CMD_JAE_     = 11 + Arg_immed,
-    CMD_JA_      = 12 + Arg_immed,
-    CMD_JB_      = 13 + Arg_immed,
-    CMD_JE_      = 14 + Arg_immed,
-    CMD_JNE_     = 15 + Arg_immed,
+    // #include ???? code generation
+    CMD_HLT_,
+    CMD_PUSH_,
+    CMD_POP_,
+    CMD_ADDì,
+    CMD_SUB_,
+    CMD_MUL_,
+    CMD_DIV_,
+    CMD_OUT_,
+    CMD_DUMP_,
+    CMD_JBE_,
+    CMD_JAEì,
+    CMD_JA_,
+    CMD_JB_,
+    CMD_JE_,
+    CMD_JNE_,
 };
 
 //-----------------------------------------------------------------------------
 
-typedef struct Cmd_got
+typedef struct Cmd_got // ??
 {
     int num;
     char par;
@@ -50,6 +51,7 @@ typedef struct Cmd_got
 const Cmd_got Cmd_cpu[] =
 {
     {CMD_HLT_,      0},
+    {CMD_POP_,      1},
     {CMD_PUSH_,     1},
     {CMD_ADD_,      0},
     {CMD_SUB_,      0},
@@ -57,8 +59,6 @@ const Cmd_got Cmd_cpu[] =
     {CMD_DIV_,      0},
     {CMD_OUT_,      0},
     {CMD_DUMP_,     0},
-    {CMD_RG_PUSH_,  3},
-    {CMD_RM_PUSH_,  3},
     {CMD_JBE_,      2},
     {CMD_JAE_,      2},
     {CMD_JB_,       2},

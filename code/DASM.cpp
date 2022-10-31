@@ -61,7 +61,7 @@ void read_code_file (FILE *code_file_, double **code_)
 
     *code_ = (double*) calloc (res_sum + 1, sizeof (double));
 
-    if(code_sgntr == Cor_signature)
+    if(code_sgntr == CORCT_SIGN)
     {
         fill_code_array (code_file_, res_sum, *code_);
 
@@ -109,7 +109,7 @@ void fill_code_array (FILE *code_file_, int res_sum_, double *code_)
 
         code_[ib] = (double) cmd;
 
-        for(int num_cmd = 0; num_cmd < Num_sup_cmd + Num_sup_jmps; num_cmd++)
+        for(int num_cmd = 0; num_cmd < NUM_SUP_CMD + NUM_OF_JMPS; num_cmd++)
         {
             if(Cmd_cpu[num_cmd].num == cmd && Cmd_cpu[num_cmd].par == 1)
             {

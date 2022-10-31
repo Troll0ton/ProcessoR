@@ -4,15 +4,9 @@ CMD_(CMD_PUSH_,
     ip++;
 })
 
-CMD_(CMD_RG_PUSH_,
+CMD_(CMD_POP_,
 {
-    stack_push (stk, arg_d);
-    ip++;
-})
-
-CMD_(CMD_RM_PUSH_,
-{
-    stack_push (stk, arg_d);
+    stack_pop (stk);
     ip++;
 })
 

@@ -14,8 +14,6 @@ void processor ()
     Stack stk1 = { 0 };
     stack_ctor (&stk1, 2);
 
-    fseek (label_file, 0, SEEK_SET);
-
     read_label_file (label_file, Cpu_data);
 
     read_code_file  (code_file,  Cpu_data);
@@ -63,39 +61,28 @@ void read_label_file (FILE *label_file_, Cpu_data_ *data)
 
     data->labels[0] = res_lab; // res_label ??
 
-    int val1 = -1;
+    fread (data->labels + 1, sizeof(int), res_lab, label_file_);
 
-    for(int i = 1; i <= res_lab; i++)
-    {
-        fread (&val1, sizeof(int), 1, label_file_);
-        data->labels[i] = val1;
-    }
-
-    label_dump (*data, res_lab);
+    label_dump (data->labels, res_lab);
 }
 
 //-----------------------------------------------------------------------------
 
 void read_code_file (FILE *code_file_, Cpu_data_ *data)
 {
-    int res_sum  = -1;
-    int32_t code_sgntr = -1;
+    double res_sum    = -1;
+    double code_sgntr = -1;
 
-    fread (&res_sum,    sizeof(int),     1, code_file_);
-    fread (&code_sgntr, sizeof(int32_t), 1, code_file_);
+    fread (&res_sum,    sizeof(double), 1, code_file_);
+    fread (&code_sgntr, sizeof(double), 1, code_file_);
 
-    data->code = (double*) calloc (res_sum + 1, sizeof (double));
+    data->code = (double*) calloc (res_sum, sizeof (double));
 
-    if(code_sgntr == Cor_signature)
+    if(code_sgntr == CORCT_SIGN)
     {
         fill_code_array (code_file_, res_sum, data);
 
-        code_dump (*data, res_sum, code_sgntr);
-    }
-
-    else
-    {
-        printf ("|Wrong signature!|\n");
+        code_dump (data->code - 1, res_sum, code_sgntr);
     }
 }
 
@@ -109,14 +96,19 @@ void calculator (Stack *stk_, Cpu_data_ data, FILE *file_log)
     {
         int cmd_d = data.code[ip];
         double arg_d = 0;
+        int pos = 0;
 
-        if(cmd_d & Arg_immed) arg_d += data.code[ip + 1];  // ??
+        if(cmd_d & MASK_REG)
+        {
+            arg_d += data.regs[(int) data.code[ip + 1]];
+            pos++;
+        }
 
-        if(cmd_d & Arg_reg)   arg_d += data.regs[(int) data.code[ip + 1]];
+        if(cmd_d & MASK_IMM) arg_d += data.code[ip + 1 + pos];  // ??
 
-        if(cmd_d & Arg_ram)   arg_d =  data.ram[(int) arg_d];
+        if(cmd_d & MASK_RAM) arg_d =  data.ram[(int) arg_d];
 
-        handle_cmds (stk_, cmd_d, arg_d, &ip, data, file_log);
+        handle_cmds (stk_, cmd_d & MASK_CMD, arg_d, &ip, data, file_log);
     }
 }
 
@@ -124,37 +116,9 @@ void calculator (Stack *stk_, Cpu_data_ data, FILE *file_log)
 
 void fill_code_array (FILE *code_file_, int res_sum_, Cpu_data_ *data)
 {
-    int cmd = -1;
-
     data->code[0] = res_sum_;
 
-    for(int ib = 1; ib <= res_sum_; ib++)
-    {
-        fread (&cmd, sizeof(int), 1, code_file_);
-
-        data->code[ib] = (double) cmd;
-
-        for(int num_cmd = 0; num_cmd < Num_sup_cmd + Num_sup_jmps; num_cmd++)
-        {
-            if(Cmd_cpu[num_cmd].num == cmd && Cmd_cpu[num_cmd].par == 1)
-            {
-                ib++;
-                double val = 0;
-                fread (&val, sizeof(double), 1, code_file_);
-
-                data->code[ib] = val;
-            }
-
-            else if(Cmd_cpu[num_cmd].num == cmd && Cmd_cpu[num_cmd].par > 1)
-            {
-                ib++;
-                int val2 = 0;
-                fread (&val2, sizeof(int), 1, code_file_);
-
-                data->code[ib] = (double) val2;
-            }
-        }
-    }
+    fread (data->code + 1, sizeof(double), res_sum_ - 1, code_file_);
 }
 
 //-----------------------------------------------------------------------------
@@ -175,7 +139,6 @@ void handle_cmds (Stack *stk, int cmd_d, double arg_d, int *ipp, Cpu_data_ data,
     double f1 = -1;
     double f2 = -1;
 
-
     #define CMD_(cmd, code, ...)   \
         case cmd:                  \
             code                   \
@@ -192,6 +155,8 @@ void handle_cmds (Stack *stk, int cmd_d, double arg_d, int *ipp, Cpu_data_ data,
     }
 
     #undef CMD_
+
+    stack_dumps (stk, file_log);
 
     *ipp = ip;
 }
@@ -210,16 +175,16 @@ void free_Cpu_info (Cpu_data_ *data)
 // BAN!
 //-----------------------------------------------------------------------------
 
-void code_dump (Cpu_data_ data, int size, int32_t code_sgntr)
+void code_dump (double *code, int size, int32_t code_sgntr)
 {
     FILE *code_dmp_file  = fopen ("../dump/code_dump.txt", "w+");
 
     fprintf (code_dmp_file,
              "\n________________________CODE_DUMP__________________________\n\n"
-             "|RES SUM|   - %lg\n"
-             "|Signature| - %x\n", data.code[0], code_sgntr);
+             "|RES SUM|   - %d\n"
+             "|Signature| - %x\n", size, code_sgntr);
 
-    for(int i = 1; i <= size; i++)
+    for(int i = 2; i < size; i++)
     {
         int num_nul = 0;
 
@@ -238,7 +203,7 @@ void code_dump (Cpu_data_ data, int size, int32_t code_sgntr)
             fprintf (code_dmp_file, "0");
         }
 
-        fprintf (code_dmp_file, "%d || %lg\n", i, data.code[i]);
+        fprintf (code_dmp_file, "%d || %lg\n", i, code[i]);
     }
 
     fprintf (code_dmp_file, "___________________________________________________________\n\n");
@@ -248,13 +213,13 @@ void code_dump (Cpu_data_ data, int size, int32_t code_sgntr)
 
 //-----------------------------------------------------------------------------
 
-void label_dump (Cpu_data_ data, int size)
+void label_dump (int *labels, int size)
 {
     FILE *label_dmp_file  = fopen ("../dump/label_dump.txt", "w+");
 
     fprintf (label_dmp_file,
              "\n________________________LABEL_DUMP__________________________\n\n"
-             "|RES SUM|   - %d\n", data.labels[0]);
+             "|RES SUM|   - %d\n", labels[0]);
 
     for(int i = 1; i <= size; i++)
     {
@@ -275,7 +240,7 @@ void label_dump (Cpu_data_ data, int size)
             fprintf (label_dmp_file, "0");
         }
 
-        fprintf (label_dmp_file, "%d || %d\n", i, data.labels[i]);
+        fprintf (label_dmp_file, "%d || %d\n", i, labels[i]);
     }
 
     fprintf (label_dmp_file, "____________________________________________________________\n\n");

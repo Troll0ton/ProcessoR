@@ -9,35 +9,35 @@
 
 //-----------------------------------------------------------------------------
 
-#define Num_sup_cmd 10
-#define Num_sup_jmps 6
+#define NUM_SUP_CMD 10
+#define NUM_OF_JMPS 6
 
-#define Cor_signature 0xBACAFE
+#define CORCT_SIGN 0xBACAFE
 
-#define Arg_immed 0x20
-#define Arg_reg   0x40
-#define Arg_ram   0x80
+#define MASK_IMM 0x20
+#define MASK_REG   0x40
+#define MASK_RAM   0x80
 
 //-----------------------------------------------------------------------------
 
 enum CMD_CODES_
 {
     CMD_HLT_     = 0,
-    CMD_PUSH_    = 1  + Arg_immed,
+    CMD_PUSH_    = 1  + MASK_IMM,
     CMD_ADD_     = 2,
     CMD_SUB_     = 3,
     CMD_MUL_     = 4,
     CMD_DIV_     = 5,
     CMD_OUT_     = 6,
     CMD_DUMP_    = 7,
-    CMD_RG_PUSH_ = 1  + Arg_reg,
-    CMD_RM_PUSH_ = 1  + Arg_ram,
-    CMD_JBE_     = 10 + Arg_immed,
-    CMD_JAE_     = 11 + Arg_immed,
-    CMD_JA_      = 12 + Arg_immed,
-    CMD_JB_      = 13 + Arg_immed,
-    CMD_JE_      = 14 + Arg_immed,
-    CMD_JNE_     = 15 + Arg_immed,
+    CMD_RG_PUSH_ = 1  + MASK_REG,
+    CMD_RM_PUSH_ = 1  + MASK_RAM,
+    CMD_JBE_     = 10 + MASK_IMM,
+    CMD_JAE_     = 11 + MASK_IMM,
+    CMD_JA_      = 12 + MASK_IMM,
+    CMD_JB_      = 13 + MASK_IMM,
+    CMD_JE_      = 14 + MASK_IMM,
+    CMD_JNE_     = 15 + MASK_IMM,
 };
 
 //-----------------------------------------------------------------------------
