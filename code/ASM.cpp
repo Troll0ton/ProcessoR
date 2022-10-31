@@ -135,6 +135,7 @@ void parse_arg (Assembler *Asm)
         {
             Asm->code_array[Asm->code_arr_size + 1] = Asm->Opts.val_int;
             Asm->Opts.mask |= MASK_IMM;
+
             Asm->Opts.type++;
         }
 

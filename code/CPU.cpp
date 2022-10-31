@@ -82,7 +82,7 @@ void read_code_file (FILE *code_file_, Cpu_data_ *data)
     {
         fill_code_array (code_file_, res_sum, data);
 
-        code_dump (data->code - 1, res_sum, code_sgntr);
+        code_dump (data->code, res_sum - 1, code_sgntr);
     }
 }
 

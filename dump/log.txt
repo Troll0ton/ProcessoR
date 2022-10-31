@@ -6,7 +6,7 @@ stk1[0064FEA4](OK) at CPU.cpp, LINE - 15
     size_stk     = 1       
     capacity_stk = 2       
                             
-    buffer_stk[00CF1680]          
+    buffer_stk[00AF1680]          
     {                       
           [0] = 10        
           [1] = 0        
@@ -23,7 +23,7 @@ stk1[0064FEA4](OK) at CPU.cpp, LINE - 15
     size_stk     = 2       
     capacity_stk = 2       
                             
-    buffer_stk[00CF1680]          
+    buffer_stk[00AF1680]          
     {                       
           [0] = 10        
           [1] = 1        
@@ -40,7 +40,7 @@ stk1[0064FEA4](OK) at CPU.cpp, LINE - 15
     size_stk     = 3       
     capacity_stk = 4       
                             
-    buffer_stk[00CF24F0]          
+    buffer_stk[00AF24F0]          
     {                       
           [0] = 10        
           [1] = 1        
@@ -59,7 +59,7 @@ stk1[0064FEA4](OK) at CPU.cpp, LINE - 15
     size_stk     = 2       
     capacity_stk = 2       
                             
-    buffer_stk[00CF24F0]          
+    buffer_stk[00AF24F0]          
     {                       
           [0] = 10        
           [1] = 2        
@@ -76,7 +76,7 @@ stk1[0064FEA4](OK) at CPU.cpp, LINE - 15
     size_stk     = 2       
     capacity_stk = 2       
                             
-    buffer_stk[00CF24F0]          
+    buffer_stk[00AF24F0]          
     {                       
           [0] = 10        
           [1] = 2        
@@ -89,35 +89,496 @@ stk1[0064FEA4](OK) at CPU.cpp, LINE - 15
 {                           
     canary_open  = badded       
     canary_close = dedbad       
-    hash         = 4fb0       
-    size_stk     = 1       
-    capacity_stk = 1       
+    hash         = 8a354       
+    size_stk     = 3       
+    capacity_stk = 4       
                             
-    buffer_stk[00CF24F0]          
+    buffer_stk[00AF24F0]          
     {                       
-          [0] = 12        
+          [0] = 10        
+          [1] = 2        
+          [2] = 1        
+          [3] = 0        
     }                       
 }                           
 
 _____________________________________________________________
 
-stk1[0064FEA4](ERROR) at CPU.cpp, LINE - 15 
+stk1[0064FEA4](OK) at CPU.cpp, LINE - 15 
 {                           
     canary_open  = badded       
     canary_close = dedbad       
-    hash         = 4fb0       
-    size_stk     = 1       
-    capacity_stk = 1       
+    hash         = 19514       
+    size_stk     = 2       
+    capacity_stk = 2       
                             
-    buffer_stk[00CF24F0]          
+    buffer_stk[00AF24F0]          
     {                       
-          [0] = 12        
+          [0] = 10        
+          [1] = 3        
     }                       
 }                           
 
 _____________________________________________________________
 
-stk1[0064FEA4](ERROR) at CPU.cpp, LINE - 15 
+stk1[0064FEA4](OK) at CPU.cpp, LINE - 15 
+{                           
+    canary_open  = badded       
+    canary_close = dedbad       
+    hash         = 19514       
+    size_stk     = 2       
+    capacity_stk = 2       
+                            
+    buffer_stk[00AF24F0]          
+    {                       
+          [0] = 10        
+          [1] = 3        
+    }                       
+}                           
+
+_____________________________________________________________
+
+stk1[0064FEA4](OK) at CPU.cpp, LINE - 15 
+{                           
+    canary_open  = badded       
+    canary_close = dedbad       
+    hash         = 91438       
+    size_stk     = 3       
+    capacity_stk = 4       
+                            
+    buffer_stk[00AF24F0]          
+    {                       
+          [0] = 10        
+          [1] = 3        
+          [2] = 1        
+          [3] = 0        
+    }                       
+}                           
+
+_____________________________________________________________
+
+stk1[0064FEA4](OK) at CPU.cpp, LINE - 15 
+{                           
+    canary_open  = badded       
+    canary_close = dedbad       
+    hash         = 205f8       
+    size_stk     = 2       
+    capacity_stk = 2       
+                            
+    buffer_stk[00AF24F0]          
+    {                       
+          [0] = 10        
+          [1] = 4        
+    }                       
+}                           
+
+_____________________________________________________________
+
+stk1[0064FEA4](OK) at CPU.cpp, LINE - 15 
+{                           
+    canary_open  = badded       
+    canary_close = dedbad       
+    hash         = 205f8       
+    size_stk     = 2       
+    capacity_stk = 2       
+                            
+    buffer_stk[00AF24F0]          
+    {                       
+          [0] = 10        
+          [1] = 4        
+    }                       
+}                           
+
+_____________________________________________________________
+
+stk1[0064FEA4](OK) at CPU.cpp, LINE - 15 
+{                           
+    canary_open  = badded       
+    canary_close = dedbad       
+    hash         = 9851c       
+    size_stk     = 3       
+    capacity_stk = 4       
+                            
+    buffer_stk[00AF24F0]          
+    {                       
+          [0] = 10        
+          [1] = 4        
+          [2] = 1        
+          [3] = 0        
+    }                       
+}                           
+
+_____________________________________________________________
+
+stk1[0064FEA4](OK) at CPU.cpp, LINE - 15 
+{                           
+    canary_open  = badded       
+    canary_close = dedbad       
+    hash         = 276dc       
+    size_stk     = 2       
+    capacity_stk = 2       
+                            
+    buffer_stk[00AF24F0]          
+    {                       
+          [0] = 10        
+          [1] = 5        
+    }                       
+}                           
+
+_____________________________________________________________
+
+stk1[0064FEA4](OK) at CPU.cpp, LINE - 15 
+{                           
+    canary_open  = badded       
+    canary_close = dedbad       
+    hash         = 276dc       
+    size_stk     = 2       
+    capacity_stk = 2       
+                            
+    buffer_stk[00AF24F0]          
+    {                       
+          [0] = 10        
+          [1] = 5        
+    }                       
+}                           
+
+_____________________________________________________________
+
+stk1[0064FEA4](OK) at CPU.cpp, LINE - 15 
+{                           
+    canary_open  = badded       
+    canary_close = dedbad       
+    hash         = 9f600       
+    size_stk     = 3       
+    capacity_stk = 4       
+                            
+    buffer_stk[00AF24F0]          
+    {                       
+          [0] = 10        
+          [1] = 5        
+          [2] = 1        
+          [3] = 0        
+    }                       
+}                           
+
+_____________________________________________________________
+
+stk1[0064FEA4](OK) at CPU.cpp, LINE - 15 
+{                           
+    canary_open  = badded       
+    canary_close = dedbad       
+    hash         = 2e7c0       
+    size_stk     = 2       
+    capacity_stk = 2       
+                            
+    buffer_stk[00AF24F0]          
+    {                       
+          [0] = 10        
+          [1] = 6        
+    }                       
+}                           
+
+_____________________________________________________________
+
+stk1[0064FEA4](OK) at CPU.cpp, LINE - 15 
+{                           
+    canary_open  = badded       
+    canary_close = dedbad       
+    hash         = 2e7c0       
+    size_stk     = 2       
+    capacity_stk = 2       
+                            
+    buffer_stk[00AF24F0]          
+    {                       
+          [0] = 10        
+          [1] = 6        
+    }                       
+}                           
+
+_____________________________________________________________
+
+stk1[0064FEA4](OK) at CPU.cpp, LINE - 15 
+{                           
+    canary_open  = badded       
+    canary_close = dedbad       
+    hash         = a66e4       
+    size_stk     = 3       
+    capacity_stk = 4       
+                            
+    buffer_stk[00AF24F0]          
+    {                       
+          [0] = 10        
+          [1] = 6        
+          [2] = 1        
+          [3] = 0        
+    }                       
+}                           
+
+_____________________________________________________________
+
+stk1[0064FEA4](OK) at CPU.cpp, LINE - 15 
+{                           
+    canary_open  = badded       
+    canary_close = dedbad       
+    hash         = 358a4       
+    size_stk     = 2       
+    capacity_stk = 2       
+                            
+    buffer_stk[00AF24F0]          
+    {                       
+          [0] = 10        
+          [1] = 7        
+    }                       
+}                           
+
+_____________________________________________________________
+
+stk1[0064FEA4](OK) at CPU.cpp, LINE - 15 
+{                           
+    canary_open  = badded       
+    canary_close = dedbad       
+    hash         = 358a4       
+    size_stk     = 2       
+    capacity_stk = 2       
+                            
+    buffer_stk[00AF24F0]          
+    {                       
+          [0] = 10        
+          [1] = 7        
+    }                       
+}                           
+
+_____________________________________________________________
+
+stk1[0064FEA4](OK) at CPU.cpp, LINE - 15 
+{                           
+    canary_open  = badded       
+    canary_close = dedbad       
+    hash         = ad7c8       
+    size_stk     = 3       
+    capacity_stk = 4       
+                            
+    buffer_stk[00AF24F0]          
+    {                       
+          [0] = 10        
+          [1] = 7        
+          [2] = 1        
+          [3] = 0        
+    }                       
+}                           
+
+_____________________________________________________________
+
+stk1[0064FEA4](OK) at CPU.cpp, LINE - 15 
+{                           
+    canary_open  = badded       
+    canary_close = dedbad       
+    hash         = 3c988       
+    size_stk     = 2       
+    capacity_stk = 2       
+                            
+    buffer_stk[00AF24F0]          
+    {                       
+          [0] = 10        
+          [1] = 8        
+    }                       
+}                           
+
+_____________________________________________________________
+
+stk1[0064FEA4](OK) at CPU.cpp, LINE - 15 
+{                           
+    canary_open  = badded       
+    canary_close = dedbad       
+    hash         = 3c988       
+    size_stk     = 2       
+    capacity_stk = 2       
+                            
+    buffer_stk[00AF24F0]          
+    {                       
+          [0] = 10        
+          [1] = 8        
+    }                       
+}                           
+
+_____________________________________________________________
+
+stk1[0064FEA4](OK) at CPU.cpp, LINE - 15 
+{                           
+    canary_open  = badded       
+    canary_close = dedbad       
+    hash         = b48ac       
+    size_stk     = 3       
+    capacity_stk = 4       
+                            
+    buffer_stk[00AF24F0]          
+    {                       
+          [0] = 10        
+          [1] = 8        
+          [2] = 1        
+          [3] = 0        
+    }                       
+}                           
+
+_____________________________________________________________
+
+stk1[0064FEA4](OK) at CPU.cpp, LINE - 15 
+{                           
+    canary_open  = badded       
+    canary_close = dedbad       
+    hash         = 43a6c       
+    size_stk     = 2       
+    capacity_stk = 2       
+                            
+    buffer_stk[00AF24F0]          
+    {                       
+          [0] = 10        
+          [1] = 9        
+    }                       
+}                           
+
+_____________________________________________________________
+
+stk1[0064FEA4](OK) at CPU.cpp, LINE - 15 
+{                           
+    canary_open  = badded       
+    canary_close = dedbad       
+    hash         = 43a6c       
+    size_stk     = 2       
+    capacity_stk = 2       
+                            
+    buffer_stk[00AF24F0]          
+    {                       
+          [0] = 10        
+          [1] = 9        
+    }                       
+}                           
+
+_____________________________________________________________
+
+stk1[0064FEA4](OK) at CPU.cpp, LINE - 15 
+{                           
+    canary_open  = badded       
+    canary_close = dedbad       
+    hash         = bb990       
+    size_stk     = 3       
+    capacity_stk = 4       
+                            
+    buffer_stk[00AF24F0]          
+    {                       
+          [0] = 10        
+          [1] = 9        
+          [2] = 1        
+          [3] = 0        
+    }                       
+}                           
+
+_____________________________________________________________
+
+stk1[0064FEA4](OK) at CPU.cpp, LINE - 15 
+{                           
+    canary_open  = badded       
+    canary_close = dedbad       
+    hash         = 4ab50       
+    size_stk     = 2       
+    capacity_stk = 2       
+                            
+    buffer_stk[00AF24F0]          
+    {                       
+          [0] = 10        
+          [1] = 10        
+    }                       
+}                           
+
+_____________________________________________________________
+
+stk1[0064FEA4](OK) at CPU.cpp, LINE - 15 
+{                           
+    canary_open  = badded       
+    canary_close = dedbad       
+    hash         = 4ab50       
+    size_stk     = 2       
+    capacity_stk = 2       
+                            
+    buffer_stk[00AF24F0]          
+    {                       
+          [0] = 10        
+          [1] = 10        
+    }                       
+}                           
+
+_____________________________________________________________
+
+stk1[0064FEA4](OK) at CPU.cpp, LINE - 15 
+{                           
+    canary_open  = badded       
+    canary_close = dedbad       
+    hash         = c2a74       
+    size_stk     = 3       
+    capacity_stk = 4       
+                            
+    buffer_stk[00AF24F0]          
+    {                       
+          [0] = 10        
+          [1] = 10        
+          [2] = 1        
+          [3] = 0        
+    }                       
+}                           
+
+_____________________________________________________________
+
+stk1[0064FEA4](OK) at CPU.cpp, LINE - 15 
+{                           
+    canary_open  = badded       
+    canary_close = dedbad       
+    hash         = 51c34       
+    size_stk     = 2       
+    capacity_stk = 2       
+                            
+    buffer_stk[00AF24F0]          
+    {                       
+          [0] = 10        
+          [1] = 11        
+    }                       
+}                           
+
+_____________________________________________________________
+
+stk1[0064FEA4](OK) at CPU.cpp, LINE - 15 
+{                           
+    canary_open  = badded       
+    canary_close = dedbad       
+    hash         = 51c34       
+    size_stk     = 2       
+    capacity_stk = 2       
+                            
+    buffer_stk[00AF24F0]          
+    {                       
+          [0] = 10        
+          [1] = 11        
+    }                       
+}                           
+
+_____________________________________________________________
+
+stk1[0064FEA4](OK) at CPU.cpp, LINE - 15 
+{                           
+    canary_open  = badded       
+    canary_close = dedbad       
+    hash         = 8b74       
+    size_stk     = 1       
+    capacity_stk = 1       
+                            
+    buffer_stk[00AF24F0]          
+    {                       
+          [0] = 21        
+    }                       
+}                           
+
+_____________________________________________________________
+
+stk1[0064FEA4](OK) at CPU.cpp, LINE - 15 
 {                           
     canary_open  = badded       
     canary_close = dedbad       
@@ -125,7 +586,7 @@ stk1[0064FEA4](ERROR) at CPU.cpp, LINE - 15
     size_stk     = 0       
     capacity_stk = 1       
                             
-    buffer_stk[00CF24F0]          
+    buffer_stk[00AF24F0]          
     {                       
           [0] = 0        
     }                       
@@ -133,15 +594,15 @@ stk1[0064FEA4](ERROR) at CPU.cpp, LINE - 15
 
 _____________________________________________________________
 
-stk1[0064FEA4](ERROR) at CPU.cpp, LINE - 15 
+stk1[0064FEA4](OK) at CPU.cpp, LINE - 15 
 {                           
     canary_open  = badded       
     canary_close = dedbad       
     hash         = 0       
-    size_stk     = -1       
+    size_stk     = 0       
     capacity_stk = 1       
                             
-    buffer_stk[00CF24F0]          
+    buffer_stk[00AF24F0]          
     {                       
           [0] = 0        
     }                       
@@ -149,15 +610,15 @@ stk1[0064FEA4](ERROR) at CPU.cpp, LINE - 15
 
 _____________________________________________________________
 
-stk1[0064FEA4](ERROR) at CPU.cpp, LINE - 15 
+stk1[0064FEA4](OK) at CPU.cpp, LINE - 15 
 {                           
     canary_open  = badded       
     canary_close = dedbad       
     hash         = 0       
-    size_stk     = -1       
+    size_stk     = 0       
     capacity_stk = 1       
                             
-    buffer_stk[00CF24F0]          
+    buffer_stk[00AF24F0]          
     {                       
           [0] = 0        
     }                       
@@ -165,31 +626,15 @@ stk1[0064FEA4](ERROR) at CPU.cpp, LINE - 15
 
 _____________________________________________________________
 
-stk1[0064FEA4](ERROR) at CPU.cpp, LINE - 15 
+stk1[0064FEA4](OK) at CPU.cpp, LINE - 15 
 {                           
     canary_open  = badded       
     canary_close = dedbad       
     hash         = 0       
-    size_stk     = -1       
+    size_stk     = 0       
     capacity_stk = 1       
                             
-    buffer_stk[00CF24F0]          
-    {                       
-          [0] = 0        
-    }                       
-}                           
-
-_____________________________________________________________
-
-stk1[0064FEA4](ERROR) at CPU.cpp, LINE - 15 
-{                           
-    canary_open  = badded       
-    canary_close = dedbad       
-    hash         = 0       
-    size_stk     = -1       
-    capacity_stk = 1       
-                            
-    buffer_stk[00CF24F0]          
+    buffer_stk[00AF24F0]          
     {                       
           [0] = 0        
     }                       

@@ -52,7 +52,7 @@ CMD_(CMD_JB_,
     if(f1 < f2)
     {
         int pos_ch = arg_d;
-        ip = data.labels[pos_ch];
+        ip = data.labels[pos_ch] - 2;
     }
     else ip++;
     stack_push (stk, f1);
@@ -66,7 +66,7 @@ CMD_(CMD_JBE_,
     if(f1 <= f2)
     {
         int pos_ch = arg_d;
-        ip = data.labels[pos_ch];
+        ip = data.labels[pos_ch] - 2;
     }
     else ip++;
     stack_push (stk, f1);
@@ -80,7 +80,7 @@ CMD_(CMD_JA_,
     if(f1 > f2)
     {
         int pos_ch = arg_d;
-        ip = data.labels[pos_ch];
+        ip = data.labels[pos_ch] - 2;
     }
     else ip++;
     stack_push (stk, f1);
@@ -94,7 +94,7 @@ CMD_(CMD_JAE_,
     if(f1 >= f2)
     {
         int pos_ch = arg_d;
-        ip = data.labels[pos_ch];
+        ip = data.labels[pos_ch] - 2;
     }
     else ip++;
     stack_push (stk, f1);
@@ -108,7 +108,7 @@ CMD_(CMD_JE_,
     if(is_equal(f1,f2))
     {
         int pos_ch = arg_d;
-        ip = data.labels[pos_ch];
+        ip = data.labels[pos_ch] - 2;
     }
     else ip++;
     stack_push (stk, f1);
@@ -122,7 +122,7 @@ CMD_(CMD_JNE_,
     if(!is_equal(f1,f2))
     {
         int pos_ch = arg_d;
-        ip = data.labels[pos_ch];
+        ip = data.labels[pos_ch] - 2;
     }
     else ip++;
     stack_push (stk, f1);

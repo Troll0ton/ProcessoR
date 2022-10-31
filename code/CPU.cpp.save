@@ -82,7 +82,7 @@ void read_code_file (FILE *code_file_, Cpu_data_ *data)
     {
         fill_code_array (code_file_, res_sum, data);
 
-        code_dump (data->code, res_sum, code_sgntr);
+        code_dump (data->code, res_sum - 1, code_sgntr);
     }
 }
 
@@ -106,7 +106,7 @@ void calculator (Stack *stk_, Cpu_data_ data, FILE *file_log)
 
         if(cmd_d & MASK_IMM) arg_d += data.code[ip + 1 + pos];  // ??
 
-        if(cmd_d & MASK_RAM)   arg_d =  data.ram[(int) arg_d];
+        if(cmd_d & MASK_RAM) arg_d =  data.ram[(int) arg_d];
 
         handle_cmds (stk_, cmd_d & MASK_CMD, arg_d, &ip, data, file_log);
     }
@@ -175,14 +175,17 @@ void free_Cpu_info (Cpu_data_ *data)
 // BAN!
 //-----------------------------------------------------------------------------
 
+#define dump(name, num, offset, code) \
+    if (strcmp (cmd, #name) == 0) return num; \
+
 void code_dump (double *code, int size, int32_t code_sgntr)
 {
     FILE *code_dmp_file  = fopen ("../dump/code_dump.txt", "w+");
 
     fprintf (code_dmp_file,
              "\n________________________CODE_DUMP__________________________\n\n"
-             "|RES SUM|   - %lg\n"
-             "|Signature| - %x\n", code[0], code_sgntr);
+             "|RES SUM|   - %d\n"
+             "|Signature| - %x\n", size, code_sgntr);
 
     for(int i = 2; i < size; i++)
     {

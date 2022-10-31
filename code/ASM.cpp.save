@@ -128,13 +128,14 @@ void parse_label (Assembler *Asm)
 //-----------------------------------------------------------------------------
 
 void parse_arg (Assembler *Asm)
-{    
+{
     if(strchr (Asm->Cur_line.begin_line, ':') != NULL)
     {
         if(sscanf (Asm->Cur_line.begin_line, "%20s %d", Asm->Opts.cmd, &Asm->Opts.val_int) == 2)
         {
             Asm->code_array[Asm->code_arr_size + 1] = Asm->Opts.val_int;
             Asm->Opts.mask |= MASK_IMM;
+            
             Asm->Opts.type++;
         }
 
@@ -151,7 +152,7 @@ void parse_arg (Assembler *Asm)
         Asm->Opts.type++;
     }
 
-    else if(sscanf (Asm->Cur_line.begin_line, "%*s [r%cx + %d]", &Asm->Opts.reg_sym, &Asm->Opts.val_int) == 3)
+    else if(sscanf (Asm->Cur_line.begin_line, "%*s [r%cx + %d]", &Asm->Opts.reg_sym, &Asm->Opts.val_int) == 2)
     {
         Asm->code_array[Asm->code_arr_size + 1] = Asm->Opts.reg_sym - 'a';
         Asm->code_array[Asm->code_arr_size + 2] = Asm->Opts.val_int;
@@ -159,14 +160,14 @@ void parse_arg (Assembler *Asm)
         Asm->Opts.type+=2;
     }
 
-    else if(sscanf (Asm->Cur_line.begin_line, "%*s r%cx", &Asm->Opts.reg_sym) == 2)
+    else if(sscanf (Asm->Cur_line.begin_line, "%*s r%cx", &Asm->Opts.reg_sym) == 1)
     {
         Asm->code_array[Asm->code_arr_size + 1] = Asm->Opts.reg_sym - 'a';
         Asm->Opts.mask |= MASK_REG;
         Asm->Opts.type++;
     }
 
-    else if(sscanf (Asm->Cur_line.begin_line, "%*s %lg", &Asm->Opts.val_dbl) == 2)
+    else if(sscanf (Asm->Cur_line.begin_line, "%*s %lg", &Asm->Opts.val_dbl) == 1)
     {
         Asm->code_array[Asm->code_arr_size + 1] = Asm->Opts.val_dbl;
         Asm->Opts.mask |= MASK_IMM;
