@@ -2,36 +2,32 @@
 
 //-----------------------------------------------------------------------------
 
-void processor ()
+int processor ()
 {
     Processor Cpu = { 0 };
-    
+
     if(processor_ctor (&Cpu) == ERR_CTOR)
     {
         return ERR_CPU;
     }
-    
-    Stack stk1 = { 0 };
-    stack_ctor (&stk1, 2);
 
-    read_label_file (label_file, Cpu_Cpu);
+    read_files (&Cpu);
 
-    read_code_file  (code_file,  Cpu_Cpu);
+    calculator (&Cpu);
 
-    calculator (&stk1, *Cpu_Cpu, log_file);
+    processor_dtor (&Cpu);
 
-    stack_dtor (&stk1);
-
-    fclose (code_file);
-    fclose (label_file);
-    fclose (log_file);
+    return 0;
 }
 
 //-----------------------------------------------------------------------------
 
-void processor_ctor (Processor *Cpu)
+int processor_ctor (Processor *Cpu)
 {
-`   Cpu->Info = { 0 };
+    Cpu->Info = { 0 };
+
+    Cpu->Stk = { 0 };
+    stack_ctor (&Cpu->Stk, 2);
 
     Cpu->regs = (int*) calloc (5, sizeof (int));
 
@@ -47,10 +43,7 @@ void processor_ctor (Processor *Cpu)
         Cpu->ram[i] = 0;
     }
 
-    Cpu->labels = NULL;
-    Cpu->code   = NULL;
-    
-    return (cpu_info_ctor (&Cpu->Info);
+    return (cpu_info_ctor (&Cpu->Info));
 }
 
 //-----------------------------------------------------------------------------
@@ -73,36 +66,68 @@ int cpu_info_ctor (Cpu_info *Info)
 
 //-----------------------------------------------------------------------------
 
-void read_label_file (FILE *label_file_, Cpu_Cpu_ *Cpu)
+void processor_dtor (Processor *Cpu)
+{
+    stack_dtor (&Cpu->Stk);
+
+    free (Cpu->regs);
+    free (Cpu->ram);
+    free (Cpu->labels);
+    free (Cpu->code);
+
+    cpu_info_dtor (&Cpu->Info);
+}
+
+//-----------------------------------------------------------------------------
+
+void cpu_info_dtor (Cpu_info *Info)
+{
+    fclose (Info->code_file);
+    fclose (Info->label_file);
+    fclose (Info->log_file);
+}
+
+//-----------------------------------------------------------------------------
+
+void read_files (Processor *Cpu)
+{
+    read_label_file (Cpu);
+
+    read_code_file  (Cpu);
+}
+
+//-----------------------------------------------------------------------------
+
+void read_label_file (Processor *Cpu)
 {
     int res_label = -1;
 
-    fread (&res_label, sizeof(int), 1, label_file_);
+    fread (&res_label, sizeof(int), 1, Cpu->Info.label_file);
 
     Cpu->labels = (int*) calloc (res_label + 1, sizeof (int));
 
     Cpu->labels[0] = res_label;
 
-    fread (Cpu->labels + 1, sizeof(int), res_label, label_file_);
+    fread (Cpu->labels + 1, sizeof(int), res_label, Cpu->Info.label_file);
 
     label_dump (Cpu->labels, res_label);
 }
 
 //-----------------------------------------------------------------------------
 
-void read_code_file (FILE *code_file_, Cpu_Cpu_ *Cpu)
+void read_code_file (Processor *Cpu)
 {
     double res_sum    = -1;
     double code_sgntr = -1;
 
-    fread (&res_sum,    sizeof(double), 1, code_file_);
-    fread (&code_sgntr, sizeof(double), 1, code_file_);
+    fread (&res_sum,    sizeof(double), 1, Cpu->Info.code_file);
+    fread (&code_sgntr, sizeof(double), 1, Cpu->Info.code_file);
 
     Cpu->code = (double*) calloc (res_sum, sizeof (double));
 
     if(code_sgntr == CORCT_SIGN)
     {
-        fill_code_array (code_file_, res_sum, Cpu);
+        fill_code_array (res_sum, Cpu);
 
         code_dump (Cpu->code, res_sum - 1, code_sgntr);
     }
@@ -110,35 +135,41 @@ void read_code_file (FILE *code_file_, Cpu_Cpu_ *Cpu)
 
 //-----------------------------------------------------------------------------
 
-void calculator (Stack *stk_, Cpu_Cpu_ Cpu, FILE *file_log)
+void calculator (Processor *Cpu)
 {
-    for(int ip = 1; ip <= (int) Cpu.code[0]; ip++)
+    for(int ip = 1; ip <= (int) Cpu->code[0]; ip++)
     {
-        int cmd_d = Cpu.code[ip];
+        int cmd_d = Cpu->code[ip];
         double arg_d = 0;
         int pos = 0;
+        char par_pop = 0;
 
         if(cmd_d & MASK_REG)
         {
-            arg_d += Cpu.regs[(int) Cpu.code[ip + 1]];
-            pos++;
+            arg_d += Cpu->regs[(int) Cpu->code[ip + 1]];
+            par_pop = 1
+            pos = 1;
         }
 
-        if(cmd_d & MASK_IMM) arg_d += Cpu.code[ip + 1 + pos];  // ??
+        if(cmd_d & MASK_IMM) arg_d += Cpu->code[ip + 1 + pos];  // ??
 
-        if(cmd_d & MASK_RAM) arg_d =  Cpu.ram[(int) arg_d];
+        if(cmd_d & MASK_RAM)
+        {
+            arg_d =  Cpu->ram[(int) arg_d];
+            par_pop = 2;
+        }
 
-        handle_cmds (stk_, cmd_d & MASK_CMD, arg_d, &ip, Cpu, file_log);
+        handle_cmds (cmd_d & MASK_CMD, arg_d, &ip, Cpu, par_pop);
     }
 }
 
 //-----------------------------------------------------------------------------
 
-void fill_code_array (FILE *code_file_, int res_sum_, Cpu_Cpu_ *Cpu)
+void fill_code_array (int res_sum, Processor *Cpu)
 {
-    Cpu->code[0] = res_sum_;
+    Cpu->code[0] = res_sum;
 
-    fread (Cpu->code + 1, sizeof(double), res_sum_ - 1, code_file_);
+    fread (Cpu->code + 1, sizeof(double), res_sum - 1, Cpu->Info.code_file);
 }
 
 //-----------------------------------------------------------------------------
@@ -152,7 +183,7 @@ bool is_equal (double a, double b)
 
 //-----------------------------------------------------------------------------
 
-void handle_cmds (Stack *stk, int cmd_d, double arg_d, int *ipp, Cpu_Cpu_ Cpu, FILE *file_log)
+void handle_cmds (int cmd_d, double arg_d, int *ipp, Processor *Cpu, char par_pop)
 {
     int ip = *ipp;
 
@@ -176,21 +207,10 @@ void handle_cmds (Stack *stk, int cmd_d, double arg_d, int *ipp, Cpu_Cpu_ Cpu, F
 
     #undef CMD_
 
-    stack_dumps (stk, file_log);
+    stack_dumps (&Cpu->Stk, Cpu->Info.log_file);
 
     *ipp = ip;
 }
-
-//-----------------------------------------------------------------------------
-
-void free_Cpu_info (Cpu_Cpu_ *Cpu)
-{
-    free (Cpu->labels);
-    free (Cpu->code);
-    free (Cpu->regs);
-    free (Cpu->ram);
-}
-
 
 // BAN!
 //-----------------------------------------------------------------------------

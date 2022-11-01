@@ -7,12 +7,17 @@ int main (int argc, char *argv[])
 {
     if(assembling (argv) == ERR_ASM)
     {
-        printf ("-------ERROR ASM-------");
+        printf ("-------ERROR ASM-------\n");
 
         return ERR_ASM;
     }
 
-    processor ();
+    if(processor () == ERR_CPU)
+    {
+        printf ("-------ERROR CPU-------\n");
+
+        return ERR_ASM;
+    }
 
     return 0;
 }

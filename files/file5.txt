@@ -1,0 +1,11 @@
+push 1
+pop rex
+
+push 1982
+pop [2]
+
+push [rex + 1]
+
+out
+
+hlt

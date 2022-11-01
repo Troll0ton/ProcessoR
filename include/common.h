@@ -32,6 +32,13 @@ enum CMD_CODES
     CMD_JNE,
 };
 
+enum ERROR_CODE
+{
+    ERR_CTOR = 1,
+    ERR_ASM  = 2,
+    ERR_CPU  = 3,
+};
+
 //-----------------------------------------------------------------------------
 
 #endif //COMMON_H

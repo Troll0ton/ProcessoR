@@ -148,7 +148,7 @@ void parse_arg (Assembler *Asm)
     else if(sscanf (Asm->Cur_line.begin_line, "%20s [%d]", Asm->Opts.cmd, &Asm->Opts.val_int) == 2)
     {
         Asm->code_array[Asm->code_arr_size + 1] = Asm->Opts.val_int;
-        Asm->Opts.mask |= MASK_RAM;
+        Asm->Opts.mask |= (MASK_RAM | MASK_IMM);
         Asm->Opts.type++;
     }
 
@@ -156,7 +156,7 @@ void parse_arg (Assembler *Asm)
     {
         Asm->code_array[Asm->code_arr_size + 1] = Asm->Opts.reg_sym - 'a';
         Asm->code_array[Asm->code_arr_size + 2] = Asm->Opts.val_int;
-        Asm->Opts.mask |= (MASK_RAM | MASK_REG);
+        Asm->Opts.mask |= (MASK_RAM | MASK_REG | MASK_IMM);
         Asm->Opts.type+=2;
     }
 

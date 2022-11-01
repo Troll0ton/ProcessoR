@@ -10,6 +10,11 @@
 
 //-----------------------------------------------------------------------------
 
+const int num_of_regs = 5;
+const int ram_size    = 3;
+
+//-----------------------------------------------------------------------------
+
 enum REGS
 {
     RAX,
@@ -26,7 +31,6 @@ typedef struct Cpu_info
     FILE *code_file;
     FILE *label_file;
     FILE *log_file;
-    int32_t code_sgntr;
 } Cpu_info;
 
 //-----------------------------------------------------------------------------
@@ -39,31 +43,39 @@ typedef struct Processor
     double  *ram;
     double  *code;
     Stack    Stk;
-} Assembler;
+} Processor;
 
 //-----------------------------------------------------------------------------
 
-void processor       ();
+int  processor       ();
 
-void Cpu_data_ctor   (Cpu_data_ *data);
+int  processor_ctor  (Processor *Cpu);
 
-void code_dump       (double *code, int size, int32_t code_sgntr);
+int  cpu_info_ctor   (Cpu_info *Info);
 
-void read_label_file (FILE *label_file_, Cpu_data_ *data);
+void processor_dtor  (Processor *Cpu);
 
-void read_code_file  (FILE *code_file_, Cpu_data_ *data);
+void cpu_info_dtor   (Cpu_info *Info);
 
-void calculator      (Stack *stk_, Cpu_data_ data, FILE *file_log);
+void read_files      (Processor *Cpu);
 
-void label_dump      (int *labels, int size);
+void read_label_file (Processor *Cpu);
 
-void fill_code_array (FILE *code_file_, int res_sum_, Cpu_data_ *data);
+void read_code_file  (Processor *Cpu);
+
+void calculator      (Processor *Cpu);
+
+void fill_code_array (int res_sum, Processor *Cpu);
 
 bool is_equal        (double a, double b);
 
-void handle_cmds     (Stack *stk, int cmd_d, double arg_d, int *ipp, Cpu_data_ data, FILE *file_log);
+void handle_cmds     (int cmd_d, double arg_d, int *ipp, Processor *Cpu);
 
-void free_Cpu_info   (Cpu_data_ *data);
+void code_dump       (double *code, int size, int32_t code_sgntr);
+
+void label_dump      (int *labels, int size);
+
+
 
 //-----------------------------------------------------------------------------
 

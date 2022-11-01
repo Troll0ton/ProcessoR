@@ -16,19 +16,19 @@ add
 
 push 100
 sub
-
+dump
 push 100
 div
-
+dump
 push 20
 mul
-
+dump
 push [2]
 sub
-
+dump
 push rbx
 add
-
+dump
 push rax
 add
 dump
