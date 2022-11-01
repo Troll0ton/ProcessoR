@@ -4,21 +4,21 @@
 
 void processor ()
 {
-    Cpu_data_ *Cpu_data = (Cpu_data_*) calloc (1, sizeof (Cpu_data_));
-    Cpu_data_ctor (Cpu_data);
+    Processor Cpu = { 0 };
 
-    FILE *code_file  = fopen ("../files/code.bin",   "rb");
-    FILE *label_file = fopen ("../files/labels.bin", "rb");
-    FILE *log_file   = fopen ("../dump/log.txt",     "w+");
+    if(processor_ctor (&Cpu) == ERR_CTOR)
+    {
+        return ERR_CPU;
+    }
 
     Stack stk1 = { 0 };
     stack_ctor (&stk1, 2);
 
-    read_label_file (label_file, Cpu_data);
+    read_label_file (label_file, Cpu_Cpu);
 
-    read_code_file  (code_file,  Cpu_data);
+    read_code_file  (code_file,  Cpu_Cpu);
 
-    calculator (&stk1, *Cpu_data, log_file);
+    calculator (&stk1, *Cpu_Cpu, log_file);
 
     stack_dtor (&stk1);
 
@@ -29,46 +29,68 @@ void processor ()
 
 //-----------------------------------------------------------------------------
 
-void Cpu_data_ctor (Cpu_data_ *data) //?
+void processor_ctor (Processor *Cpu)
 {
-    data->regs = (int*) calloc (5, sizeof (int));
-    // regs[RAX]
-    // rax = 0
-    data->regs[0] = 99;   // 000??
-    data->regs[1] = 98;
-    data->regs[2] = 97;
-    data->regs[3] = 96;
-    data->regs[4] = 95;
+`   Cpu->Info = { 0 };
 
-    data->ram =  (double*) calloc (3, sizeof (double));
-    data->ram[0] = 999;  // ??
-    data->ram[1] = 999;
-    data->ram[2] = 999;
+    Cpu->regs = (int*) calloc (5, sizeof (int));
 
-    data->labels = NULL;
-    data->code   = NULL;
+    for(int rx = 0; rx < num_of_regs; rx++)
+    {
+        Cpu->regs[rx] = 0;
+    }
+
+    Cpu->ram = (double*) calloc (3, sizeof (double));
+
+    for(int i = 0; i < ram_size; i++)
+    {
+        Cpu->ram[i] = 0;
+    }
+
+    Cpu->labels = NULL;
+    Cpu->code   = NULL;
+
+    return (cpu_info_ctor (&Cpu->Info);
 }
 
 //-----------------------------------------------------------------------------
 
-void read_label_file (FILE *label_file_, Cpu_data_ *data)
+int cpu_info_ctor (Cpu_info *Info)
 {
-    int res_lab = -1;
+    Info->code_file  = fopen ("../files/code.bin",   "rb");
+    Info->label_file = fopen ("../files/labels.bin", "rb");
+    Info->log_file   = fopen ("../dump/log.txt",     "w+");
 
-    fread (&res_lab, sizeof(int), 1, label_file_);
+    if(Info->label_file == NULL ||
+       Info->code_file  == NULL ||
+       Info->log_file   == NULL   )
+    {
+        return ERR_CTOR;
+    }
 
-    data->labels = (int*) calloc (res_lab + 1, sizeof (int));
-
-    data->labels[0] = res_lab; // res_label ??
-
-    fread (data->labels + 1, sizeof(int), res_lab, label_file_);
-
-    label_dump (data->labels, res_lab);
+    return 0;
 }
 
 //-----------------------------------------------------------------------------
 
-void read_code_file (FILE *code_file_, Cpu_data_ *data)
+void read_label_file (FILE *label_file_, Cpu_Cpu_ *Cpu)
+{
+    int res_label = -1;
+
+    fread (&res_label, sizeof(int), 1, label_file_);
+
+    Cpu->labels = (int*) calloc (res_label + 1, sizeof (int));
+
+    Cpu->labels[0] = res_label;
+
+    fread (Cpu->labels + 1, sizeof(int), res_label, label_file_);
+
+    label_dump (Cpu->labels, res_label);
+}
+
+//-----------------------------------------------------------------------------
+
+void read_code_file (FILE *code_file_, Cpu_Cpu_ *Cpu)
 {
     double res_sum    = -1;
     double code_sgntr = -1;
@@ -76,49 +98,47 @@ void read_code_file (FILE *code_file_, Cpu_data_ *data)
     fread (&res_sum,    sizeof(double), 1, code_file_);
     fread (&code_sgntr, sizeof(double), 1, code_file_);
 
-    data->code = (double*) calloc (res_sum, sizeof (double));
+    Cpu->code = (double*) calloc (res_sum, sizeof (double));
 
     if(code_sgntr == CORCT_SIGN)
     {
-        fill_code_array (code_file_, res_sum, data);
+        fill_code_array (code_file_, res_sum, Cpu);
 
-        code_dump (data->code, res_sum - 1, code_sgntr);
+        code_dump (Cpu->code, res_sum - 1, code_sgntr);
     }
 }
 
 //-----------------------------------------------------------------------------
 
-// 5 + 3 ?
-
-void calculator (Stack *stk_, Cpu_data_ data, FILE *file_log)
+void calculator (Stack *stk_, Cpu_Cpu_ Cpu, FILE *file_log)
 {
-    for(int ip = 1; ip <= (int) data.code[0]; ip++)
+    for(int ip = 1; ip <= (int) Cpu.code[0]; ip++)
     {
-        int cmd_d = data.code[ip];
+        int cmd_d = Cpu.code[ip];
         double arg_d = 0;
         int pos = 0;
 
         if(cmd_d & MASK_REG)
         {
-            arg_d += data.regs[(int) data.code[ip + 1]];
+            arg_d += Cpu.regs[(int) Cpu.code[ip + 1]];
             pos++;
         }
 
-        if(cmd_d & MASK_IMM) arg_d += data.code[ip + 1 + pos];  // ??
+        if(cmd_d & MASK_IMM) arg_d += Cpu.code[ip + 1 + pos];  // ??
 
-        if(cmd_d & MASK_RAM) arg_d =  data.ram[(int) arg_d];
+        if(cmd_d & MASK_RAM) arg_d =  Cpu.ram[(int) arg_d];
 
-        handle_cmds (stk_, cmd_d & MASK_CMD, arg_d, &ip, data, file_log);
+        handle_cmds (stk_, cmd_d & MASK_CMD, arg_d, &ip, Cpu, file_log);
     }
 }
 
 //-----------------------------------------------------------------------------
 
-void fill_code_array (FILE *code_file_, int res_sum_, Cpu_data_ *data)
+void fill_code_array (FILE *code_file_, int res_sum_, Cpu_Cpu_ *Cpu)
 {
-    data->code[0] = res_sum_;
+    Cpu->code[0] = res_sum_;
 
-    fread (data->code + 1, sizeof(double), res_sum_ - 1, code_file_);
+    fread (Cpu->code + 1, sizeof(double), res_sum_ - 1, code_file_);
 }
 
 //-----------------------------------------------------------------------------
@@ -132,7 +152,7 @@ bool is_equal (double a, double b)
 
 //-----------------------------------------------------------------------------
 
-void handle_cmds (Stack *stk, int cmd_d, double arg_d, int *ipp, Cpu_data_ data, FILE *file_log)
+void handle_cmds (Stack *stk, int cmd_d, double arg_d, int *ipp, Cpu_Cpu_ Cpu, FILE *file_log)
 {
     int ip = *ipp;
 
@@ -163,12 +183,12 @@ void handle_cmds (Stack *stk, int cmd_d, double arg_d, int *ipp, Cpu_data_ data,
 
 //-----------------------------------------------------------------------------
 
-void free_Cpu_info (Cpu_data_ *data)
+void free_Cpu_info (Cpu_Cpu_ *Cpu)
 {
-    free (data->labels);
-    free (data->code);
-    free (data->regs);
-    free (data->ram);
+    free (Cpu->labels);
+    free (Cpu->code);
+    free (Cpu->regs);
+    free (Cpu->ram);
 }
 
 

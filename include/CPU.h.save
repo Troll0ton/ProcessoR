@@ -10,14 +10,36 @@
 
 //-----------------------------------------------------------------------------
 
-typedef struct Cpu_data_
+enum REGS
 {
-    int    *regs;
-    double *ram;
+    RAX,
+    RBX,
+    RCX,
+    RDX,
+    REX,
+};
 
-    int    *labels;
-    double *code;
-} Cpu_data_;
+//-----------------------------------------------------------------------------
+
+typedef struct Cpu_info
+{
+    FILE *code_file;
+    FILE *label_file;
+    FILE *log_file;
+    int32_t code_sgntr;
+} Cpu_info;
+
+//-----------------------------------------------------------------------------
+
+typedef struct Processor
+{
+    Cpu_info Info;
+    int     *regs;
+    int     *labels;
+    double  *ram;
+    double  *code;
+    Stack stk1;
+} Assembler;
 
 //-----------------------------------------------------------------------------
 

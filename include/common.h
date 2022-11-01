@@ -13,4 +13,25 @@
 
 //-----------------------------------------------------------------------------
 
+enum CMD_CODES
+{
+    CMD_HLT,
+    CMD_PUSH,
+    CMD_POP,
+    CMD_ADD,
+    CMD_SUB,
+    CMD_MUL,
+    CMD_DIV,
+    CMD_OUT,
+    CMD_DUMP,
+    CMD_JBE,
+    CMD_JAE,
+    CMD_JA,
+    CMD_JB,
+    CMD_JE,
+    CMD_JNE,
+};
+
+//-----------------------------------------------------------------------------
+
 #endif //COMMON_H

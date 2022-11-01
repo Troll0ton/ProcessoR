@@ -10,36 +10,36 @@
 
 //-----------------------------------------------------------------------------
 
-enum CMD_CODES_
+enum REGS
 {
-    // #include ???? code generation
-    CMD_HLT_,
-    CMD_PUSH_,
-    CMD_POP_,
-    CMD_ADD_,
-    CMD_SUB_,
-    CMD_MUL_,
-    CMD_DIV_,
-    CMD_OUT_,
-    CMD_DUMP_,
-    CMD_JBE_,
-    CMD_JAE_,
-    CMD_JA_,
-    CMD_JB_,
-    CMD_JE_,
-    CMD_JNE_,
+    RAX,
+    RBX,
+    RCX,
+    RDX,
+    REX,
 };
 
 //-----------------------------------------------------------------------------
 
-typedef struct Cpu_data_
+typedef struct Cpu_info
 {
-    int    *regs;
-    double *ram;
+    FILE *code_file;
+    FILE *label_file;
+    FILE *log_file;
+    int32_t code_sgntr;
+} Cpu_info;
 
-    int    *labels;
-    double *code;
-} Cpu_data_;
+//-----------------------------------------------------------------------------
+
+typedef struct Processor
+{
+    Cpu_info Info;
+    int     *regs;
+    int     *labels;
+    double  *ram;
+    double  *code;
+    Stack    Stk;
+} Assembler;
 
 //-----------------------------------------------------------------------------
 

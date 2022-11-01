@@ -87,7 +87,7 @@ CMD_(CMD_JA,
     stack_push (stk, f2);
 })
 
-CMD_(CMD_JAE,
+CMD_(CMD_JAE_,
 {
     f2 = stack_pop (stk);
     f1 = stack_pop (stk);
@@ -101,7 +101,7 @@ CMD_(CMD_JAE,
     stack_push (stk, f2);
 })
 
-CMD_(CMD_JE,
+CMD_(CMD_JE_,
 {
     f2 = stack_pop (stk);
     f1 = stack_pop (stk);
@@ -115,7 +115,7 @@ CMD_(CMD_JE,
     stack_push (stk, f2);
 })
 
-CMD_(CMD_JNE,
+CMD_(CMD_JNE_,
 {
     f2 = stack_pop (stk);
     f1 = stack_pop (stk);
