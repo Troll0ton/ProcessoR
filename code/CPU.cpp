@@ -13,6 +13,8 @@ int processor ()
 
     read_files (&Cpu);
 
+    cpu_dump (&Cpu);
+
     calculator (&Cpu);
 
     processor_dtor (&Cpu);
@@ -27,18 +29,19 @@ int processor_ctor (Processor *Cpu)
     Cpu->Info = { 0 };
 
     Cpu->Stk = { 0 };
+
     stack_ctor (&Cpu->Stk, 2);
 
     Cpu->regs = (int*) calloc (5, sizeof (int));
 
-    for(int rx = 0; rx < num_of_regs; rx++)
+    for(int rx = 0; rx < NUM_OF_REGS; rx++)
     {
         Cpu->regs[rx] = 0;
     }
 
     Cpu->ram = (double*) calloc (3, sizeof (double));
 
-    for(int i = 0; i < ram_size; i++)
+    for(int i = 0; i < RAM_SIZE; i++)
     {
         Cpu->ram[i] = 0;
     }
@@ -109,15 +112,13 @@ void read_label_file (Processor *Cpu)
     Cpu->labels[0] = res_label;
 
     fread (Cpu->labels + 1, sizeof(int), res_label, Cpu->Info.label_file);
-
-    label_dump (Cpu->labels, res_label);
 }
 
 //-----------------------------------------------------------------------------
 
 void read_code_file (Processor *Cpu)
 {
-    double res_sum    = -1;
+    double res_sum  = -1;
     double code_sgntr = -1;
 
     fread (&res_sum,    sizeof(double), 1, Cpu->Info.code_file);
@@ -128,8 +129,6 @@ void read_code_file (Processor *Cpu)
     if(code_sgntr == CORCT_SIGN)
     {
         fill_code_array (res_sum, Cpu);
-
-        code_dump (Cpu->code, res_sum - 1, code_sgntr);
     }
 }
 
@@ -159,7 +158,10 @@ void calculator (Processor *Cpu)
             arg_d = Cpu->ram[(int) arg_d];
         }
 
-        if(cmd_d & MASK_RAM && cmd_d & MASK_IMM && cmd_d & MASK_REG) pos = 1;
+        if(cmd_d & MASK_RAM &&
+           cmd_d & MASK_IMM &&
+           cmd_d & MASK_REG   ) pos = 1;
+
         else pos = 0;
 
         handle_cmds (cmd_d & MASK_CMD, arg_d, &ip, Cpu);
@@ -194,10 +196,10 @@ void handle_cmds (int cmd_d, double arg_d, int *ipp, Processor *Cpu)
     double f1 = -1;
     double f2 = -1;
 
-    #define CMD_(cmd, code, ...)   \
-        case cmd:                  \
-            code                   \
-            __VA_ARGS__            \
+    #define CMD_DEF(cmd, code, ...) \
+        case cmd:                   \
+            code                    \
+            __VA_ARGS__             \
             break;
 
     switch (cmd_d)
@@ -209,89 +211,63 @@ void handle_cmds (int cmd_d, double arg_d, int *ipp, Processor *Cpu)
             break;
     }
 
-    #undef CMD_
+    #undef CMD_DEF
 
     stack_dumps (&Cpu->Stk, Cpu->Info.log_file);
 
     *ipp = ip;
 }
 
-// BAN!
 //-----------------------------------------------------------------------------
 
-void code_dump (double *code, int size, int32_t code_sgntr)
+void cpu_dump (Processor *Cpu)
 {
     FILE *code_dmp_file  = fopen ("../dump/code_dump.txt", "w+");
+    FILE *label_dmp_file = fopen ("../dump/label_dump.txt", "w+");
 
-    fprintf (code_dmp_file,
-             "\n________________________CODE_DUMP__________________________\n\n"
-             "|RES SUM|   - %d\n"
-             "|Signature| - %x\n", size, code_sgntr);
-
-    for(int i = 1; i < size; i++)
+    for(int i = 0; i <= Cpu->code[0]; i++)
     {
-        int num_nul = 0;
+        print_num_dmp (code_dmp_file, i);
 
-        int pow = 1;
-
-        while(i / pow != 0)
-        {
-            pow *= 10;
-            num_nul++;
-        }
-
-        if(num_nul == 0) num_nul++;
-
-        for(int j = 0; j < 5 - num_nul; j++)
-        {
-            fprintf (code_dmp_file, "0");
-        }
-
-        fprintf (code_dmp_file, "%d || %lg\n", i, code[i]);
+        fprintf (code_dmp_file, "%lg\n", Cpu->code[i]);
     }
 
-    fprintf (code_dmp_file, "___________________________________________________________\n\n");
+    for(int i = 0; i <= Cpu->labels[0]; i++)
+    {
+        print_num_dmp (label_dmp_file, i);
+
+        fprintf (label_dmp_file, "%d\n", Cpu->labels[i]);
+    }
 
     fclose  (code_dmp_file);
-}
-
-//-----------------------------------------------------------------------------
-
-void label_dump (int *labels, int size)
-{
-    FILE *label_dmp_file  = fopen ("../dump/label_dump.txt", "w+");
-
-    fprintf (label_dmp_file,
-             "\n________________________LABEL_DUMP__________________________\n\n"
-             "|RES SUM|   - %d\n", labels[0]);
-
-    for(int i = 1; i <= size; i++)
-    {
-        int num_nul = 0;
-
-        int pow = 1;
-
-        while(i / pow != 0)
-        {
-            pow *= 10;
-            num_nul++;
-        }
-
-        if(num_nul == 0) num_nul++;
-
-        for(int j = 0; j < 5 - num_nul; j++)
-        {
-            fprintf (label_dmp_file, "0");
-        }
-
-        fprintf (label_dmp_file, "%d || %d\n", i, labels[i]);
-    }
-
-    fprintf (label_dmp_file, "____________________________________________________________\n\n");
-
     fclose  (label_dmp_file);
 }
 
 //-----------------------------------------------------------------------------
+
+void print_num_dmp (FILE *file, int pos)
+{
+    int num_nul = 0;
+
+    int pow = 1;
+
+    while(pos / pow != 0)
+    {
+        pow *= 10;
+        num_nul++;
+    }
+
+    if(num_nul == 0) num_nul++;
+
+    for(int j = 0; j < 5 - num_nul; j++)
+    {
+        fprintf (file, "0");
+    }
+
+    fprintf (file, "%d || ", pos);
+}
+
+//-----------------------------------------------------------------------------
+
 
 

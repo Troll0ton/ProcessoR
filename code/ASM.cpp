@@ -33,10 +33,10 @@ int assembler_ctor (Assembler *Asm, char *argv[])
     }
 
     Asm->code_arr_size  = 2;
-    Asm->code_arr_capct = 100;
+    Asm->code_arr_capct = CODE_SIZE_INIT;
 
     Asm->label_arr_size  = 1;
-    Asm->label_arr_capct = 50;
+    Asm->label_arr_capct = LABEL_SIZE_INIT;
 
     Asm->Info     = { 0 };
     Asm->Cur_line = { 0 };
@@ -66,13 +66,14 @@ int asm_info_ctor (Asm_info *Info, char *argv[])
 
 //-----------------------------------------------------------------------------
 
-void asm_opts_ctor (Assembler *Asm)
+void asm_pars_ctor (Assembler *Asm)
 {
-    Asm->Opts.val_dbl = -1;
-    Asm->Opts.val_int = -1;
-    Asm->Opts.reg_sym =  0;
-    Asm->Opts.mask    =  0;
-    Asm->Opts.type    =  1;
+    Asm->Pars.val_dbl = -1;
+    Asm->Pars.val_int = -1;
+    Asm->Pars.reg_sym =  0;
+    Asm->Pars.flag_cmd = 0;
+    Asm->Pars.mask =  0;
+    Asm->Pars.num_readed_codes =  1;
 }
 
 //-----------------------------------------------------------------------------
@@ -98,18 +99,18 @@ void fill_asm_arrays (Assembler *Asm)
 
 void handle_line (Assembler *Asm)
 {
-    asm_opts_ctor (Asm);
+    asm_pars_ctor (Asm);
 
-    if(sscanf (Asm->Cur_line.begin_line, ":%d", &Asm->Opts.val_int) == 1)
+    if(sscanf (Asm->Cur_line.begin_line, ":%d", &Asm->Pars.val_int) == 1)
     {
         parse_label (Asm);
     }
 
-    else if(line_empty (Asm))
+    else
     {
         parse_arg (Asm);
 
-        parse_cmd (Asm);
+        if(Asm->Pars.flag_cmd) parse_cmd (Asm);
     }
 }
 
@@ -117,28 +118,38 @@ void handle_line (Assembler *Asm)
 
 void parse_label (Assembler *Asm)
 {
-    if(Asm->Opts.val_int > Asm->label_arr_size)
+    if(Asm->label_arr_size + 10 > Asm->label_arr_capct)
     {
-        Asm->label_arr_size = Asm->Opts.val_int;
+        Asm->label_arr_capct *= 2;
+
+        Asm->label_array = (int*) recalloc (Asm->label_array,
+                                            Asm->label_arr_capct,
+                                            Asm->label_arr_size,
+                                            sizeof (int)         );
     }
 
-    Asm->label_array[Asm->Opts.val_int] = Asm->code_arr_size;
+    if(Asm->Pars.val_int > Asm->label_arr_size)
+    {
+        Asm->label_arr_size = Asm->Pars.val_int;
+    }
+
+    Asm->label_array[Asm->Pars.val_int] = Asm->code_arr_size;
 }
 
 //-----------------------------------------------------------------------------
 
 void parse_arg (Assembler *Asm)
 {
-    sscanf (Asm->Cur_line.begin_line, "%20s", Asm->Opts.cmd);
+    if(sscanf (Asm->Cur_line.begin_line, "%20s", Asm->Pars.cmd) == 1)
+    {
+        Asm->Pars.flag_cmd++;
+    }
 
     if(strchr (Asm->Cur_line.begin_line, ':') != NULL)
     {
-        if(sscanf (Asm->Cur_line.begin_line, "%*s %d", &Asm->Opts.val_int) == 1)
+        if(sscanf (Asm->Cur_line.begin_line, "%*s %d", &Asm->Pars.val_int) == 1)
         {
-            Asm->code_array[Asm->code_arr_size + 1] = Asm->Opts.val_int;
-            Asm->Opts.mask |= MASK_IMM;
-
-            Asm->Opts.type++;
+            write_in_arg (Asm, Asm->Pars.val_dbl, MASK_IMM);
         }
 
         else
@@ -147,41 +158,50 @@ void parse_arg (Assembler *Asm)
         }
     }
 
-    else if(sscanf (Asm->Cur_line.begin_line, "%*s [r%cx + %d]", &Asm->Opts.reg_sym, &Asm->Opts.val_int) == 2)
+    else if(sscanf (Asm->Cur_line.begin_line, "%*s [r%cx + %d]", &Asm->Pars.reg_sym, &Asm->Pars.val_int) == 2)
     {
-        Asm->code_array[Asm->code_arr_size + 1] = Asm->Opts.reg_sym - 'a';
-        Asm->code_array[Asm->code_arr_size + 2] = Asm->Opts.val_int;
-        Asm->Opts.mask |= (MASK_RAM | MASK_REG | MASK_IMM);
-        Asm->Opts.type+=2;
+        write_in_arg (Asm, Asm->Pars.reg_sym - 'a', 0);
+        write_in_arg (Asm, Asm->Pars.val_int , MASK_RAM | MASK_REG | MASK_IMM);
     }
 
-    else if(sscanf (Asm->Cur_line.begin_line, "%*s [%d]", &Asm->Opts.val_int) == 1)
+    else if(sscanf (Asm->Cur_line.begin_line, "%*s [%d]", &Asm->Pars.val_int) == 1)
     {
-        Asm->code_array[Asm->code_arr_size + 1] = Asm->Opts.val_int;
-        Asm->Opts.mask |= (MASK_RAM | MASK_IMM);
-        Asm->Opts.type++;
+        write_in_arg (Asm, Asm->Pars.val_int, MASK_RAM | MASK_IMM);
     }
 
-    else if(sscanf (Asm->Cur_line.begin_line, "%*s [r%cx]", &Asm->Opts.reg_sym) == 1)
+    else if(sscanf (Asm->Cur_line.begin_line, "%*s [r%cx]", &Asm->Pars.reg_sym) == 1)
     {
-        Asm->code_array[Asm->code_arr_size + 1] = Asm->Opts.reg_sym - 'a';
-        Asm->Opts.mask |= (MASK_RAM | MASK_REG);
-        Asm->Opts.type++;
+        write_in_arg (Asm, Asm->Pars.reg_sym - 'a', MASK_RAM | MASK_REG);
     }
 
-    else if(sscanf (Asm->Cur_line.begin_line, "%*s r%cx", &Asm->Opts.reg_sym) == 1)
+    else if(sscanf (Asm->Cur_line.begin_line, "%*s r%cx", &Asm->Pars.reg_sym) == 1)
     {
-        Asm->code_array[Asm->code_arr_size + 1] = Asm->Opts.reg_sym - 'a';
-        Asm->Opts.mask |= MASK_REG;
-        Asm->Opts.type++;
+        write_in_arg (Asm, Asm->Pars.reg_sym - 'a', MASK_REG);
     }
 
-    else if(sscanf (Asm->Cur_line.begin_line, "%*s %lg", &Asm->Opts.val_dbl) == 1)
+    else if(sscanf (Asm->Cur_line.begin_line, "%*s %lg", &Asm->Pars.val_dbl) == 1)
     {
-        Asm->code_array[Asm->code_arr_size + 1] = Asm->Opts.val_dbl;
-        Asm->Opts.mask |= MASK_IMM;
-        Asm->Opts.type++;
+        write_in_arg (Asm, Asm->Pars.val_dbl, MASK_IMM);
     }
+}
+
+//-----------------------------------------------------------------------------
+
+void write_in_arg (Assembler *Asm, double val, int mask)
+{
+    if(Asm->code_arr_size + 10 > Asm->code_arr_capct)
+    {
+        Asm->code_arr_capct *= 2;
+
+        Asm->code_array = (double*) recalloc (Asm->code_array,
+                                              Asm->code_arr_capct,
+                                              Asm->code_arr_size,
+                                              sizeof (double)     );
+    }
+
+    Asm->code_array[Asm->code_arr_size + 1] = val;
+    Asm->Pars.mask |= mask;
+    Asm->Pars.num_readed_codes++;
 }
 
 //-----------------------------------------------------------------------------
@@ -192,12 +212,12 @@ void parse_cmd (Assembler *Asm)
 
     #include "../include/cmd_names.h"
 
-    for(int num_cmd = 0; num_cmd < NUM_SUP_CMD; num_cmd++)
+    for(int num_cmd = 0; num_cmd < NUM_OF_SUP_CMD; num_cmd++)
     {
-        if(stricmp (Asm->Opts.cmd, name_cmd[num_cmd]) == 0)
+        if(stricmp (Asm->Pars.cmd, name_cmd[num_cmd]) == 0)
         {
-            Asm->code_array[Asm->code_arr_size] = num_cmd | Asm->Opts.mask;
-            Asm->code_arr_size += Asm->Opts.type;
+            Asm->code_array[Asm->code_arr_size] = num_cmd | Asm->Pars.mask;
+            Asm->code_arr_size += Asm->Pars.num_readed_codes;
             flag_found++;
 
             break;
@@ -205,29 +225,6 @@ void parse_cmd (Assembler *Asm)
     }
 
     if(flag_found == 0) Asm->Info.code_sgntr = WRONG_SIGN;
-}
-
-//-----------------------------------------------------------------------------
-
-int line_empty (Assembler *Asm)
-{
-    char c[MAX_LEN] = "";
-    sscanf (Asm->Cur_line.begin_line, "%s", c);
-
-    int cmd_len = strlen (c);
-    int num_of_sym = 0;
-
-    for(int i = 0; i < cmd_len; i++)
-    {
-        if(c[i] != '_')
-        {
-            num_of_sym++;
-
-            break;
-        }
-    }
-
-    return num_of_sym;
 }
 
 //-----------------------------------------------------------------------------
@@ -245,9 +242,8 @@ void assembler_dtor (Assembler *Asm)
     free (Asm->code_array);
     free (Asm->label_array);
 
-    Asm->code_arr_size  = -1;
-    Asm->code_arr_capct = -1;
-
+    Asm->code_arr_size   = -1;
+    Asm->code_arr_capct  = -1;
     Asm->label_arr_size  = -1;
     Asm->label_arr_capct = -1;
 
@@ -276,9 +272,4 @@ void write_res_sums (Assembler *Asm)
 }
 
 //-----------------------------------------------------------------------------
-
-
-
-
-
 

@@ -1,37 +1,37 @@
-CMD_(CMD_PUSH_,
+CMD_DEF(CMD_PUSH_,
 {
     fprintf (file_out, "push %lg\n", arg_d);
     ip++;
 })
 
-CMD_(CMD_RG_PUSH_,
+CMD_DEF(CMD_RG_PUSH_,
 {
-    fprintf (file_out, "push r%cx\n", (int) arg_d + 97);
+    fprintf (file_out, "push r%cx\n", (int) arg_d + 'a');
     ip++;
 })
 
-CMD_(CMD_RM_PUSH_,
+CMD_DEF(CMD_RM_PUSH_,
 {
     fprintf (file_out, "push [%d]\n", (int) arg_d);
     ip++;
 })
 
-CMD_(CMD_ADD_,
+CMD_DEF(CMD_ADD_,
 {
     fprintf (file_out, "add\n");
 })
 
-CMD_(CMD_SUB_,
+CMD_DEF(CMD_SUB_,
 {
     fprintf (file_out, "sub\n");
 })
 
-CMD_(CMD_MUL_,
+CMD_DEF(CMD_MUL_,
 {
     fprintf (file_out, "mul\n");
 })
 
-CMD_(CMD_DIV_,
+CMD_DEF(CMD_DIV_,
 {
     fprintf (file_out, "div\n");
 })

@@ -10,12 +10,15 @@
 
 //-----------------------------------------------------------------------------
 
-const int num_of_regs = 5;
-const int ram_size    = 3;
+enum Nums
+{
+    NUM_OF_REGS = 5,
+    RAM_SIZE = 3,
+};
 
 //-----------------------------------------------------------------------------
 
-enum REGS
+enum Regs
 {
     RAX,
     RBX,
@@ -71,11 +74,9 @@ bool is_equal        (double a, double b);
 
 void handle_cmds     (int cmd_d, double arg_d, int *ipp, Processor *Cpu);
 
-void code_dump       (double *code, int size, int32_t code_sgntr);
+void cpu_dump        (Processor *Cpu);
 
-void label_dump      (int *labels, int size);
-
-
+void print_num_dmp   (FILE *file, int pos);
 
 //-----------------------------------------------------------------------------
 

@@ -73,7 +73,7 @@ void stack_resize (struct Stack *stk, int opt_resize)
 
         stk->capacity_stk *= 2;
 
-        stk->buffer_stk = (double*) recalloc (stk->buffer_stk, stk->capacity_stk, stk->size_stk);
+        stk->buffer_stk = (double*) recalloc (stk->buffer_stk, stk->capacity_stk, stk->size_stk, sizeof (double));
     }
 
     else if (opt_resize == stk_decrease)
@@ -81,7 +81,7 @@ void stack_resize (struct Stack *stk, int opt_resize)
         if(stk->capacity_stk >= 2)
         {
             stk->capacity_stk /= 2;
-            stk->buffer_stk = (double*) recalloc (stk->buffer_stk, stk->capacity_stk, stk->size_stk);
+            stk->buffer_stk = (double*) recalloc (stk->buffer_stk, stk->capacity_stk, stk->size_stk, sizeof (double));
         }
     }
 
@@ -265,13 +265,13 @@ void stack_dump_ (struct Stack *stk)
 
 //-----------------------------------------------------------------------------
 
-void *recalloc (void *buffer, int capacity, int size)
+void *recalloc (void *buffer, int capacity, int size, int size_of_type)
 {
-    char *pointer = (char*) realloc ((char*) buffer, capacity * sizeof (double));
+    char *pointer = (char*) realloc ((char*) buffer, capacity * size_of_type);
 
     if(capacity > size)
     {
-        memset (pointer + size * sizeof (double), '\0', (capacity - size) * sizeof (double));
+        memset (pointer + size * size_of_type, '\0', (capacity - size) * size_of_type);
     }
 
     return (void*) pointer;

@@ -1,136 +1,82 @@
-CMD_(stk, CMD_PUSH_, arg_d, ip,
+CMD_(CMD_PUSH_,
 {
     fprintf (file_out, "push %lg\n", arg_d);
     ip++;
 })
 
-CMD_(stk, CMD_RG_PUSH_, arg_d, ip,
+CMD_(CMD_RG_PUSH_,
 {
-    fprintf (file_out, "push r%cx\n", (int) arg_d + 97);
+    fprintf (file_out, "push r%cx\n", (int) arg_d + 'a');
     ip++;
 })
 
-CMD_(stk, CMD_RM_PUSH_, arg_d, ip,
+CMD_(CMD_RM_PUSH_,
 {
-    fprintf (file_out, "push[%lg]\n", (int) arg_d + 97);
+    fprintf (file_out, "push [%d]\n", (int) arg_d);
     ip++;
 })
 
-CMD_(stk, CMD_ADD_, arg_d, ip,
+CMD_(CMD_ADD_,
 {
-    stack_push (stk, stack_pop (stk) + stack_pop (stk));
+    fprintf (file_out, "add\n");
 })
 
-CMD_(stk, CMD_SUB_, arg_d, ip,
+CMD_(CMD_SUB_,
 {
-    stack_push (stk, -(stack_pop (stk) - stack_pop (stk)));
+    fprintf (file_out, "sub\n");
 })
 
-CMD_(stk, CMD_MUL_, arg_d, ip,
+CMD_(CMD_MUL_,
 {
-    stack_push (stk, stack_pop (stk) * stack_pop (stk));
+    fprintf (file_out, "mul\n");
 })
 
-CMD_(stk, CMD_DIV_, arg_d, ip,
+CMD_(CMD_DIV_,
 {
-    stack_push (stk, 1 / stack_pop (stk) * stack_pop (stk));
+    fprintf (file_out, "div\n");
 })
 
-CMD_(stk, CMD_HLT_, arg_d, ip,
+CMD_(CMD_HLT_,
 {
-    printf ("");
+    fprintf (file_out, "hlt\n");
 })
 
-CMD_(stk, CMD_OUT_, arg_d, ip,
+CMD_(CMD_OUT_,
 {
-    printf ("result: %lg\n", stack_pop (stk));
+    fprintf (file_out, "out\n");
 })
 
-CMD_(stk, CMD_DUMP_, arg_d, ip,
+CMD_(CMD_DUMP_,
 {
-    printf ("|dump|\n");
+    fprintf (file_out, "dump\n");
 })
 
-CMD_(stk, CMD_JB_, arg_d, ip,
+CMD_(CMD_JB_,
 {
-    f2 = stack_pop (stk);
-    f1 = stack_pop (stk);
-    if(f1 < f2)
-    {
-        int pos_ch = arg_d;
-        ip = labels_[pos_ch];
-    }
-    else ip++;
-    stack_push (stk, f1);
-    stack_push (stk, f2);
+    fprintf (file_out, "jb %d:\n", (int) arg_d);
 })
 
-CMD_(stk, CMD_JBE_, arg_d, ip,
+CMD_(CMD_JBE_,
 {
-    f2 = stack_pop (stk);
-    f1 = stack_pop (stk);
-    if(f1 <= f2)
-    {
-        int pos_ch = arg_d;
-        ip = labels_[pos_ch];
-    }
-    else ip++;
-    stack_push (stk, f1);
-    stack_push (stk, f2);
+    fprintf (file_out, "jbe %d:\n", (int) arg_d);
 })
 
-CMD_(stk, CMD_JA_, arg_d, ip,
+CMD_(CMD_JA_,
 {
-    f2 = stack_pop (stk);
-    f1 = stack_pop (stk);
-    if(f1 > f2)
-    {
-        int pos_ch = arg_d;
-        ip = labels_[pos_ch];
-    }
-    else ip++;
-    stack_push (stk, f1);
-    stack_push (stk, f2);
+    fprintf (file_out, "ja %d:\n", (int) arg_d);
 })
 
-CMD_(stk, CMD_JAE_, arg_d, ip,
+CMD_(CMD_JAE_,
 {
-    f2 = stack_pop (stk);
-    f1 = stack_pop (stk);
-    if(f1 >= f2)
-    {
-        int pos_ch = arg_d;
-        ip = labels_[pos_ch];
-    }
-    else ip++;
-    stack_push (stk, f1);
-    stack_push (stk, f2);
+    fprintf (file_out, "jae %d:\n", (int) arg_d);
 })
 
-CMD_(stk, CMD_JE_, arg_d, ip,
+CMD_(CMD_JE_,
 {
-    f2 = stack_pop (stk);
-    f1 = stack_pop (stk);
-    if(is_equal(f1,f2))
-    {
-        int pos_ch = arg_d;
-        ip = labels_[pos_ch];
-    }
-    else ip++;
-    stack_push (stk, f1);
-    stack_push (stk, f2);
+    fprintf (file_out, "je %d:\n", (int) arg_d);
 })
 
-CMD_(stk, CMD_JNE_, arg_d, ip,
+CMD_(CMD_JNE_,
 {
-    f2 = stack_pop (stk);
-    f1 = stack_pop (stk);
-    if(!is_equal(f1,f2))
-    {
-        int pos_ch = arg_d;
-        ip = labels_[pos_ch];
-    }
-    else ip++;
-    stack_push (stk, f1);
-    stack_push (stk, f2);
+    fprintf (file_out, "jne %d:\n", (int) arg_d);
 })

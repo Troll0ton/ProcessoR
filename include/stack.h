@@ -111,7 +111,7 @@ void    handle_errors    (struct Stack *stk);
 void    debug_stack      (struct Stack *stk);
 void    check_errors     (struct Stack *stk, int32_t new_hash);
 int32_t calculate_hash   (struct Stack *stk);
-void   *recalloc         (void *buffer, int capacity, int size);
+void   *recalloc         (void *buffer, int capacity, int size, int size_of_type);
 
 //-----------------------------------------------------------------------------
 

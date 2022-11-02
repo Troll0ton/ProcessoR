@@ -2,7 +2,8 @@ push 1
 pop rex
 push 2112
 pop [rex]
-push [1a]
+push [1]
+dump
 out
 
 hlt
