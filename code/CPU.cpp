@@ -152,11 +152,15 @@ void calculator (Processor *Cpu)
         if(cmd_d & MASK_IMM)
         {
             arg_d += Cpu->code[ip + 1 + pos];
-
-            if(cmd_d & MASK_REG) pos = 1;
         }
 
-        if(cmd_d & MASK_RAM) arg_d =  Cpu->ram[(int) arg_d];
+        if(cmd_d & MASK_RAM)
+        {
+            arg_d = Cpu->ram[(int) arg_d];
+        }
+
+        if(cmd_d & MASK_RAM && cmd_d & MASK_IMM && cmd_d & MASK_REG) pos = 1;
+        else pos = 0;
 
         handle_cmds (cmd_d & MASK_CMD, arg_d, &ip, Cpu);
         ip += pos;
@@ -224,7 +228,7 @@ void code_dump (double *code, int size, int32_t code_sgntr)
              "|RES SUM|   - %d\n"
              "|Signature| - %x\n", size, code_sgntr);
 
-    for(int i = 2; i < size; i++)
+    for(int i = 1; i < size; i++)
     {
         int num_nul = 0;
 

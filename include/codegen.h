@@ -6,7 +6,12 @@ CMD_(CMD_PUSH,
 
 CMD_(CMD_POP,
 {
-    if((int) Cpu->code[ip] & MASK_REG)
+    if((int) Cpu->code[ip] & MASK_RAM && (int) Cpu->code[ip] & MASK_REG)
+    {
+        Cpu->ram[Cpu->regs[(int) Cpu->code[ip + 1]]]  = stack_pop (&Cpu->Stk);
+    }
+
+    else if((int) Cpu->code[ip] & MASK_REG)
     {
         Cpu->regs[(int) Cpu->code[ip + 1]] = stack_pop (&Cpu->Stk);
     }

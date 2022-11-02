@@ -16,7 +16,7 @@ int main (int argc, char *argv[])
     {
         printf ("-------ERROR CPU-------\n");
 
-        return ERR_ASM;
+        return ERR_CPU;
     }
 
     return 0;
