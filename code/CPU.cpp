@@ -6,7 +6,7 @@ int processor ()
 {
     Processor Cpu = { 0 };
 
-    if(processor_ctor (&Cpu) == ERR_CTOR)
+    if(processor_ctor (&Cpu, calculator) == ERR_CTOR)
     {
         return ERR_CPU;
     }
@@ -15,7 +15,7 @@ int processor ()
 
     cpu_dump (&Cpu);
 
-    calculator (&Cpu);
+    handle_cmds (&Cpu);
 
     processor_dtor (&Cpu);
 
@@ -24,11 +24,13 @@ int processor ()
 
 //-----------------------------------------------------------------------------
 
-int processor_ctor (Processor *Cpu)
+int processor_ctor (Processor *Cpu, void (*funct) (CMD_FUNCT))
 {
     Cpu->Info = { 0 };
 
     Cpu->Stk = { 0 };
+
+    Cpu->func = funct;
 
     stack_ctor (&Cpu->Stk, 2);
 
@@ -118,7 +120,7 @@ void read_label_file (Processor *Cpu)
 
 void read_code_file (Processor *Cpu)
 {
-    double res_sum  = -1;
+    double res_sum = -1;
     double code_sgntr = -1;
 
     fread (&res_sum,    sizeof(double), 1, Cpu->Info.code_file);
@@ -134,7 +136,7 @@ void read_code_file (Processor *Cpu)
 
 //-----------------------------------------------------------------------------
 
-void calculator (Processor *Cpu)
+void handle_cmds (Processor *Cpu)
 {
     for(int ip = 1; ip <= (int) Cpu->code[0]; ip++)
     {
@@ -164,7 +166,7 @@ void calculator (Processor *Cpu)
 
         else pos = 0;
 
-        handle_cmds (cmd_d & MASK_CMD, arg_d, &ip, Cpu);
+        Cpu->func (cmd_d & MASK_CMD, arg_d, &ip, Cpu);
         ip += pos;
     }
 }
@@ -189,7 +191,7 @@ bool is_equal (double a, double b)
 
 //-----------------------------------------------------------------------------
 
-void handle_cmds (int cmd_d, double arg_d, int *ipp, Processor *Cpu)
+void calculator (int cmd_d, double arg_d, int *ipp, Processor *Cpu)
 {
     int ip = *ipp;
 

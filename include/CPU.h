@@ -46,13 +46,14 @@ typedef struct Processor
     double  *ram;
     double  *code;
     Stack    Stk;
+    void (*func) (CMD_FUNCT);
 } Processor;
 
 //-----------------------------------------------------------------------------
 
 int  processor       ();
 
-int  processor_ctor  (Processor *Cpu);
+int processor_ctor    (Processor *Cpu, void (*funct) (CMD_FUNCT));
 
 int  cpu_info_ctor   (Cpu_info *Info);
 
@@ -66,13 +67,13 @@ void read_label_file (Processor *Cpu);
 
 void read_code_file  (Processor *Cpu);
 
-void calculator      (Processor *Cpu);
+void handle_cmds     (Processor *Cpu);
 
 void fill_code_array (int res_sum, Processor *Cpu);
 
 bool is_equal        (double a, double b);
 
-void handle_cmds     (int cmd_d, double arg_d, int *ipp, Processor *Cpu);
+void calculator      (int cmd_d, double arg_d, int *ipp, Processor *Cpu);
 
 void cpu_dump        (Processor *Cpu);
 

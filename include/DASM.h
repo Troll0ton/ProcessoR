@@ -1,12 +1,19 @@
-//! @file CPU.h
+//! @file DASM.h
 
-#ifndef   CPU_H
-#define   CPU_H
+#ifndef   DASM_H
+#define   DASM_H
+
+//-----------------------------------------------------------------------------
+
+#define Disassember Processor
+#define disassember processor
+#define disassember processor
 
 //-----------------------------------------------------------------------------
 
 #include "../include/stack.h"
 #include "../include/common.h"
+#include "../include/CPU.h"
 
 //-----------------------------------------------------------------------------
 
@@ -33,7 +40,7 @@ typedef struct Cpu_info
 {
     FILE *code_file;
     FILE *label_file;
-    FILE *log_file;
+    FILE *file_out;
 } Cpu_info;
 
 //-----------------------------------------------------------------------------
@@ -50,7 +57,7 @@ typedef struct Processor
 
 //-----------------------------------------------------------------------------
 
-int  processor       ();
+int  disassembling   ();
 
 int  processor_ctor  (Processor *Cpu);
 
@@ -80,5 +87,5 @@ void print_num_dmp   (FILE *file, int pos);
 
 //-----------------------------------------------------------------------------
 
-#endif //CPU_H
+#endif //DASM_H
 
