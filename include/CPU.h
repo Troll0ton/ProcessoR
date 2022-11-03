@@ -13,7 +13,8 @@
 enum Nums
 {
     NUM_OF_REGS = 5,
-    RAM_SIZE = 3,
+    RAM_SIZE    = 3,
+    STOP        = -1,
 };
 
 //-----------------------------------------------------------------------------
@@ -33,7 +34,7 @@ typedef struct Cpu_info
 {
     FILE *code_file;
     FILE *label_file;
-    FILE *log_file;
+    FILE *file_out;
 } Cpu_info;
 
 //-----------------------------------------------------------------------------
@@ -53,7 +54,7 @@ typedef struct Processor
 
 int  processor       ();
 
-int processor_ctor    (Processor *Cpu, void (*funct) (CMD_FUNCT));
+int processor_ctor   (Processor *Cpu, void (*funct) (CMD_FUNCT));
 
 int  cpu_info_ctor   (Cpu_info *Info);
 

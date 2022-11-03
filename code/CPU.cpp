@@ -28,25 +28,13 @@ int processor_ctor (Processor *Cpu, void (*funct) (CMD_FUNCT))
 {
     Cpu->Info = { 0 };
 
-    Cpu->Stk = { 0 };
-
     Cpu->func = funct;
 
+    Cpu->Stk = { 0 };
     stack_ctor (&Cpu->Stk, 2);
 
-    Cpu->regs = (int*) calloc (5, sizeof (int));
-
-    for(int rx = 0; rx < NUM_OF_REGS; rx++)
-    {
-        Cpu->regs[rx] = 0;
-    }
-
-    Cpu->ram = (double*) calloc (3, sizeof (double));
-
-    for(int i = 0; i < RAM_SIZE; i++)
-    {
-        Cpu->ram[i] = 0;
-    }
+    Cpu->regs = (int*)    calloc (5, sizeof (int));
+    Cpu->ram  = (double*) calloc (3, sizeof (double));
 
     return (cpu_info_ctor (&Cpu->Info));
 }
@@ -57,11 +45,11 @@ int cpu_info_ctor (Cpu_info *Info)
 {
     Info->code_file  = fopen ("../files/code.bin",   "rb");
     Info->label_file = fopen ("../files/labels.bin", "rb");
-    Info->log_file   = fopen ("../dump/log.txt",     "w+");
+    Info->file_out   = fopen ("../dump/log.txt",     "w+");
 
     if(Info->label_file == NULL ||
        Info->code_file  == NULL ||
-       Info->log_file   == NULL   )
+       Info->file_out   == NULL   )
     {
         return ERR_CTOR;
     }
@@ -89,7 +77,7 @@ void cpu_info_dtor (Cpu_info *Info)
 {
     fclose (Info->code_file);
     fclose (Info->label_file);
-    fclose (Info->log_file);
+    fclose (Info->file_out);
 }
 
 //-----------------------------------------------------------------------------
@@ -138,11 +126,11 @@ void read_code_file (Processor *Cpu)
 
 void handle_cmds (Processor *Cpu)
 {
-    for(int ip = 1; ip <= (int) Cpu->code[0]; ip++)
+    for(int ip = 1; ip < (int) Cpu->code[0] - 1; ip++)
     {
-        int cmd_d = Cpu->code[ip];
+        int    cmd_d = Cpu->code[ip];
+        int    pos   = 0;
         double arg_d = 0;
-        int pos = 0;
 
         if(cmd_d & MASK_REG)
         {
@@ -166,7 +154,7 @@ void handle_cmds (Processor *Cpu)
 
         else pos = 0;
 
-        Cpu->func (cmd_d & MASK_CMD, arg_d, &ip, Cpu);
+        Cpu->func (cmd_d, arg_d, &ip, Cpu);
         ip += pos;
     }
 }
@@ -195,10 +183,12 @@ void calculator (int cmd_d, double arg_d, int *ipp, Processor *Cpu)
 {
     int ip = *ipp;
 
+    cmd_d &= MASK_CMD;
+
     double f1 = -1;
     double f2 = -1;
 
-    #define CMD_DEF(cmd, code, ...) \
+    #define CMD_DEF(cmd, name, code, ...) \
         case cmd:                   \
             code                    \
             __VA_ARGS__             \
@@ -215,7 +205,7 @@ void calculator (int cmd_d, double arg_d, int *ipp, Processor *Cpu)
 
     #undef CMD_DEF
 
-    stack_dumps (&Cpu->Stk, Cpu->Info.log_file);
+    stack_dumps (&Cpu->Stk, Cpu->Info.file_out);
 
     *ipp = ip;
 }
@@ -227,7 +217,7 @@ void cpu_dump (Processor *Cpu)
     FILE *code_dmp_file  = fopen ("../dump/code_dump.txt", "w+");
     FILE *label_dmp_file = fopen ("../dump/label_dump.txt", "w+");
 
-    for(int i = 0; i <= Cpu->code[0]; i++)
+    for(int i = 0; i < Cpu->code[0] - 1; i++)
     {
         print_num_dmp (code_dmp_file, i);
 

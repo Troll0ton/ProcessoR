@@ -1,10 +1,22 @@
-all: dasm
+all: proc
 
-dasm: DASM.o 
-  g++ DASM.o 
+proc: DASM.o CPU.o lines_handle.o input_output.o stack.o
+	g++ DASM.o CPU.o lines_handle.o input_output.o stack.o
 
-main.o: DASM.cpp
+DASM.o: DASM.cpp
 	g++ -c DASM.cpp
+
+CPU.o: CPU.cpp
+	g++ -c CPU.cpp
+
+lines_handle.o: lines_handle.cpp
+	g++ -c lines_handle.cpp
+
+input_output.o: input_output.cpp
+	g++ -c input_output.cpp
+
+stack.o: stack.cpp
+	g++ -c stack.cpp
 
 clean:
 	rm -rf *.o

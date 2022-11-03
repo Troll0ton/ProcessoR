@@ -1,19 +1,19 @@
-CMD_DEF(HLT,
+CMD_DEF(HLT, "hlt",
 {
-    printf ("");
+    stack_push (&Cpu->Stk, STOP);
 })
 
-CMD_DEF(PUSH,
+CMD_DEF(PUSH, "push",
 {
     stack_push (&Cpu->Stk, arg_d);
     ip++;
 })
 
-CMD_DEF(POP,
+CMD_DEF(POP, "pop",
 {
     if((int) Cpu->code[ip] & MASK_RAM && (int) Cpu->code[ip] & MASK_REG)
     {
-        Cpu->ram[Cpu->regs[(int) Cpu->code[ip + 1]]]  = stack_pop (&Cpu->Stk);
+        Cpu->ram[Cpu->regs[(int) Cpu->code[ip + 1]]] = stack_pop (&Cpu->Stk);
     }
 
     else if((int) Cpu->code[ip] & MASK_REG)
@@ -35,37 +35,37 @@ CMD_DEF(POP,
     ip++;
 })
 
-CMD_DEF(ADD,
+CMD_DEF(ADD, "add",
 {
     stack_push (&Cpu->Stk, stack_pop (&Cpu->Stk) + stack_pop (&Cpu->Stk));
 })
 
-CMD_DEF(SUB,
+CMD_DEF(SUB, "sub",
 {
     stack_push (&Cpu->Stk, -(stack_pop (&Cpu->Stk) - stack_pop (&Cpu->Stk)));
 })
 
-CMD_DEF(MUL,
+CMD_DEF(MUL, "mul",
 {
     stack_push (&Cpu->Stk, stack_pop (&Cpu->Stk) * stack_pop (&Cpu->Stk));
 })
 
-CMD_DEF(DIV,
+CMD_DEF(DIV, "div",
 {
     stack_push (&Cpu->Stk, 1 / stack_pop (&Cpu->Stk) * stack_pop (&Cpu->Stk));
 })
 
-CMD_DEF(OUT,
+CMD_DEF(OUT, "out",
 {
     printf ("result: %lg\n", stack_pop (&Cpu->Stk));
 })
 
-CMD_DEF(DUMP,
+CMD_DEF(DUMP, "dump",
 {
-    stack_dumps (&Cpu->Stk, Cpu->Info.log_file);
+    stack_dumps (&Cpu->Stk, Cpu->Info.file_out);
 })
 
-CMD_DEF(JBE,
+CMD_DEF(JBE, "jbe",
 {
     f2 = stack_pop (&Cpu->Stk);
     f1 = stack_pop (&Cpu->Stk);
@@ -79,7 +79,7 @@ CMD_DEF(JBE,
     stack_push (&Cpu->Stk, f2);
 })
 
-CMD_DEF(JAE,
+CMD_DEF(JAE, "jae",
 {
     f2 = stack_pop (&Cpu->Stk);
     f1 = stack_pop (&Cpu->Stk);
@@ -93,7 +93,7 @@ CMD_DEF(JAE,
     stack_push (&Cpu->Stk, f2);
 })
 
-CMD_DEF(JA,
+CMD_DEF(JA, "ja",
 {
     f2 = stack_pop (&Cpu->Stk);
     f1 = stack_pop (&Cpu->Stk);
@@ -107,7 +107,7 @@ CMD_DEF(JA,
     stack_push (&Cpu->Stk, f2);
 })
 
-CMD_DEF(JB,
+CMD_DEF(JB, "jb",
 {
     f2 = stack_pop (&Cpu->Stk);
     f1 = stack_pop (&Cpu->Stk);
@@ -121,7 +121,7 @@ CMD_DEF(JB,
     stack_push (&Cpu->Stk, f2);
 })
 
-CMD_DEF(JE,
+CMD_DEF(JE, "je",
 {
     f2 = stack_pop (&Cpu->Stk);
     f1 = stack_pop (&Cpu->Stk);
@@ -135,7 +135,7 @@ CMD_DEF(JE,
     stack_push (&Cpu->Stk, f2);
 })
 
-CMD_DEF(JNE,
+CMD_DEF(JNE, "jne",
 {
     f2 = stack_pop (&Cpu->Stk);
     f1 = stack_pop (&Cpu->Stk);

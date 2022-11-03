@@ -24,8 +24,8 @@ int assembling (char *argv[])
 
 int assembler_ctor (Assembler *Asm, char *argv[])
 {
-    Asm->code_array  = (double*) calloc (100, sizeof (double));
-    Asm->label_array = (int*)    calloc (50,  sizeof (int));
+    Asm->code_array  = (double*) calloc (CODE_SIZE_INIT,   sizeof (double));
+    Asm->label_array = (int*)    calloc (LABEL_SIZE_INIT,  sizeof (int));
 
     if(Asm->code_array == NULL || Asm->label_array == NULL)
     {
@@ -68,11 +68,11 @@ int asm_info_ctor (Asm_info *Info, char *argv[])
 
 void asm_pars_ctor (Assembler *Asm)
 {
-    Asm->Pars.val_dbl = -1;
-    Asm->Pars.val_int = -1;
-    Asm->Pars.reg_sym =  0;
-    Asm->Pars.flag_cmd = 0;
-    Asm->Pars.mask =  0;
+    Asm->Pars.val_dbl          = -1;
+    Asm->Pars.val_int          = -1;
+    Asm->Pars.reg_sym          =  0;
+    Asm->Pars.flag_cmd         =  0;
+    Asm->Pars.mask             =  0;
     Asm->Pars.num_readed_codes =  1;
 }
 
@@ -118,7 +118,7 @@ void handle_line (Assembler *Asm)
 
 void parse_label (Assembler *Asm)
 {
-    if(Asm->label_arr_size + 10 > Asm->label_arr_capct)
+    if(Asm->label_arr_size + LIMIT_DIFRCE > Asm->label_arr_capct)
     {
         Asm->label_arr_capct *= 2;
 
@@ -149,7 +149,7 @@ void parse_arg (Assembler *Asm)
     {
         if(sscanf (Asm->Cur_line.begin_line, "%*s %d", &Asm->Pars.val_int) == 1)
         {
-            write_in_arg (Asm, Asm->Pars.val_dbl, MASK_IMM);
+            write_in_arg (Asm, Asm->Pars.val_int, MASK_IMM);
         }
 
         else
@@ -189,7 +189,7 @@ void parse_arg (Assembler *Asm)
 
 void write_in_arg (Assembler *Asm, double val, int mask)
 {
-    if(Asm->code_arr_size + 10 > Asm->code_arr_capct)
+    if(Asm->code_arr_size + LIMIT_DIFRCE > Asm->code_arr_capct)
     {
         Asm->code_arr_capct *= 2;
 
@@ -210,7 +210,15 @@ void parse_cmd (Assembler *Asm)
 {
     int flag_found = 0;
 
-    #include "../include/cmd_names.h"
+    char *name_cmd[] =
+    {
+        #define CMD_DEF(cmd, name, ...) \
+            name,
+
+        #include "../include/codegen.h"
+
+        #undef CMD_DEF
+    };
 
     for(int num_cmd = 0; num_cmd < NUM_OF_SUP_CMD; num_cmd++)
     {
@@ -257,6 +265,7 @@ void assembler_dtor (Assembler *Asm)
 void asm_info_dtor (Asm_info *Info)
 {
     Info->code_sgntr = WRONG_SIGN;
+
     fclose (Info->file_in);
     fclose (Info->code_file);
     fclose (Info->label_file);

@@ -33,7 +33,7 @@ typedef struct Cpu_info
 {
     FILE *code_file;
     FILE *label_file;
-    FILE *log_file;
+    FILE *file_out;
 } Cpu_info;
 
 //-----------------------------------------------------------------------------
@@ -46,14 +46,14 @@ typedef struct Processor
     double  *ram;
     double  *code;
     Stack    Stk;
-    void (*func) (CMD_FUNC_ARGS);
+    void (*func) (CMD_FUNCT);
 } Processor;
 
 //-----------------------------------------------------------------------------
 
 int  processor       ();
 
-int  processor_ctor  (Processor *Cpu);
+int processor_ctor    (Processor *Cpu, void (*funct) (CMD_FUNCT));
 
 int  cpu_info_ctor   (Cpu_info *Info);
 

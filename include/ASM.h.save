@@ -12,15 +12,21 @@
 
 //-----------------------------------------------------------------------------
 
+#define SUCCESS_READ 1
+#define EMPTY_LINE   0
+
+//-----------------------------------------------------------------------------
+
 enum Sizes
 {
-    NUM_OF_SUP_CMD = 15,
-    NUM_OF_JMPS = 6,
+    NUM_OF_SUP_CMD  = 15,
+    NUM_OF_JMPS     = 6,
     NUM_OF_CMDS_RAM = 2,
     NUM_OF_CMDS_RGS = 2,
-    CMD_MAX_LEN = 20,
-    CODE_SIZE_INIT = 100,
+    CMD_MAX_LEN     = 20,
+    CODE_SIZE_INIT  = 100,
     LABEL_SIZE_INIT = 50,
+    LIMIT_DIFRCE    = 10,
 };
 
 //-----------------------------------------------------------------------------
@@ -39,7 +45,7 @@ typedef struct Asm_info
     FILE   *file_in;
     FILE   *code_file;
     FILE   *label_file;
-    int32_t code_sgntr;
+    int code_sgntr;
 } Asm_info;
 
 //-----------------------------------------------------------------------------
@@ -97,8 +103,6 @@ void  parse_label     (Assembler *Asm);
 void  parse_arg       (Assembler *Asm);
 
 void  parse_cmd       (Assembler *Asm);
-
-int   line_empty      (Assembler *Asm);
 
 void  write_in_arg    (Assembler *Asm, double val, int mask);
 
