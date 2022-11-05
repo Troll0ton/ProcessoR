@@ -33,8 +33,14 @@ int processor_ctor (Processor *Cpu, void (*funct) (CMD_FUNCT))
     Cpu->Stk = { 0 };
     stack_ctor (&Cpu->Stk, 2);
 
+    // double*
     Cpu->regs = (int*)    calloc (5, sizeof (int));
     Cpu->ram  = (double*) calloc (3, sizeof (double));
+
+    if(Cpu->regs == NULL || Cpu->ram == NULL)
+    {
+        return ERR_CTOR;
+    }
 
     return (cpu_info_ctor (&Cpu->Info));
 }
@@ -99,6 +105,11 @@ void read_label_file (Processor *Cpu)
 
     Cpu->labels = (int*) calloc (res_label + 1, sizeof (int));
 
+    if(Cpu->labels == NULL)
+    {
+        printf ("|ERROR - NULL pointer label|\n");
+    }
+
     Cpu->labels[0] = res_label;
 
     fread (Cpu->labels + 1, sizeof(int), res_label, Cpu->Info.label_file);
@@ -116,6 +127,12 @@ void read_code_file (Processor *Cpu)
 
     Cpu->code = (double*) calloc (res_sum, sizeof (double));
 
+    if(Cpu->code == NULL)
+    {
+        printf ("|ERROR - NULL pointer code|\n");
+    }
+
+        // ???
     if(code_sgntr == CORCT_SIGN)
     {
         fill_code_array (res_sum, Cpu);
@@ -126,8 +143,10 @@ void read_code_file (Processor *Cpu)
 
 void handle_cmds (Processor *Cpu)
 {
+    // ???
     for(int ip = 1; ip < (int) Cpu->code[0] - 1; ip++)
     {
+        // curr_cmd
         int    cmd_d = Cpu->code[ip];
         int    pos   = 0;
         double arg_d = 0;
@@ -150,7 +169,9 @@ void handle_cmds (Processor *Cpu)
 
         if(cmd_d & MASK_RAM &&
            cmd_d & MASK_IMM &&
-           cmd_d & MASK_REG   ) pos = 1;
+           cmd_d & MASK_REG   )
+           // offset
+           pos = 1;
 
         else pos = 0;
 
@@ -160,6 +181,7 @@ void handle_cmds (Processor *Cpu)
 }
 
 //-----------------------------------------------------------------------------
+// ??
 
 void fill_code_array (int res_sum, Processor *Cpu)
 {
@@ -189,10 +211,12 @@ void calculator (int cmd_d, double arg_d, int *ipp, Processor *Cpu)
     double f2 = -1;
 
     #define CMD_DEF(cmd, name, code, ...) \
-        case cmd:                   \
-            code                    \
-            __VA_ARGS__             \
-            break;
+        case cmd:                         \
+        {                                 \
+            code                          \
+            __VA_ARGS__                   \
+            break;                        \
+        }
 
     switch (cmd_d)
     {

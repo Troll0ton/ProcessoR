@@ -1,0 +1,28 @@
+ARG_DEF(HLT, "hlt",
+{
+    else if(sscanf (Asm->Cur_line.begin_line, "%*s [r%cx + %d]", &Asm->Pars.reg_sym, &Asm->Pars.val_int) == 2)
+    {
+        write_in_arg (Asm, Asm->Pars.reg_sym - 'a', 0);
+        write_in_arg (Asm, Asm->Pars.val_int , MASK_RAM | MASK_REG | MASK_IMM);
+    }
+
+    else if(sscanf (Asm->Cur_line.begin_line, "%*s [%d]", &Asm->Pars.val_int) == 1)
+    {
+        write_in_arg (Asm, Asm->Pars.val_int, MASK_RAM | MASK_IMM);
+    }
+
+    else if(sscanf (Asm->Cur_line.begin_line, "%*s [r%cx]", &Asm->Pars.reg_sym) == 1)
+    {
+        write_in_arg (Asm, Asm->Pars.reg_sym - 'a', MASK_RAM | MASK_REG);
+    }
+
+    else if(sscanf (Asm->Cur_line.begin_line, "%*s r%cx", &Asm->Pars.reg_sym) == 1)
+    {
+        write_in_arg (Asm, Asm->Pars.reg_sym - 'a', MASK_REG);
+    }
+
+    else if(sscanf (Asm->Cur_line.begin_line, "%*s %lg", &Asm->Pars.val_dbl) == 1)
+    {
+        write_in_arg (Asm, Asm->Pars.val_dbl, MASK_IMM);
+    }
+})

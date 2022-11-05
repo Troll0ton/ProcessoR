@@ -2,6 +2,7 @@
 #include "../include/CPU.h"
 
 //-----------------------------------------------------------------------------
+// two mains
 
 int main (int argc, char *argv[])
 {

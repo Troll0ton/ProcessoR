@@ -2,6 +2,8 @@
 
 //-----------------------------------------------------------------------------
 
+//
+
 int assembling (char *argv[])
 {
     Assembler Asm = { 0 };
@@ -11,6 +13,7 @@ int assembling (char *argv[])
         return ERR_ASM;
     }
 
+    // assembling
     fill_asm_arrays (&Asm);
 
     files_ctor (&Asm);
@@ -24,24 +27,24 @@ int assembling (char *argv[])
 
 int assembler_ctor (Assembler *Asm, char *argv[])
 {
-    Asm->code_array  = (double*) calloc (CODE_SIZE_INIT,   sizeof (double));
-    Asm->label_array = (int*)    calloc (LABEL_SIZE_INIT,  sizeof (int));
+    Asm->code_array  = (double*) calloc (CODE_SIZE_INIT,  sizeof (double));
+    Asm->label_array = (int*)    calloc (LABEL_SIZE_INIT, sizeof (int));
 
     if(Asm->code_array == NULL || Asm->label_array == NULL)
     {
         return ERR_CTOR;
     }
 
-    Asm->code_arr_size  = 2;
+    Asm->code_arr_size  = NUM_FRST_EL_CD;
     Asm->code_arr_capct = CODE_SIZE_INIT;
 
-    Asm->label_arr_size  = 1;
+    Asm->label_arr_size  = NUM_FRST_EL_LB;
     Asm->label_arr_capct = LABEL_SIZE_INIT;
 
     Asm->Info     = { 0 };
     Asm->Cur_line = { 0 };
 
-    return (asm_info_ctor (&(Asm->Info), argv));
+    return asm_info_ctor (&(Asm->Info), argv);
 }
 
 //-----------------------------------------------------------------------------
@@ -77,6 +80,7 @@ void asm_pars_ctor (Assembler *Asm)
 }
 
 //-----------------------------------------------------------------------------
+// assembling
 
 void fill_asm_arrays (Assembler *Asm)
 {
@@ -140,6 +144,9 @@ void parse_label (Assembler *Asm)
 
 void parse_arg (Assembler *Asm)
 {
+    //
+    //  int reg_sym = 0;
+
     if(sscanf (Asm->Cur_line.begin_line, "%20s", Asm->Pars.cmd) == 1)
     {
         Asm->Pars.flag_cmd++;
@@ -236,6 +243,7 @@ void parse_cmd (Assembler *Asm)
 }
 
 //-----------------------------------------------------------------------------
+// ?????
 
 void files_ctor (Assembler *Asm)
 {

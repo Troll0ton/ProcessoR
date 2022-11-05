@@ -33,9 +33,11 @@ enum Sizes
 
 enum Numbers
 {
-    CMD_REG_NUM = 1,
-    CMD_RAM_NUM = 1,
-    CMD_JMP_NUM = 9,
+    CMD_REG_NUM    = 1,
+    CMD_RAM_NUM    = 1,
+    CMD_JMP_NUM    = 9,
+    NUM_FRST_EL_CD = 2,
+    NUM_FRST_EL_LB = 1,
 };
 
 //-----------------------------------------------------------------------------
@@ -52,9 +54,10 @@ typedef struct Asm_info
 
 typedef struct Input_pars
 {
+    // char* ??
     char   cmd[CMD_MAX_LEN];
     double val_dbl;
-    int    val_int;
+    int    val_int; // naming
     char   reg_sym;
     int    mask;
     int    flag_cmd;

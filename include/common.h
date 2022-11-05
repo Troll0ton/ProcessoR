@@ -7,9 +7,9 @@
 
 //-----------------------------------------------------------------------------
 
-#define CMD_FUNCT int cmd_d,   \
-                      double arg_d,\
-                      int *ipp,    \
+#define CMD_FUNCT int cmd_d,        \
+                      double arg_d, \
+                      int *ipp,     \
                       Processor *Cpu
 
 //-----------------------------------------------------------------------------

@@ -2,6 +2,15 @@
 
 //-----------------------------------------------------------------------------
 
+int main ()
+{
+    disassembling ();
+
+    return 0;
+}
+
+//-----------------------------------------------------------------------------
+
 int disassembling ()
 {
     Disassember Dasm = { 0 };
@@ -26,12 +35,12 @@ void file_writer (int cmd_d, double arg_d, int *ipp, Processor *Cpu)
 {
     int ip = *ipp;
 
-    #define CMD_DEF(cmd, name, ...)                    \
+    #define CMD_DEF(cmd, name,msk, ...)                    \
         case cmd:                                      \
             fprintf (Cpu->Info.file_out, "%s ", name); \
             break;
 
-    switch (cmd_d)
+    switch (cmd_d & MASK_CMD)
     {
         #include "../include/codegen.h"
 
@@ -46,39 +55,43 @@ void file_writer (int cmd_d, double arg_d, int *ipp, Processor *Cpu)
        cmd_d & MASK_IMM &&
        cmd_d & MASK_REG   )
     {
-        fprintf (Cpu->Info.file_out, "[r%cx + %d]\n", (int) Cpu->code[ip + 1] + 'a', (int) Cpu->code[ip + 2]);
+        fprintf (Cpu->Info.file_out, "[r%cx + %d]", (int) Cpu->code[ip + 1] + 'a', (int) Cpu->code[ip + 2]);
         ip += 2;
     }
 
     else if(cmd_d & MASK_REG &&
             cmd_d & MASK_RAM   )
     {
-        fprintf (Cpu->Info.file_out, "[r%cx]\n", (int) Cpu->code[ip + 1] + 'a');
+        fprintf (Cpu->Info.file_out, "[r%cx]", (int) Cpu->code[ip + 1] + 'a');
         ip += 1;
     }
 
     else if(cmd_d & MASK_IMM &&
             cmd_d & MASK_RAM   )
     {
-        fprintf (Cpu->Info.file_out, "[%d]\n", (int) Cpu->code[ip + 1]);
+        fprintf (Cpu->Info.file_out, "[%d]", (int) Cpu->code[ip + 1]);
         ip += 1;
     }
 
     else if(cmd_d & MASK_IMM)
     {
-        fprintf (Cpu->Info.file_out, "%d\n", (int) Cpu->code[ip + 1]);
+        fprintf (Cpu->Info.file_out, "%d", (int) Cpu->code[ip + 1]);
         ip += 1;
     }
 
     else if(cmd_d & MASK_REG)
     {
-        fprintf (Cpu->Info.file_out, "r%cx\n", (int) Cpu->code[ip + 1] + 'a');
+        fprintf (Cpu->Info.file_out, "r%cx", (int) Cpu->code[ip + 1] + 'a');
         ip += 1;
     }
+
+    fprintf (Cpu->Info.file_out, "\n");
 
     *ipp = ip;
 }
 
 //-----------------------------------------------------------------------------
+
+
 
 

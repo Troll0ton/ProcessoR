@@ -54,7 +54,7 @@ typedef struct Processor
 
 int  processor       ();
 
-int processor_ctor   (Processor *Cpu, void (*funct) (CMD_FUNCT));
+int  processor_ctor  (Processor *Cpu, void (*funct) (CMD_FUNCT));
 
 int  cpu_info_ctor   (Cpu_info *Info);
 
