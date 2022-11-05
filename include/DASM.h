@@ -1,4 +1,4 @@
-//! @file DASM.h
+``//! @file DASM.h
 
 #ifndef   DASM_H
 #define   DASM_H
@@ -19,7 +19,7 @@
 
 int  disassembling ();
 
-void file_writer   (int cmd_d, double arg_d, int *ipp, Processor *Cpu);
+void file_writer   (int curr_cmd, double curr_arg, int *curr_ptr, Processor *Cpu);
 
 //-----------------------------------------------------------------------------
 

@@ -1,13 +1,14 @@
-all: procm
+CC=g++
+CFLAGS=-c -Wall
+LDFLAGS=
+SOURCES=CPU.cpp lines_handle.cpp input_output.cpp stack.cpp
+OBJECTS=$(SOURCES:.cpp=.o)
+EXECUTABLE=cpu
 
-procm: CPU.o stack.o
-	g++ CPU.o stack.o
+all: $(SOURCES) $(EXECUTABLE)
+	
+$(EXECUTABLE): $(OBJECTS) 
+	$(CC) $(LDFLAGS) $(OBJECTS) -o $@
 
-CPU.o: CPU.cpp
-	g++ -c CPU.cpp
-
-stack.o: stack.cpp
-	g++ -c stack.cpp
-
-clean:
-	rm -rf *.o
+.cpp.o:
+	$(CC) $(CFLAGS) $< -o $@

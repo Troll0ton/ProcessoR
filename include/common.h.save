@@ -7,21 +7,21 @@
 
 //-----------------------------------------------------------------------------
 
-#define CMD_FUNC_ARGS int cmd_d,   \
-                      double arg_d,\
-                      int *ipp,    \
+#define CMD_FUNCT int curr_cmd,        \
+                      double arg_d, \
+                      int *ipp,     \
                       Processor *Cpu
 
 //-----------------------------------------------------------------------------
 
 enum CMD_CODES
 {
-    #define CMD_DEF(cmd, ...) \
+    #define curr_cmdEF(cmd, ...) \
     cmd,
 
     #include "codegen.h"
 
-    #undef CMD_DEF
+    #undef curr_cmdEF
 };
 
 //-----------------------------------------------------------------------------

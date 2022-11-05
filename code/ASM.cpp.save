@@ -2,21 +2,18 @@
 
 //-----------------------------------------------------------------------------
 
-//
-
-int assembling (char *argv[])
+int main (int argc, char *argv[])
 {
     Assembler Asm = { 0 };
 
     if(assembler_ctor (&Asm, argv) == ERR_CTOR)
     {
-        return ERR_ASM;
+        printf ("----ERROR ASM----");
     }
 
-    // assembling
-    fill_asm_arrays (&Asm);
+    assembling (&Asm);
 
-    files_ctor (&Asm);
+    asm_dump (&Asm);
 
     assembler_dtor (&Asm);
 
@@ -36,7 +33,9 @@ int assembler_ctor (Assembler *Asm, char *argv[])
     }
 
     Asm->code_arr_size  = NUM_FRST_EL_CD;
+    Asm->cur_pos        = NUM_FRST_EL_CD;
     Asm->code_arr_capct = CODE_SIZE_INIT;
+    Asm->offset         = 0;
 
     Asm->label_arr_size  = NUM_FRST_EL_LB;
     Asm->label_arr_capct = LABEL_SIZE_INIT;
@@ -55,11 +54,10 @@ int asm_info_ctor (Asm_info *Info, char *argv[])
 
     Info->file_in    = fopen ((char*) argv[1],       "rb");
     Info->code_file  = fopen ("../files/code.bin",   "wb");
-    Info->label_file = fopen ("../files/labels.bin", "wb");
+    Info->dbl_pass   = false;
 
     if(Info->file_in    == NULL ||
-       Info->code_file  == NULL ||
-       Info->label_file == NULL   )
+       Info->code_file  == NULL   )
     {
         return ERR_CTOR;
     }
@@ -69,23 +67,25 @@ int asm_info_ctor (Asm_info *Info, char *argv[])
 
 //-----------------------------------------------------------------------------
 
-void asm_pars_ctor (Assembler *Asm)
-{
-    Asm->Pars.val_dbl          = -1;
-    Asm->Pars.val_int          = -1;
-    Asm->Pars.reg_sym          =  0;
-    Asm->Pars.flag_cmd         =  0;
-    Asm->Pars.mask             =  0;
-    Asm->Pars.num_readed_codes =  1;
-}
-
-//-----------------------------------------------------------------------------
-// assembling
-
-void fill_asm_arrays (Assembler *Asm)
+void assembling (Assembler *Asm)
 {
     File *File_input = file_reader (Asm->Info.file_in);
     Line *Text = lines_separator (File_input);
+
+    handle_text (Asm, Text, File_input);
+
+    write_res_sums (Asm);
+
+    clear_mem (Text, File_input);
+
+    fwrite (Asm->code_array, sizeof(double), Asm->code_arr_size, Asm->Info.code_file);
+}
+
+//-----------------------------------------------------------------------------
+
+void handle_text (Assembler *Asm, Line *Text, File *File_input)
+{
+    Asm->Info.dbl_pass = false;
 
     for(int i = 0; i < File_input->num_of_lines; i++)
     {
@@ -94,33 +94,36 @@ void fill_asm_arrays (Assembler *Asm)
         handle_line (Asm);
     }
 
-    write_res_sums (Asm);
+    Asm->code_arr_size = Asm->cur_pos;
+    Asm->cur_pos = 0;
 
-    clear_mem (Text, File_input);
+    if(Asm->Info.dbl_pass) handle_text (Asm, Text, File_input);
 }
 
 //-----------------------------------------------------------------------------
 
 void handle_line (Assembler *Asm)
 {
-    asm_pars_ctor (Asm);
+    int label;
 
-    if(sscanf (Asm->Cur_line.begin_line, ":%d", &Asm->Pars.val_int) == 1)
+    Command Cmd = { 0 };
+
+    if(!Asm->Info.dbl_pass && sscanf (Asm->Cur_line.begin_line, ":%d", &label) == 1)
     {
-        parse_label (Asm);
+        parse_label (Asm, label);
     }
 
     else
     {
-        parse_arg (Asm);
+        parse_arg (Asm, &Cmd);
 
-        if(Asm->Pars.flag_cmd) parse_cmd (Asm);
+        if(Cmd.flag_cmd) parse_cmd (Asm, Cmd);
     }
 }
 
 //-----------------------------------------------------------------------------
 
-void parse_label (Assembler *Asm)
+void parse_label (Assembler *Asm, int label)
 {
     if(Asm->label_arr_size + LIMIT_DIFRCE > Asm->label_arr_capct)
     {
@@ -132,31 +135,39 @@ void parse_label (Assembler *Asm)
                                             sizeof (int)         );
     }
 
-    if(Asm->Pars.val_int > Asm->label_arr_size)
+    if(label > Asm->label_arr_size)
     {
-        Asm->label_arr_size = Asm->Pars.val_int;
+        Asm->label_arr_size = label;
     }
 
-    Asm->label_array[Asm->Pars.val_int] = Asm->code_arr_size;
+    Asm->label_array[label] = Asm->cur_pos;
 }
 
 //-----------------------------------------------------------------------------
 
-void parse_arg (Assembler *Asm)
+void parse_arg (Assembler *Asm, Command *Cmd)
 {
-    //
-    //  int reg_sym = 0;
+    Cmd->title     = NULL;
+    Cmd->flag_cmd = 0;
+    Cmd->mask     = 0;
+    Asm->offset   = 0;
 
-    if(sscanf (Asm->Cur_line.begin_line, "%20s", Asm->Pars.cmd) == 1)
+    int    label                 = 0;
+    char   reg_sym               = 0;
+    char   cmd_name[CMD_MAX_LEN] = "";
+    double arg_val               = 0;
+
+    if(sscanf (Asm->Cur_line.begin_line, "%20s", cmd_name) == 1)
     {
-        Asm->Pars.flag_cmd++;
+        Cmd->title = cmd_name;
+        Cmd->flag_cmd++;
     }
 
     if(strchr (Asm->Cur_line.begin_line, ':') != NULL)
     {
-        if(sscanf (Asm->Cur_line.begin_line, "%*s %d", &Asm->Pars.val_int) == 1)
+        if(sscanf (Asm->Cur_line.begin_line, "%*s %d", &label) == 1)
         {
-            write_in_arg (Asm, Asm->Pars.val_int, MASK_IMM);
+            parse_jmp (Asm, Cmd, label);
         }
 
         else
@@ -165,90 +176,100 @@ void parse_arg (Assembler *Asm)
         }
     }
 
-    else if(sscanf (Asm->Cur_line.begin_line, "%*s [r%cx + %d]", &Asm->Pars.reg_sym, &Asm->Pars.val_int) == 2)
+    else if(sscanf (Asm->Cur_line.begin_line, "%*s [r%cx + %lg]", &reg_sym, &arg_val) == 2)
     {
-        write_in_arg (Asm, Asm->Pars.reg_sym - 'a', 0);
-        write_in_arg (Asm, Asm->Pars.val_int , MASK_RAM | MASK_REG | MASK_IMM);
+        write_in_arg (Asm, Cmd, reg_sym - 'a', 0);
+        write_in_arg (Asm, Cmd, arg_val, MASK_RAM | MASK_REG | MASK_IMM);
     }
 
-    else if(sscanf (Asm->Cur_line.begin_line, "%*s [%d]", &Asm->Pars.val_int) == 1)
+    else if(sscanf (Asm->Cur_line.begin_line, "%*s [%lg]", &arg_val) == 1)
     {
-        write_in_arg (Asm, Asm->Pars.val_int, MASK_RAM | MASK_IMM);
+        write_in_arg (Asm, Cmd, arg_val, MASK_RAM | MASK_IMM);
     }
 
-    else if(sscanf (Asm->Cur_line.begin_line, "%*s [r%cx]", &Asm->Pars.reg_sym) == 1)
+    else if(sscanf (Asm->Cur_line.begin_line, "%*s [r%cx]", &reg_sym) == 1)
     {
-        write_in_arg (Asm, Asm->Pars.reg_sym - 'a', MASK_RAM | MASK_REG);
+        write_in_arg (Asm, Cmd, reg_sym - 'a', MASK_RAM | MASK_REG);
     }
 
-    else if(sscanf (Asm->Cur_line.begin_line, "%*s r%cx", &Asm->Pars.reg_sym) == 1)
+    else if(sscanf (Asm->Cur_line.begin_line, "%*s r%cx", &reg_sym) == 1)
     {
-        write_in_arg (Asm, Asm->Pars.reg_sym - 'a', MASK_REG);
+        write_in_arg (Asm, Cmd, reg_sym - 'a', MASK_REG);
     }
 
-    else if(sscanf (Asm->Cur_line.begin_line, "%*s %lg", &Asm->Pars.val_dbl) == 1)
+    else if(sscanf (Asm->Cur_line.begin_line, "%*s %lg", &arg_val) == 1)
     {
-        write_in_arg (Asm, Asm->Pars.val_dbl, MASK_IMM);
+        write_in_arg (Asm, Cmd, arg_val, MASK_IMM);
     }
 }
 
 //-----------------------------------------------------------------------------
 
-void write_in_arg (Assembler *Asm, double val, int mask)
+void parse_jmp (Assembler *Asm, Command *Cmd, int label)
 {
-    if(Asm->code_arr_size + LIMIT_DIFRCE > Asm->code_arr_capct)
+    if(label <= Asm->label_arr_size && Asm->label_array[label] > 0)
+    {
+        write_in_arg (Asm, Cmd, Asm->label_array[label], MASK_IMM);
+    }
+
+    else
+    {
+        write_in_arg (Asm, Cmd, -1, MASK_IMM);
+
+        Asm->Info.dbl_pass = true;
+    }
+}
+
+//-----------------------------------------------------------------------------
+
+void write_in_arg (Assembler *Asm, Command *Cmd, double arg_val, int mask)
+{
+    if(Asm->cur_pos + LIMIT_DIFRCE > Asm->code_arr_capct)
     {
         Asm->code_arr_capct *= 2;
 
         Asm->code_array = (double*) recalloc (Asm->code_array,
                                               Asm->code_arr_capct,
-                                              Asm->code_arr_size,
+                                              Asm->cur_pos,
                                               sizeof (double)     );
     }
 
-    Asm->code_array[Asm->code_arr_size + 1] = val;
-    Asm->Pars.mask |= mask;
-    Asm->Pars.num_readed_codes++;
+    Asm->code_array[Asm->cur_pos + 1] = arg_val;
+    Cmd->mask |= mask;
+    Asm->offset++;
 }
 
 //-----------------------------------------------------------------------------
 
-void parse_cmd (Assembler *Asm)
+void parse_cmd (Assembler *Asm, Command Cmd)
 {
     int flag_found = 0;
 
-    char *name_cmd[] =
+    char *cmd_names[] =
     {
-        #define CMD_DEF(cmd, name, ...) \
-            name,
+        #define curr_cmdEF(cmd, name, code, ...)\
+        name,
 
         #include "../include/codegen.h"
 
-        #undef CMD_DEF
+        #undef curr_cmdEF
     };
 
     for(int num_cmd = 0; num_cmd < NUM_OF_SUP_CMD; num_cmd++)
     {
-        if(stricmp (Asm->Pars.cmd, name_cmd[num_cmd]) == 0)
+        if(stricmp (Cmd.title, cmd_names[num_cmd]) == 0)
         {
-            Asm->code_array[Asm->code_arr_size] = num_cmd | Asm->Pars.mask;
-            Asm->code_arr_size += Asm->Pars.num_readed_codes;
+            Asm->code_array[Asm->cur_pos] = num_cmd | Cmd.mask;
+            Asm->cur_pos += Asm->offset;
             flag_found++;
+            printf  ("a");
 
             break;
         }
     }
 
+
     if(flag_found == 0) Asm->Info.code_sgntr = WRONG_SIGN;
-}
-
-//-----------------------------------------------------------------------------
-// 
-
-void files_ctor (Assembler *Asm)
-{
-    fwrite (Asm->code_array,  sizeof(double), Asm->code_arr_size,  Asm->Info.code_file);
-    fwrite (Asm->label_array, sizeof(int),    Asm->label_arr_size + 1, Asm->Info.label_file);
 }
 
 //-----------------------------------------------------------------------------
@@ -276,7 +297,6 @@ void asm_info_dtor (Asm_info *Info)
 
     fclose (Info->file_in);
     fclose (Info->code_file);
-    fclose (Info->label_file);
 }
 
 //-----------------------------------------------------------------------------
@@ -289,4 +309,27 @@ void write_res_sums (Assembler *Asm)
 }
 
 //-----------------------------------------------------------------------------
+
+void asm_dump (Assembler *Asm)
+{
+    FILE *code_dmp_file  = fopen ("../dump/code_asm_dump.txt", "w+");
+    FILE *label_dmp_file = fopen ("../dump/label_asm_dump.txt", "w+");
+
+    for(int i = 0; i < Asm->code_array[0]; i++)
+    {
+        fprintf (code_dmp_file, "%06d || %lg\n", i, Asm->code_array[i]);
+    }
+
+    for(int i = 0; i <= Asm->label_array[0]; i++)
+    {
+        fprintf (label_dmp_file, "%06d || %d\n", i, Asm->label_array[i]);
+    }
+
+    fclose  (code_dmp_file);
+    fclose  (label_dmp_file);
+}
+
+//-----------------------------------------------------------------------------
+
+
 

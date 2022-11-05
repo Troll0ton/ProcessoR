@@ -46,33 +46,29 @@ typedef struct Asm_info
 {
     FILE   *file_in;
     FILE   *code_file;
-    FILE   *label_file;
-    int code_sgntr;
+    int     code_sgntr;
+    bool    dbl_pass;
 } Asm_info;
 
 //-----------------------------------------------------------------------------
 
-typedef struct Input_pars
+typedef struct Command
 {
-    // char* ??
-    char   cmd[CMD_MAX_LEN];
-    double val_dbl;
-    int    val_int; // naming
-    char   reg_sym;
-    int    mask;
-    int    flag_cmd;
-    int    num_readed_codes;
-} Input_pars;
+    char *title;
+    int   flag_cmd;
+    int   mask;
+} Command;
 
 //-----------------------------------------------------------------------------
 
 typedef struct Assembler
 {
     Asm_info   Info;
-    Input_pars Pars;
     Line       Cur_line;
     double    *code_array;
     int       *label_array;
+    int        cur_pos;
+    int        offset;
     int        code_arr_size;
     int        label_arr_size;
     int        code_arr_capct;
@@ -81,33 +77,35 @@ typedef struct Assembler
 
 //-----------------------------------------------------------------------------
 
-int   assembling      (char *argv[]);
+void assembling     (Assembler *Asm);
 
-int   assembler_ctor  (Assembler *Asm, char *argv[]);
+int  assembler_ctor (Assembler *Asm, char *argv[]);
 
-int   asm_info_ctor   (Asm_info *Info, char *argv[]);
+int  asm_info_ctor  (Asm_info *Info, char *argv[]);
 
-void  fill_asm_arrays (Assembler *Asm);
+void handle_line    (Assembler *Asm);
 
-void  handle_line     (Assembler *Asm);
+void assembler_dtor (Assembler *Asm);
 
-void  files_ctor      (Assembler *Asm);
+void asm_info_dtor  (Asm_info *Info);
 
-void  assembler_dtor  (Assembler *Asm);
+void write_res_sums (Assembler *Asm);
 
-void  asm_info_dtor   (Asm_info *Info);
+void asm_pars_ctor  (Assembler *Asm);
 
-void  write_res_sums  (Assembler *Asm);
+void parse_label    (Assembler *Asm, int label);
 
-void  asm_pars_ctor   (Assembler *Asm);
+void parse_arg      (Assembler *Asm, Command *Cmd);
 
-void  parse_label     (Assembler *Asm);
+void parse_cmd      (Assembler *Asm, Command Cmd);
 
-void  parse_arg       (Assembler *Asm);
+void parse_jmp      (Assembler *Asm, Command *Cmd, int label);
 
-void  parse_cmd       (Assembler *Asm);
+void handle_text    (Assembler *Asm, Line *Text, File *File_input);
 
-void  write_in_arg    (Assembler *Asm, double val, int mask);
+void write_in_arg   (Assembler *Asm, Command *Cmd, double arg_val, int mask);
+
+void asm_dump       (Assembler *Asm);
 
 //-----------------------------------------------------------------------------
 

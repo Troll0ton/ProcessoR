@@ -1,25 +1,14 @@
-all: proc
+CC=g++
+CFLAGS=-c -Wall
+LDFLAGS=
+SOURCES=ASM.cpp lines_handle.cpp input_output.cpp stack.cpp
+OBJECTS=$(SOURCES:.cpp=.o)
+EXECUTABLE=asm
 
-proc: ASM.o lines_handle.o input_output.o CPU.o stack.o make_file.o
-	g++ ASM.o lines_handle.o input_output.o CPU.o stack.o make_file.o
+all: $(SOURCES) $(EXECUTABLE)
+	
+$(EXECUTABLE): $(OBJECTS) 
+	$(CC) $(LDFLAGS) $(OBJECTS) -o $@
 
-ASM.o: ASM.cpp
-	g++ -c ASM.cpp
-
-lines_handle.o: lines_handle.cpp
-	g++ -c lines_handle.cpp
-
-input_output.o: input_output.cpp
-	g++ -c input_output.cpp
-
-CPU.o: CPU.cpp
-	g++ -c CPU.cpp
-
-stack.o: stack.cpp
-	g++ -c stack.cpp
-
-make_file.o: make_file.cpp
-	g++ -c make_file.cpp
-
-clean:
-	rm -rf *.o
+.cpp.o:
+	$(CC) $(CFLAGS) $< -o $@

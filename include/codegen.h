@@ -5,7 +5,7 @@ CMD_DEF(HLT, "hlt",
 
 CMD_DEF(PUSH, "push",
 {
-    stack_push (&Cpu->Stk, arg_d);
+    stack_push (&Cpu->Stk, curr_arg);
     ip++;
 })
 
@@ -13,7 +13,7 @@ CMD_DEF(POP, "pop",
 {
     if((int) Cpu->code[ip] & MASK_RAM && (int) Cpu->code[ip] & MASK_REG)
     {
-        Cpu->ram[Cpu->regs[(int) Cpu->code[ip + 1]]] = stack_pop (&Cpu->Stk);
+        Cpu->ram[(int) Cpu->regs[(int) Cpu->code[ip + 1]]] = stack_pop (&Cpu->Stk);
     }
 
     else if((int) Cpu->code[ip] & MASK_REG)
@@ -67,84 +67,87 @@ CMD_DEF(DUMP, "dump",
 
 CMD_DEF(JBE, "jbe",
 {
-    f2 = stack_pop (&Cpu->Stk);
-    f1 = stack_pop (&Cpu->Stk);
-    if(f1 <= f2)
+    double second_number = stack_pop (&Cpu->Stk);
+    double first_number  = stack_pop (&Cpu->Stk);
+
+    if(first_number <= second_number)
     {
-        int pos_ch = arg_d;
-        ip = Cpu->labels[pos_ch] - 2;
+        int pos_ch = curr_arg;
+        ip = pos_ch - 2;
     }
+
     else ip++;
-    stack_push (&Cpu->Stk, f1);
-    stack_push (&Cpu->Stk, f2);
+
+    stack_push (&Cpu->Stk, first_number);
+    stack_push (&Cpu->Stk, second_number);
 })
 
 CMD_DEF(JAE, "jae",
 {
-    f2 = stack_pop (&Cpu->Stk);
-    f1 = stack_pop (&Cpu->Stk);
-    if(f1 >= f2)
+    double second_number = stack_pop (&Cpu->Stk);
+    double first_number  = stack_pop (&Cpu->Stk);
+    if(first_number >= second_number)
     {
-        int pos_ch = arg_d;
-        ip = Cpu->labels[pos_ch] - 2;
+        int pos_ch = curr_arg;
+        ip = pos_ch - 2;
     }
     else ip++;
-    stack_push (&Cpu->Stk, f1);
-    stack_push (&Cpu->Stk, f2);
+    stack_push (&Cpu->Stk, first_number);
+    stack_push (&Cpu->Stk, second_number);
 })
 
 CMD_DEF(JA, "ja",
 {
-    f2 = stack_pop (&Cpu->Stk);
-    f1 = stack_pop (&Cpu->Stk);
-    if(f1 > f2)
+    double second_number = stack_pop (&Cpu->Stk);
+    double first_number  = stack_pop (&Cpu->Stk);
+    if(first_number > second_number)
     {
-        int pos_ch = arg_d;
-        ip = Cpu->labels[pos_ch] - 2;
+        int pos_ch = curr_arg;
+        ip = pos_ch- 2;
     }
     else ip++;
-    stack_push (&Cpu->Stk, f1);
-    stack_push (&Cpu->Stk, f2);
+    stack_push (&Cpu->Stk, first_number);
+    stack_push (&Cpu->Stk, second_number);
 })
 
 CMD_DEF(JB, "jb",
 {
-    f2 = stack_pop (&Cpu->Stk);
-    f1 = stack_pop (&Cpu->Stk);
-    if(f1 < f2)
+    double second_number = stack_pop (&Cpu->Stk);
+    double first_number  = stack_pop (&Cpu->Stk);
+    if(first_number < second_number)
     {
-        int pos_ch = arg_d;
-        ip = Cpu->labels[pos_ch] - 2;
+        int pos_ch = curr_arg;
+        ip = pos_ch - 2;
     }
     else ip++;
-    stack_push (&Cpu->Stk, f1);
-    stack_push (&Cpu->Stk, f2);
+    stack_push (&Cpu->Stk, first_number);
+    stack_push (&Cpu->Stk, second_number);
 })
 
 CMD_DEF(JE, "je",
 {
-    f2 = stack_pop (&Cpu->Stk);
-    f1 = stack_pop (&Cpu->Stk);
-    if(is_equal(f1,f2))
+    double second_number = stack_pop (&Cpu->Stk);
+    double first_number  = stack_pop (&Cpu->Stk);
+    if(is_equal(first_number,second_number))
     {
-        int pos_ch = arg_d;
-        ip = Cpu->labels[pos_ch] - 2;
+        int pos_ch = curr_arg;
+        ip = pos_ch - 2;
     }
     else ip++;
-    stack_push (&Cpu->Stk, f1);
-    stack_push (&Cpu->Stk, f2);
+    stack_push (&Cpu->Stk, first_number);
+    stack_push (&Cpu->Stk, second_number);
 })
 
 CMD_DEF(JNE, "jne",
 {
-    f2 = stack_pop (&Cpu->Stk);
-    f1 = stack_pop (&Cpu->Stk);
-    if(!is_equal(f1,f2))
+    double second_number = stack_pop (&Cpu->Stk);
+    double first_number  = stack_pop (&Cpu->Stk);
+    if(!is_equal(first_number,second_number))
     {
-        int pos_ch = arg_d;
-        ip = Cpu->labels[pos_ch] - 2;
+        int pos_ch = curr_arg;
+        ip = pos_ch - 2;
     }
     else ip++;
-    stack_push (&Cpu->Stk, f1);
-    stack_push (&Cpu->Stk, f2);
+    stack_push (&Cpu->Stk, first_number);
+    stack_push (&Cpu->Stk, second_number);
 })

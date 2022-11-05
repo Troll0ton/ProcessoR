@@ -2,7 +2,7 @@
 
 //-----------------------------------------------------------------------------
 
-int processor ()
+int main (int argc, char *argv[])
 {
     Processor Cpu = { 0 };
 
@@ -11,7 +11,7 @@ int processor ()
         return ERR_CPU;
     }
 
-    read_files (&Cpu);
+    read_code_file (&Cpu);
 
     cpu_dump (&Cpu);
 
@@ -33,8 +33,7 @@ int processor_ctor (Processor *Cpu, void (*funct) (CMD_FUNCT))
     Cpu->Stk = { 0 };
     stack_ctor (&Cpu->Stk, 2);
 
-    // double*
-    Cpu->regs = (int*)    calloc (5, sizeof (int));
+    Cpu->regs = (double*) calloc (5, sizeof (double));
     Cpu->ram  = (double*) calloc (3, sizeof (double));
 
     if(Cpu->regs == NULL || Cpu->ram == NULL)
@@ -50,11 +49,9 @@ int processor_ctor (Processor *Cpu, void (*funct) (CMD_FUNCT))
 int cpu_info_ctor (Cpu_info *Info)
 {
     Info->code_file  = fopen ("../files/code.bin",   "rb");
-    Info->label_file = fopen ("../files/labels.bin", "rb");
     Info->file_out   = fopen ("../dump/log.txt",     "w+");
 
-    if(Info->label_file == NULL ||
-       Info->code_file  == NULL ||
+    if(Info->code_file  == NULL ||
        Info->file_out   == NULL   )
     {
         return ERR_CTOR;
@@ -71,7 +68,6 @@ void processor_dtor (Processor *Cpu)
 
     free (Cpu->regs);
     free (Cpu->ram);
-    free (Cpu->labels);
     free (Cpu->code);
 
     cpu_info_dtor (&Cpu->Info);
@@ -82,37 +78,7 @@ void processor_dtor (Processor *Cpu)
 void cpu_info_dtor (Cpu_info *Info)
 {
     fclose (Info->code_file);
-    fclose (Info->label_file);
     fclose (Info->file_out);
-}
-
-//-----------------------------------------------------------------------------
-
-void read_files (Processor *Cpu)
-{
-    read_label_file (Cpu);
-
-    read_code_file  (Cpu);
-}
-
-//-----------------------------------------------------------------------------
-
-void read_label_file (Processor *Cpu)
-{
-    int res_label = -1;
-
-    fread (&res_label, sizeof(int), 1, Cpu->Info.label_file);
-
-    Cpu->labels = (int*) calloc (res_label + 1, sizeof (int));
-
-    if(Cpu->labels == NULL)
-    {
-        printf ("|ERROR - NULL pointer label|\n");
-    }
-
-    Cpu->labels[0] = res_label;
-
-    fread (Cpu->labels + 1, sizeof(int), res_label, Cpu->Info.label_file);
 }
 
 //-----------------------------------------------------------------------------
@@ -123,71 +89,65 @@ void read_code_file (Processor *Cpu)
     double code_sgntr = -1;
 
     fread (&res_sum,    sizeof(double), 1, Cpu->Info.code_file);
+    code_size
     fread (&code_sgntr, sizeof(double), 1, Cpu->Info.code_file);
 
-    Cpu->code = (double*) calloc (res_sum, sizeof (double));
-
-    if(Cpu->code == NULL)
-    {
-        printf ("|ERROR - NULL pointer code|\n");
-    }
-
-        // ???
     if(code_sgntr == CORCT_SIGN)
     {
-        fill_code_array (res_sum, Cpu);
+        Cpu->code = (double*) calloc (res_sum, sizeof (double));
+
+        if(Cpu->code == NULL)
+        {
+            printf ("__________|ERROR - NULL pointer code|__________\n");
+        }
+
+        Cpu->code[0] = res_sum;
+
+        fread (Cpu->code + 1, sizeof(double), res_sum - 1, Cpu->Info.code_file);
     }
+
+    else printf ("__________|WRONG SIGNATURE!|__________\n");
 }
 
 //-----------------------------------------------------------------------------
 
 void handle_cmds (Processor *Cpu)
 {
-    // ???
+    int code_size = (int) Cpu->code[0] - 1
     for(int ip = 1; ip < (int) Cpu->code[0] - 1; ip++)
     {
         // curr_cmd
-        int    cmd_d = Cpu->code[ip];
+        int    curr_cmd = Cpu->code[ip];
         int    pos   = 0;
         double arg_d = 0;
 
-        if(cmd_d & MASK_REG)
+        if(curr_cmd & MASK_REG)
         {
             arg_d += Cpu->regs[(int) Cpu->code[ip + 1]];
             pos++;
         }
 
-        if(cmd_d & MASK_IMM)
+        if(curr_cmd & MASK_IMM)
         {
             arg_d += Cpu->code[ip + 1 + pos];
         }
 
-        if(cmd_d & MASK_RAM)
+        if(curr_cmd & MASK_RAM)
         {
             arg_d = Cpu->ram[(int) arg_d];
         }
 
-        if(cmd_d & MASK_RAM &&
-           cmd_d & MASK_IMM &&
-           cmd_d & MASK_REG   )
+        if(curr_cmd & MASK_RAM &&
+           curr_cmd & MASK_IMM &&
+           curr_cmd & MASK_REG   )
            // offset
            pos = 1;
 
         else pos = 0;
 
-        Cpu->func (cmd_d, arg_d, &ip, Cpu);
+        Cpu->func (curr_cmd, arg_d, &ip, Cpu);
         ip += pos;
     }
-}
-
-//-----------------------------------------------------------------------------
-// ??
-
-void fill_code_array (int res_sum, Processor *Cpu)
-{
-    Cpu->code[0] = res_sum;
-
-    fread (Cpu->code + 1, sizeof(double), res_sum - 1, Cpu->Info.code_file);
 }
 
 //-----------------------------------------------------------------------------
@@ -201,27 +161,26 @@ bool is_equal (double a, double b)
 
 //-----------------------------------------------------------------------------
 
-void calculator (int cmd_d, double arg_d, int *ipp, Processor *Cpu)
+void calculator (int curr_cmd, double arg_d, int *ipp, Processor *Cpu)
 {
     int ip = *ipp;
 
-    cmd_d &= MASK_CMD;
-
-    double f1 = -1;
-    double f2 = -1;
+    curr_cmd &= MASK_CMD;
 
     #define CMD_DEF(cmd, name, code, ...) \
         case cmd:                         \
+        {                                 \
             code                          \
             __VA_ARGS__                   \
-            break;
+            break;                        \
+        }
 
-    switch (cmd_d)
+    switch (curr_cmd)
     {
         #include "../include/codegen.h"
 
         default:
-            printf ("?%d \n", cmd_d);
+            printf ("?%d \n", curr_cmd);
             break;
     }
 
@@ -236,54 +195,18 @@ void calculator (int cmd_d, double arg_d, int *ipp, Processor *Cpu)
 
 void cpu_dump (Processor *Cpu)
 {
-    FILE *code_dmp_file  = fopen ("../dump/code_dump.txt", "w+");
-    FILE *label_dmp_file = fopen ("../dump/label_dump.txt", "w+");
+    FILE *code_dmp_file  = fopen ("../dump/code_cpu_dump.txt", "w+");
 
     for(int i = 0; i < Cpu->code[0] - 1; i++)
     {
-        print_num_dmp (code_dmp_file, i);
-
-        fprintf (code_dmp_file, "%lg\n", Cpu->code[i]);
-    }
-
-    for(int i = 0; i <= Cpu->labels[0]; i++)
-    {
-        print_num_dmp (label_dmp_file, i);
-
-        fprintf (label_dmp_file, "%d\n", Cpu->labels[i]);
+        fprintf (code_dmp_file, "%06d || %lg\n", i, Cpu->code[i]);
     }
 
     fclose  (code_dmp_file);
-    fclose  (label_dmp_file);
 }
 
 //-----------------------------------------------------------------------------
 
-void print_num_dmp (FILE *file, int pos)
-{
-    int num_nul = 0;
-
-    int pow = 1;
-
-    while(pos / pow != 0)
-    {
-        pow *= 10;
-        num_nul++;
-    }
-
-    if(num_nul == 0) num_nul++;
-
-    for(int j = 0; j < 5 - num_nul; j++)
-    {
-        fprintf (file, "0");
-    }
-    
-    dp
-
-    fprintf (file, "%d || ", pos);
-}
-
-//-----------------------------------------------------------------------------
 
 
 
