@@ -6,33 +6,33 @@ CMD_DEF(HLT, "hlt",
 CMD_DEF(PUSH, "push",
 {
     stack_push (&Cpu->Stk, curr_arg);
-    ip++;
+    curr_pos++;
 })
 
 CMD_DEF(POP, "pop",
 {
-    if((int) Cpu->code[ip] & MASK_RAM && (int) Cpu->code[ip] & MASK_REG)
+    if((int) Cpu->code[curr_pos] & MASK_RAM && (int) Cpu->code[curr_pos] & MASK_REG)
     {
-        Cpu->ram[(int) Cpu->regs[(int) Cpu->code[ip + 1]]] = stack_pop (&Cpu->Stk);
+        Cpu->ram[(int) Cpu->regs[(int) Cpu->code[curr_pos + 1]]] = stack_pop (&Cpu->Stk);
     }
 
-    else if((int) Cpu->code[ip] & MASK_REG)
+    else if((int) Cpu->code[curr_pos] & MASK_REG)
     {
-        Cpu->regs[(int) Cpu->code[ip + 1]] = stack_pop (&Cpu->Stk);
+        Cpu->regs[(int) Cpu->code[curr_pos + 1]] = stack_pop (&Cpu->Stk);
     }
 
-    else if((int) Cpu->code[ip] & MASK_RAM)
+    else if((int) Cpu->code[curr_pos] & MASK_RAM)
     {
-        Cpu->ram[(int) Cpu->code[ip + 1]]  = stack_pop (&Cpu->Stk);
+        Cpu->ram[(int) Cpu->code[curr_pos + 1]]  = stack_pop (&Cpu->Stk);
     }
 
     else
     {
         stack_pop (&Cpu->Stk);
-        ip--;
+        curr_pos--;
     }
 
-    ip++;
+    curr_pos++;
 })
 
 CMD_DEF(ADD, "add",
@@ -73,10 +73,10 @@ CMD_DEF(JBE, "jbe",
     if(first_number <= second_number)
     {
         int pos_ch = curr_arg;
-        ip = pos_ch - 2;
+        curr_pos = pos_ch - 2;
     }
 
-    else ip++;
+    else curr_pos++;
 
     stack_push (&Cpu->Stk, first_number);
     stack_push (&Cpu->Stk, second_number);
@@ -89,9 +89,9 @@ CMD_DEF(JAE, "jae",
     if(first_number >= second_number)
     {
         int pos_ch = curr_arg;
-        ip = pos_ch - 2;
+        curr_pos = pos_ch - 2;
     }
-    else ip++;
+    else curr_pos++;
     stack_push (&Cpu->Stk, first_number);
     stack_push (&Cpu->Stk, second_number);
 })
@@ -103,9 +103,9 @@ CMD_DEF(JA, "ja",
     if(first_number > second_number)
     {
         int pos_ch = curr_arg;
-        ip = pos_ch- 2;
+        curr_pos = pos_ch- 2;
     }
-    else ip++;
+    else curr_pos++;
     stack_push (&Cpu->Stk, first_number);
     stack_push (&Cpu->Stk, second_number);
 })
@@ -117,9 +117,9 @@ CMD_DEF(JB, "jb",
     if(first_number < second_number)
     {
         int pos_ch = curr_arg;
-        ip = pos_ch - 2;
+        curr_pos = pos_ch - 2;
     }
-    else ip++;
+    else curr_pos++;
     stack_push (&Cpu->Stk, first_number);
     stack_push (&Cpu->Stk, second_number);
 })
@@ -131,9 +131,9 @@ CMD_DEF(JE, "je",
     if(is_equal(first_number,second_number))
     {
         int pos_ch = curr_arg;
-        ip = pos_ch - 2;
+        curr_pos = pos_ch - 2;
     }
-    else ip++;
+    else curr_pos++;
     stack_push (&Cpu->Stk, first_number);
     stack_push (&Cpu->Stk, second_number);
 })
@@ -145,9 +145,9 @@ CMD_DEF(JNE, "jne",
     if(!is_equal(first_number,second_number))
     {
         int pos_ch = curr_arg;
-        ip = pos_ch - 2;
+        curr_pos = pos_ch - 2;
     }
-    else ip++;
+    else curr_pos++;
     stack_push (&Cpu->Stk, first_number);
     stack_push (&Cpu->Stk, second_number);
 })

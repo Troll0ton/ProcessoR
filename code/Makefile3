@@ -1,22 +1,14 @@
-all: proc
+CC=g++
+CFLAGS=-c -Wall
+LDFLAGS=
+SOURCES=DASM.cpp lines_handle.cpp input_output.cpp stack.cpp
+OBJECTS=$(SOURCES:.cpp=.o)
+EXECUTABLE=dasm
 
-proc: DASM.o CPU.o lines_handle.o input_output.o stack.o
-	g++ DASM.o CPU.o lines_handle.o input_output.o stack.o
+all: $(SOURCES) $(EXECUTABLE)
+	
+$(EXECUTABLE): $(OBJECTS) 
+	$(CC) $(LDFLAGS) $(OBJECTS) -o $@
 
-DASM.o: DASM.cpp
-	g++ -c DASM.cpp
-
-CPU.o: CPU.cpp
-	g++ -c CPU.cpp
-
-lines_handle.o: lines_handle.cpp
-	g++ -c lines_handle.cpp
-
-input_output.o: input_output.cpp
-	g++ -c input_output.cpp
-
-stack.o: stack.cpp
-	g++ -c stack.cpp
-
-clean:
-	rm -rf *.o
+.cpp.o:
+	$(CC) $(CFLAGS) $< -o $@

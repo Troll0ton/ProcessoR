@@ -10,11 +10,11 @@
 #define CMD_FUNCT int curr_cmd,        \
                       double curr_arg, \
                       int *curr_ptr,     \
-                      Processor *Cpu
+                      Struct *Name
 
 //-----------------------------------------------------------------------------
 
-enum CMD_CODES
+enum Cmd_codes
 {
     #define CMD_DEF(cmd, ...) \
     cmd,
@@ -22,6 +22,14 @@ enum CMD_CODES
     #include "codegen.h"
 
     #undef CMD_DEF
+};
+
+//-----------------------------------------------------------------------------
+
+enum Offsets
+{
+    BASIC_OFFSET    = 1,
+    TWO_ARGS_OFFSET = 2,
 };
 
 //-----------------------------------------------------------------------------

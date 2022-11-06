@@ -88,7 +88,7 @@ void read_code_file (Processor *Cpu)
     double res_sum = -1;
     double code_sgntr = -1;
 
-    fread (&res_sum,    sizeof(double), 1, Cpu->Info.code_file);
+    fread (&res_sum, sizeof(double), 1, Cpu->Info.code_file);
     Cpu->code_size = res_sum - 1;
 
     fread (&code_sgntr, sizeof(double), 1, Cpu->Info.code_file);
@@ -114,21 +114,21 @@ void read_code_file (Processor *Cpu)
 
 void handle_cmds (Processor *Cpu)
 {
-    for(int ip = 1; ip < Cpu->code_size; ip++)
+    for(int curr_pos = 1; curr_pos < Cpu->code_size; curr_pos++)
     {
-        int    curr_cmd = Cpu->code[ip];
+        int    curr_cmd = Cpu->code[curr_pos];
         int    offset   = 0;
         double curr_arg = 0;
 
         if(curr_cmd & MASK_REG)
         {
-            curr_arg += Cpu->regs[(int) Cpu->code[ip + 1]];
+            curr_arg += Cpu->regs[(int) Cpu->code[curr_pos + 1]];
             offset++;
         }
 
         if(curr_cmd & MASK_IMM)
         {
-            curr_arg += Cpu->code[ip + 1 + offset];
+            curr_arg += Cpu->code[curr_pos + 1 + offset];
         }
 
         if(curr_cmd & MASK_RAM)
@@ -143,8 +143,8 @@ void handle_cmds (Processor *Cpu)
 
         else offset = 0;
 
-        Cpu->func (curr_cmd, curr_arg, &ip, Cpu);
-        ip += offset;
+        Cpu->func (curr_cmd, curr_arg, &curr_pos, Cpu);
+        curr_pos += offset;
     }
 }
 
@@ -161,7 +161,7 @@ bool is_equal (double a, double b)
 
 void calculator (int curr_cmd, double curr_arg, int *curr_ptr, Processor *Cpu)
 {
-    int ip = *curr_ptr;
+    int curr_pos = *curr_ptr;
 
     curr_cmd &= MASK_CMD;
 
@@ -186,21 +186,21 @@ void calculator (int curr_cmd, double curr_arg, int *curr_ptr, Processor *Cpu)
 
     stack_dumps (&Cpu->Stk, Cpu->Info.file_out);
 
-    *curr_ptr = ip;
+    *curr_ptr = curr_pos;
 }
 
 //-----------------------------------------------------------------------------
 
 void cpu_dump (Processor *Cpu)
 {
-    FILE *code_dmp_file  = fopen ("../dump/code_cpu_dump.txt", "w+");
+    FILE *code_dmp_file = fopen ("../dump/code_cpu_dump.txt", "w+");
 
     for(int i = 0; i < Cpu->code_size; i++)
     {
         fprintf (code_dmp_file, "%06d || %lg\n", i, Cpu->code[i]);
     }
 
-    fclose  (code_dmp_file);
+    fclose (code_dmp_file);
 }
 
 //-----------------------------------------------------------------------------

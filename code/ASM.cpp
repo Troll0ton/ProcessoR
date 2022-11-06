@@ -95,7 +95,7 @@ void handle_text (Assembler *Asm, Line *Text, File *File_input)
     }
 
     Asm->code_arr_size = Asm->cur_pos;
-    Asm->cur_pos = 0;
+    Asm->cur_pos = NUM_FRST_EL_CD;
 
     if(Asm->Info.dbl_pass) handle_text (Asm, Text, File_input);
 }
@@ -108,7 +108,7 @@ void handle_line (Assembler *Asm)
 
     Command Cmd = { 0 };
 
-    if(!Asm->Info.dbl_pass && sscanf (Asm->Cur_line.begin_line, ":%d", &label) == 1)
+    if(sscanf (Asm->Cur_line.begin_line, ":%d", &label) == 1)
     {
         parse_label (Asm, label);
     }
@@ -147,19 +147,16 @@ void parse_label (Assembler *Asm, int label)
 
 void parse_arg (Assembler *Asm, Command *Cmd)
 {
-    Cmd->title     = NULL;
     Cmd->flag_cmd = 0;
     Cmd->mask     = 0;
     Asm->offset   = 0;
 
-    int    label                 = 0;
-    char   reg_sym               = 0;
-    char   cmd_name[CMD_MAX_LEN] = "";
-    double arg_val               = 0;
+    int    label   = 0;
+    char   reg_sym = 0;
+    double arg_val = 0;
 
-    if(sscanf (Asm->Cur_line.begin_line, "%20s", cmd_name) == 1)
+    if(sscanf (Asm->Cur_line.begin_line, "%20s", Cmd->name) == 1)
     {
-        Cmd->title = cmd_name;
         Cmd->flag_cmd++;
     }
 
@@ -257,15 +254,15 @@ void parse_cmd (Assembler *Asm, Command Cmd)
 
     for(int num_cmd = 0; num_cmd < NUM_OF_SUP_CMD; num_cmd++)
     {
-        if(stricmp (Cmd.title, cmd_names[num_cmd]) == 0)
+        if(stricmp (Cmd.name, cmd_names[num_cmd]) == 0)
         {
             Asm->code_array[Asm->cur_pos] = num_cmd | Cmd.mask;
-            Asm->cur_pos += Asm->offset;
+            Asm->cur_pos += (Asm->offset + BASIC_OFFSET);
             flag_found++;
-            printf  ("a");
 
             break;
         }
+
     }
 
 
@@ -315,12 +312,12 @@ void asm_dump (Assembler *Asm)
     FILE *code_dmp_file  = fopen ("../dump/code_asm_dump.txt", "w+");
     FILE *label_dmp_file = fopen ("../dump/label_asm_dump.txt", "w+");
 
-    for(int i = 0; i < Asm->code_array[0]; i++)
+    for(int i = 0; i < Asm->code_arr_size; i++)
     {
         fprintf (code_dmp_file, "%06d || %lg\n", i, Asm->code_array[i]);
     }
 
-    for(int i = 0; i <= Asm->label_array[0]; i++)
+    for(int i = 0; i <= Asm->label_arr_size; i++)
     {
         fprintf (label_dmp_file, "%06d || %d\n", i, Asm->label_array[i]);
     }

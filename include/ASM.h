@@ -54,9 +54,9 @@ typedef struct Asm_info
 
 typedef struct Command
 {
-    char *title;
     int   flag_cmd;
     int   mask;
+    char  name[CMD_MAX_LEN];
 } Command;
 
 //-----------------------------------------------------------------------------
@@ -90,8 +90,6 @@ void assembler_dtor (Assembler *Asm);
 void asm_info_dtor  (Asm_info *Info);
 
 void write_res_sums (Assembler *Asm);
-
-void asm_pars_ctor  (Assembler *Asm);
 
 void parse_label    (Assembler *Asm, int label);
 

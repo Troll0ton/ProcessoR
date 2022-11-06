@@ -52,11 +52,11 @@ typedef struct Asm_info
 
 //-----------------------------------------------------------------------------
 
-typedef struct Command 
+typedef struct Command
 {
-    char *name;
     int   flag_cmd;
     int   mask;
+    char  name[CMD_MAX_LEN];
 } Command;
 
 //-----------------------------------------------------------------------------
@@ -91,19 +91,17 @@ void asm_info_dtor  (Asm_info *Info);
 
 void write_res_sums (Assembler *Asm);
 
-void asm_pars_ctor  (Assembler *Asm);
-
 void parse_label    (Assembler *Asm, int label);
 
-void parse_arg      (Assembler *Asm);
+void parse_arg      (Assembler *Asm, Command *Cmd);
 
-void parse_cmd      (Assembler *Asm);
+void parse_cmd      (Assembler *Asm, Command Cmd);
 
-void parse_jmp      (Assembler *Asm, int label);
+void parse_jmp      (Assembler *Asm, Command *Cmd, int label);
 
 void handle_text    (Assembler *Asm, Line *Text, File *File_input);
 
-void write_in_arg   (Assembler *Asm, double val, int mask);
+void write_in_arg   (Assembler *Asm, Command *Cmd, double arg_val, int mask);
 
 void asm_dump       (Assembler *Asm);
 
