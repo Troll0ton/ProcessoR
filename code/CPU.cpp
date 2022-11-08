@@ -48,11 +48,11 @@ int processor_ctor (Processor *Cpu, void (*funct) (CMD_FUNCT))
 
 int cpu_info_ctor (Cpu_info *Info)
 {
-    Info->code_file  = fopen ("../files/code.bin",   "rb");
-    Info->file_out   = fopen ("../dump/log.txt",     "w+");
+    Info->code_file = fopen ("../files/code.bin",   "rb");
+    Info->file_out  = fopen ("../dump/log.txt",     "w+");
 
-    if(Info->code_file  == NULL ||
-       Info->file_out   == NULL   )
+    if(Info->code_file == NULL ||
+       Info->file_out  == NULL   )
     {
         return ERR_CTOR;
     }
