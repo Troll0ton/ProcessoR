@@ -33,6 +33,8 @@ int processor_ctor (Processor *Cpu, void (*funct) (CMD_FUNCT))
     Cpu->Stk = { 0 };
     stack_ctor (&Cpu->Stk, 2);
 
+    // N(REGS)
+    // 300
     Cpu->regs = (double*) calloc (5, sizeof (double));
     Cpu->ram  = (double*) calloc (3, sizeof (double));
 
@@ -81,6 +83,18 @@ void cpu_info_dtor (Cpu_info *Info)
     fclose (Info->file_out);
 }
 
+
+// call :123 [300]
+// push 5.5  [308]
+
+
+// :123  [1300]
+// ...
+// ret   [1400]
+//
+//
+
+
 //-----------------------------------------------------------------------------
 
 void read_code_file (Processor *Cpu)
@@ -92,6 +106,7 @@ void read_code_file (Processor *Cpu)
     Cpu->code_size = res_sum - 1;
 
     fread (&code_sgntr, sizeof(double), 1, Cpu->Info.code_file);
+    // one fread ...
 
     if(code_sgntr == CORCT_SIGN)
     {
@@ -107,7 +122,10 @@ void read_code_file (Processor *Cpu)
         fread (Cpu->code + 1, sizeof(double), res_sum - 1, Cpu->Info.code_file);
     }
 
-    else printf ("__________|WRONG SIGNATURE!|__________\n");
+    else
+    {
+        printf ("__________|WRONG SIGNATURE!|__________\n");
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -139,7 +157,7 @@ void handle_cmds (Processor *Cpu)
         if(curr_cmd & MASK_RAM &&
            curr_cmd & MASK_IMM &&
            curr_cmd & MASK_REG   )
-           offset = 1;
+            offset = 1;
 
         else offset = 0;
 
@@ -158,6 +176,7 @@ bool is_equal (double a, double b)
 }
 
 //-----------------------------------------------------------------------------
+// execute_cmd
 
 void calculator (int curr_cmd, double curr_arg, int *curr_ptr, Processor *Cpu)
 {

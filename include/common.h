@@ -7,8 +7,8 @@
 
 //-----------------------------------------------------------------------------
 
-#define CMD_FUNCT int curr_cmd,        \
-                      double curr_arg, \
+#define CMD_FUNCT int curr_cmd,          \
+                      double curr_arg,   \
                       int *curr_ptr,     \
                       Struct *Name
 

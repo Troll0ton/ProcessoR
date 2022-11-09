@@ -1,7 +1,11 @@
+ // #define PUSH_DOUBLE ...
+
 CMD_DEF(HLT, "hlt",
 {
     stack_push (&Cpu->Stk, STOP);
 })
+
+// CMD_DEF(PUSH | MASK_RAM, "push",
 
 CMD_DEF(PUSH, "push",
 {
@@ -128,12 +132,18 @@ CMD_DEF(JE, "je",
 {
     double second_number = stack_pop (&Cpu->Stk);
     double first_number  = stack_pop (&Cpu->Stk);
+
     if(is_equal(first_number,second_number))
     {
         int pos_ch = curr_arg;
         curr_pos = pos_ch - 2;
     }
-    else curr_pos++;
+
+    else
+    {
+    curr_pos++;
+    }
+
     stack_push (&Cpu->Stk, first_number);
     stack_push (&Cpu->Stk, second_number);
 })

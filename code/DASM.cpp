@@ -18,8 +18,6 @@ int main ()
     disassember_dtor (&Dasm);
 
     return 0;
-
-    return 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -28,11 +26,11 @@ void disassembling (int curr_cmd, double curr_arg, int *curr_ptr, Disassember *D
 {
     int cur_pos = *curr_ptr;
 
-    #define CMD_DEF(cmd, name, ...)                    \
-        case cmd:                                      \
-        {                                              \
+    #define CMD_DEF(cmd, name, ...)                     \
+        case cmd:                                       \
+        {                                               \
             fprintf (Dasm->Info.file_out, "%s ", name); \
-            break;                                     \
+            break;                                      \
         }
 
     switch (curr_cmd & MASK_CMD)
@@ -61,8 +59,7 @@ void disassembling (int curr_cmd, double curr_arg, int *curr_ptr, Disassember *D
         cur_pos += BASIC_OFFSET;
     }
 
-    else if(curr_cmd & MASK_IMM &&
-            curr_cmd & MASK_RAM   )
+    else if(curr_cmd & (MASK_IMM | MASK_RAM))
     {
         fprintf (Dasm->Info.file_out, "[%d]", (int) Dasm->code[cur_pos + 1]);
         cur_pos += BASIC_OFFSET;
@@ -79,6 +76,7 @@ void disassembling (int curr_cmd, double curr_arg, int *curr_ptr, Disassember *D
         fprintf (Dasm->Info.file_out, "r%cx", (int) Dasm->code[cur_pos + 1] + 'a');
         cur_pos += BASIC_OFFSET;
     }
+    // else
 
     fprintf (Dasm->Info.file_out, "\n");
 

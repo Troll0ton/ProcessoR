@@ -24,6 +24,7 @@ int main (int argc, char *argv[])
 
 int assembler_ctor (Assembler *Asm, char *argv[])
 {
+    // ??
     Asm->code_array  = (double*) calloc (CODE_SIZE_INIT,  sizeof (double));
     Asm->label_array = (int*)    calloc (LABEL_SIZE_INIT, sizeof (int));
 
@@ -43,17 +44,21 @@ int assembler_ctor (Assembler *Asm, char *argv[])
     Asm->Info     = { 0 };
     Asm->Cur_line = { 0 };
 
-    return asm_info_ctor (&(Asm->Info), argv);
+    return asm_info_ctor (&Asm->Info, argv);
 }
+
+#define DBL_PASS (Info->dbl_pass)
 
 //-----------------------------------------------------------------------------
 
 int asm_info_ctor (Asm_info *Info, char *argv[])
 {
+    // ??
     Info->code_sgntr = CORCT_SIGN;
 
     Info->file_in    = fopen ((char*) argv[1],       "rb");
     Info->code_file  = fopen ("../files/code.bin",   "wb");
+    // double_pass
     Info->dbl_pass   = false;
 
     if(Info->file_in    == NULL ||
@@ -64,6 +69,8 @@ int asm_info_ctor (Asm_info *Info, char *argv[])
 
     return 0;
 }
+
+#undef DBL_PASS
 
 //-----------------------------------------------------------------------------
 
@@ -82,6 +89,7 @@ void assembling (Assembler *Asm)
 }
 
 //-----------------------------------------------------------------------------
+// parse_text
 
 void handle_text (Assembler *Asm, Line *Text, File *File_input)
 {
@@ -104,7 +112,7 @@ void handle_text (Assembler *Asm, Line *Text, File *File_input)
 
 void handle_line (Assembler *Asm)
 {
-    int label;
+    int label = 0;
 
     Command Cmd = { 0 };
 
@@ -116,6 +124,7 @@ void handle_line (Assembler *Asm)
     else
     {
         parse_arg (Asm, &Cmd);
+        // first parse_cmd??
 
         if(Cmd.flag_cmd) parse_cmd (Asm, Cmd);
     }
@@ -125,6 +134,7 @@ void handle_line (Assembler *Asm)
 
 void parse_label (Assembler *Asm, int label)
 {
+    // LIMIT_DIFF
     if(Asm->label_arr_size + LIMIT_DIFRCE > Asm->label_arr_capct)
     {
         Asm->label_arr_capct *= 2;
@@ -164,6 +174,7 @@ void parse_arg (Assembler *Asm, Command *Cmd)
     {
         if(sscanf (Asm->Cur_line.begin_line, "%*s %d", &label) == 1)
         {
+            // write_label
             parse_jmp (Asm, Cmd, label);
         }
 
@@ -197,6 +208,11 @@ void parse_arg (Assembler *Asm, Command *Cmd)
     else if(sscanf (Asm->Cur_line.begin_line, "%*s %lg", &arg_val) == 1)
     {
         write_in_arg (Asm, Cmd, arg_val, MASK_IMM);
+    }
+
+    else
+    {
+        // error
     }
 }
 
@@ -281,9 +297,10 @@ void assembler_dtor (Assembler *Asm)
     Asm->label_arr_size  = -1;
     Asm->label_arr_capct = -1;
 
+    // SIGNATURE_DESTROYED
     Asm->Info.code_sgntr = WRONG_SIGN;
 
-    asm_info_dtor (&(Asm->Info));
+    asm_info_dtor (&Asm->Info);
 }
 
 //-----------------------------------------------------------------------------
@@ -309,7 +326,7 @@ void write_res_sums (Assembler *Asm)
 
 void asm_dump (Assembler *Asm)
 {
-    FILE *code_dmp_file  = fopen ("../dump/code_asm_dump.txt", "w+");
+    FILE *code_dmp_file  = fopen ("../dump/code_asm_dump.txt",  "w+");
     FILE *label_dmp_file = fopen ("../dump/label_asm_dump.txt", "w+");
 
     for(int i = 0; i < Asm->code_arr_size; i++)

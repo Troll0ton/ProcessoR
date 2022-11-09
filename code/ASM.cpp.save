@@ -24,6 +24,7 @@ int main (int argc, char *argv[])
 
 int assembler_ctor (Assembler *Asm, char *argv[])
 {
+    // ??
     Asm->code_array  = (double*) calloc (CODE_SIZE_INIT,  sizeof (double));
     Asm->label_array = (int*)    calloc (LABEL_SIZE_INIT, sizeof (int));
 
@@ -43,17 +44,21 @@ int assembler_ctor (Assembler *Asm, char *argv[])
     Asm->Info     = { 0 };
     Asm->Cur_line = { 0 };
 
-    return asm_info_ctor (&(Asm->Info), argv);
+    return asm_info_ctor (&Asm->Info, argv);
 }
+
+#define DBL_PASS Info->dbl_pass
 
 //-----------------------------------------------------------------------------
 
 int asm_info_ctor (Asm_info *Info, char *argv[])
 {
+    // ??
     Info->code_sgntr = CORCT_SIGN;
 
     Info->file_in    = fopen ((char*) argv[1],       "rb");
     Info->code_file  = fopen ("../files/code.bin",   "wb");
+    // double_pass
     Info->dbl_pass   = false;
 
     if(Info->file_in    == NULL ||
@@ -64,6 +69,8 @@ int asm_info_ctor (Asm_info *Info, char *argv[])
 
     return 0;
 }
+
+#undef D
 
 //-----------------------------------------------------------------------------
 
@@ -104,7 +111,7 @@ void handle_text (Assembler *Asm, Line *Text, File *File_input)
 
 void handle_line (Assembler *Asm)
 {
-    int label;
+    int label = 0;
 
     Command Cmd = { 0 };
 
@@ -309,7 +316,7 @@ void write_res_sums (Assembler *Asm)
 
 void asm_dump (Assembler *Asm)
 {
-    FILE *code_dmp_file  = fopen ("../dump/code_asm_dump.txt", "w+");
+    FILE *code_dmp_file  = fopen ("../dump/code_asm_dump.txt",  "w+");
     FILE *label_dmp_file = fopen ("../dump/label_asm_dump.txt", "w+");
 
     for(int i = 0; i < Asm->code_arr_size; i++)

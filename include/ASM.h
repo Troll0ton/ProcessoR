@@ -17,12 +17,26 @@
 
 //-----------------------------------------------------------------------------
 
+// N(SUPPORTED_CMD)
+
+#define N(suffix) NUM_OF_##suffix
+// enum CMD_INFO
+// {
+//     NUM_OF_SUPPORTED_CMD = 15;
+//     ...
+// }
+
+
 enum Sizes
 {
+    // ??
     NUM_OF_SUP_CMD  = 15,
     NUM_OF_JMPS     = 6,
     NUM_OF_CMDS_RAM = 2,
     NUM_OF_CMDS_RGS = 2,
+
+
+    // ??
     CMD_MAX_LEN     = 20,
     CODE_SIZE_INIT  = 100,
     LABEL_SIZE_INIT = 50,
@@ -36,6 +50,7 @@ enum Numbers
     CMD_REG_NUM    = 1,
     CMD_RAM_NUM    = 1,
     CMD_JMP_NUM    = 9,
+    // OFFSET_SIGNATURE
     NUM_FRST_EL_CD = 2,
     NUM_FRST_EL_LB = 1,
 };
@@ -65,6 +80,9 @@ typedef struct Assembler
 {
     Asm_info   Info;
     Line       Cur_line;
+    // CodeArray code;
+    // Asm.code.capacity
+    // Asm.label.capacity
     double    *code_array;
     int       *label_array;
     int        cur_pos;
