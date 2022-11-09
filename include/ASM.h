@@ -62,7 +62,7 @@ typedef struct Asm_info
     FILE   *file_in;
     FILE   *code_file;
     int     code_sgntr;
-    bool    dbl_pass;
+    bool    double_pass;
 } Asm_info;
 
 //-----------------------------------------------------------------------------
@@ -74,23 +74,35 @@ typedef struct Command
     char  name[CMD_MAX_LEN];
 } Command;
 
+
+//-----------------------------------------------------------------------------
+
+typedef struct Code_array
+{
+    double *array;
+    int     size;
+    int     capacity;
+} Code_array;
+
+//-----------------------------------------------------------------------------
+
+typedef struct Label_array
+{
+    int *array;
+    int  size;
+    int  capacity;
+} Label_array;
+
 //-----------------------------------------------------------------------------
 
 typedef struct Assembler
 {
-    Asm_info   Info;
-    Line       Cur_line;
-    // CodeArray code;
-    // Asm.code.capacity
-    // Asm.label.capacity
-    double    *code_array;
-    int       *label_array;
-    int        cur_pos;
-    int        offset;
-    int        code_arr_size;
-    int        label_arr_size;
-    int        code_arr_capct;
-    int        label_arr_capct;
+    Asm_info    Info;
+    Line        Cur_line;
+    int         cur_pos;
+    int         offset;
+    Code_array  Code;
+    Label_array Label;
 } Assembler;
 
 //-----------------------------------------------------------------------------

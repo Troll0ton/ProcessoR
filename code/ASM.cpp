@@ -28,8 +28,15 @@ int assembler_ctor (Assembler *Asm, char *argv[])
     Asm->code_array  = (double*) calloc (CODE_SIZE_INIT,  sizeof (double));
     Asm->label_array = (int*)    calloc (LABEL_SIZE_INIT, sizeof (int));
 
-    if(Asm->code_array == NULL || Asm->label_array == NULL)
+    if(Asm->code_array == NULL)
     {
+        printf ("|ERROR - Null pointer, code array|\n");
+        return ERR_CTOR;
+    }
+
+    if(Asm->label_array == NULL)
+    {
+        printf ("|ERROR - Null pointer, label array|\n");
         return ERR_CTOR;
     }
 
@@ -47,9 +54,9 @@ int assembler_ctor (Assembler *Asm, char *argv[])
     return asm_info_ctor (&Asm->Info, argv);
 }
 
-#define DBL_PASS (Info->dbl_pass)
-
 //-----------------------------------------------------------------------------
+
+#define DOUBLE_PASS (Info->double_pass)
 
 int asm_info_ctor (Asm_info *Info, char *argv[])
 {
@@ -59,7 +66,7 @@ int asm_info_ctor (Asm_info *Info, char *argv[])
     Info->file_in    = fopen ((char*) argv[1],       "rb");
     Info->code_file  = fopen ("../files/code.bin",   "wb");
     // double_pass
-    Info->dbl_pass   = false;
+    Info->double_pass   = false;
 
     if(Info->file_in    == NULL ||
        Info->code_file  == NULL   )
@@ -70,7 +77,7 @@ int asm_info_ctor (Asm_info *Info, char *argv[])
     return 0;
 }
 
-#undef DBL_PASS
+#undef double_pass
 
 //-----------------------------------------------------------------------------
 
@@ -93,7 +100,7 @@ void assembling (Assembler *Asm)
 
 void handle_text (Assembler *Asm, Line *Text, File *File_input)
 {
-    Asm->Info.dbl_pass = false;
+    Asm->Info.double_pass = false;
 
     for(int i = 0; i < File_input->num_of_lines; i++)
     {
@@ -105,7 +112,7 @@ void handle_text (Assembler *Asm, Line *Text, File *File_input)
     Asm->code_arr_size = Asm->cur_pos;
     Asm->cur_pos = NUM_FRST_EL_CD;
 
-    if(Asm->Info.dbl_pass) handle_text (Asm, Text, File_input);
+    if(Asm->Info.double_pass) handle_text (Asm, Text, File_input);
 }
 
 //-----------------------------------------------------------------------------
@@ -229,7 +236,7 @@ void parse_jmp (Assembler *Asm, Command *Cmd, int label)
     {
         write_in_arg (Asm, Cmd, -1, MASK_IMM);
 
-        Asm->Info.dbl_pass = true;
+        Asm->Info.double_pass = true;
     }
 }
 

@@ -28,8 +28,15 @@ int assembler_ctor (Assembler *Asm, char *argv[])
     Asm->code_array  = (double*) calloc (CODE_SIZE_INIT,  sizeof (double));
     Asm->label_array = (int*)    calloc (LABEL_SIZE_INIT, sizeof (int));
 
-    if(Asm->code_array == NULL || Asm->label_array == NULL)
+    if(Asm->code_array == NULL)
     {
+        printf ("|ERROR - Null pointer, code array|\n");
+        return ERR_CTOR;
+    }
+    
+    if(Asm->label_array == NULL)
+    {
+        printf ("|ERROR - Null pointer, label array|\n");
         return ERR_CTOR;
     }
 
@@ -47,9 +54,9 @@ int assembler_ctor (Assembler *Asm, char *argv[])
     return asm_info_ctor (&Asm->Info, argv);
 }
 
-#define DBL_PASS Info->dbl_pass
-
 //-----------------------------------------------------------------------------
+
+#define DOUBLE_PASS (Info->double_pass)
 
 int asm_info_ctor (Asm_info *Info, char *argv[])
 {
@@ -59,7 +66,7 @@ int asm_info_ctor (Asm_info *Info, char *argv[])
     Info->file_in    = fopen ((char*) argv[1],       "rb");
     Info->code_file  = fopen ("../files/code.bin",   "wb");
     // double_pass
-    Info->dbl_pass   = false;
+    Info->double_pass   = false;
 
     if(Info->file_in    == NULL ||
        Info->code_file  == NULL   )
@@ -70,7 +77,7 @@ int asm_info_ctor (Asm_info *Info, char *argv[])
     return 0;
 }
 
-#undef D
+#undef double_pass
 
 //-----------------------------------------------------------------------------
 
@@ -89,10 +96,11 @@ void assembling (Assembler *Asm)
 }
 
 //-----------------------------------------------------------------------------
+// parse_text
 
 void handle_text (Assembler *Asm, Line *Text, File *File_input)
 {
-    Asm->Info.dbl_pass = false;
+    Asm->Info.double_pass = false;
 
     for(int i = 0; i < File_input->num_of_lines; i++)
     {
@@ -104,7 +112,7 @@ void handle_text (Assembler *Asm, Line *Text, File *File_input)
     Asm->code_arr_size = Asm->cur_pos;
     Asm->cur_pos = NUM_FRST_EL_CD;
 
-    if(Asm->Info.dbl_pass) handle_text (Asm, Text, File_input);
+    if(Asm->Info.double_pass) handle_text (Asm, Text, File_input);
 }
 
 //-----------------------------------------------------------------------------
@@ -123,6 +131,7 @@ void handle_line (Assembler *Asm)
     else
     {
         parse_arg (Asm, &Cmd);
+        // first parse_cmd??
 
         if(Cmd.flag_cmd) parse_cmd (Asm, Cmd);
     }
@@ -132,6 +141,7 @@ void handle_line (Assembler *Asm)
 
 void parse_label (Assembler *Asm, int label)
 {
+    // LIMIT_DIFF
     if(Asm->label_arr_size + LIMIT_DIFRCE > Asm->label_arr_capct)
     {
         Asm->label_arr_capct *= 2;
@@ -171,6 +181,7 @@ void parse_arg (Assembler *Asm, Command *Cmd)
     {
         if(sscanf (Asm->Cur_line.begin_line, "%*s %d", &label) == 1)
         {
+            // write_label
             parse_jmp (Asm, Cmd, label);
         }
 
@@ -205,6 +216,11 @@ void parse_arg (Assembler *Asm, Command *Cmd)
     {
         write_in_arg (Asm, Cmd, arg_val, MASK_IMM);
     }
+
+    else
+    {
+        // error
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -220,7 +236,7 @@ void parse_jmp (Assembler *Asm, Command *Cmd, int label)
     {
         write_in_arg (Asm, Cmd, -1, MASK_IMM);
 
-        Asm->Info.dbl_pass = true;
+        Asm->Info.double_pass = true;
     }
 }
 
@@ -288,9 +304,10 @@ void assembler_dtor (Assembler *Asm)
     Asm->label_arr_size  = -1;
     Asm->label_arr_capct = -1;
 
+    // SIGNATURE_DESTROYED
     Asm->Info.code_sgntr = WRONG_SIGN;
 
-    asm_info_dtor (&(Asm->Info));
+    asm_info_dtor (&Asm->Info);
 }
 
 //-----------------------------------------------------------------------------

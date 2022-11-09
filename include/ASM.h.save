@@ -17,12 +17,26 @@
 
 //-----------------------------------------------------------------------------
 
+// N(SUPPORTED_CMD)
+
+#define N(suffix) NUM_OF_##suffix
+// enum CMD_INFO
+// {
+//     NUM_OF_SUPPORTED_CMD = 15;
+//     ...
+// }
+
+
 enum Sizes
 {
+    // ??
     NUM_OF_SUP_CMD  = 15,
     NUM_OF_JMPS     = 6,
     NUM_OF_CMDS_RAM = 2,
     NUM_OF_CMDS_RGS = 2,
+
+
+    // ??
     CMD_MAX_LEN     = 20,
     CODE_SIZE_INIT  = 100,
     LABEL_SIZE_INIT = 50,
@@ -36,6 +50,7 @@ enum Numbers
     CMD_REG_NUM    = 1,
     CMD_RAM_NUM    = 1,
     CMD_JMP_NUM    = 9,
+    // OFFSET_SIGNATURE
     NUM_FRST_EL_CD = 2,
     NUM_FRST_EL_LB = 1,
 };
@@ -47,7 +62,7 @@ typedef struct Asm_info
     FILE   *file_in;
     FILE   *code_file;
     int     code_sgntr;
-    bool    dbl_pass;
+    bool    double_pass;
 } Asm_info;
 
 //-----------------------------------------------------------------------------
@@ -59,20 +74,35 @@ typedef struct Command
     char  name[CMD_MAX_LEN];
 } Command;
 
+
+//-----------------------------------------------------------------------------
+
+typedef struct Code_array
+{
+    double *array;
+    int     size;
+    int     capacity;
+} Code_array;
+
+//-----------------------------------------------------------------------------
+
+typedef struct Label_array
+{
+    int *array;
+    int  size;
+    int  capacity;
+} Label_array;
+
 //-----------------------------------------------------------------------------
 
 typedef struct Assembler
 {
-    Asm_info   Info;
-    Line       Cur_line;
-    double    *code_array;
-    int       *label_array;
-    int        cur_pos;
-    int        offset;
-    int        code_arr_size;
-    int        label_arr_size;
-    int        code_arr_capct;
-    int        label_arr_capct;
+    Asm_info    Info;
+    Line        Cur_line;
+    int         cur_pos;
+    int         offset;
+    Code_array  Code;
+    Label_array Label;
 } Assembler;
 
 //-----------------------------------------------------------------------------
