@@ -48,10 +48,11 @@ typedef struct Processor
     Cpu_info Info;
     double  *regs;
     double  *ram;
+
     // char* videomem;
-    // 300 x 200 [993]
+    //  [993]
     //
-    double  *code;
+    char    *code;
     int      code_size;
     Stack    Stk;
     void (*func) (CMD_FUNCT);

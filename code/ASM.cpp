@@ -13,7 +13,7 @@ int main (int argc, char *argv[])
 
     assembling (&Asm);
 
-    asm_dump (&Asm);
+    //asm_dump (&Asm);
 
     assembler_dtor (&Asm);
 
@@ -39,7 +39,7 @@ int assembler_ctor (Assembler *Asm, char *argv[])
         return ERR_CTOR;
     }
 
-    Asm->Code.size      = NUM_FRST_EL_CD;
+    Asm->Code.size      = 2 * sizeof (double);
     Asm->Code.capacity  = CODE_SIZE_INIT;
 
     Asm->Label.size     = NUM_FRST_EL_LB;
@@ -87,71 +87,60 @@ void assembling (Assembler *Asm)
     File *File_input = file_reader (Asm->Info.file_in);
     Line *Text = lines_separator (File_input);
 
-    parse_text (Asm, Text, File_input);
+    handle_text (Asm, Text, File_input);
 
     write_res_sums (Asm);
 
     clear_mem (Text, File_input);
 
-    fwrite (Asm->Code.array, sizeof(double), Asm->Code.size, Asm->Info.code_file);
+    fwrite (Asm->Code.array, sizeof(char), Asm->Code.size, Asm->Info.code_file);
 }
 
 //-----------------------------------------------------------------------------
 
-#define DOUBLE_PASS (Info->double_pass)
-
-void parse_text (Assembler *Asm, Line *Text, File *File_input)
+void handle_text (Assembler *Asm, Line *Text, File *File_input)
 {
+    #define DOUBLE_PASS (Asm->Info.double_pass)
+
     DOUBLE_PASS = false;
 
     for(int i = 0; i < File_input->num_of_lines; i++)
     {
+        Command Cmd  = { 0 };
+        Argument Arg = { 0 };
+
         Asm->Cur_line = Text[i];
 
-        handle_line (Asm);
+        parse_line (Asm, &Cmd, &Arg);
+
+        write_in_code (Asm, Cmd, Arg);
     }
 
     Asm->Code.size = Asm->cur_pos;
-    Asm->cur_pos = NUM_FRST_EL_CD;
+    Asm->cur_pos = 2 * sizeof (double);
 
-    if(DOUBLE_PASS) parse_text (Asm, Text, File_input);
-}
+    if(DOUBLE_PASS) handle_text (Asm, Text, File_input);
 
-#undef DOUBLE_PASS
-
-//-----------------------------------------------------------------------------
-
-void parse_line (Assembler *Asm)
-{
-    Command Cmd  = { 0 };
-    Argument Arg = { 0 };
-
-    Cmd.flag = false;
-    Arg.flag = false;
-
-    parse_label (Asm, &Arg);
-
-    parse_cmd (Asm, &Cmd);
-
-    parse_arg (Asm, &Cmd);
+    #undef DOUBLE_PASS
 }
 
 //-----------------------------------------------------------------------------
 
-void parse_label (Assembler *Asm, Argument Arg)
+void parse_line (Assembler *Asm, Command *Cmd, Argument *Arg)
 {
-    if(sscanf (Asm->Cur_line.begin_line, ":%d", Arg->value) == 1)
+    parse_label (Asm, Arg);
+
+    parse_cmd   (Asm, Cmd, Arg);
+
+    parse_arg   (Asm, Cmd, Arg);
+}
+
+//-----------------------------------------------------------------------------
+
+void parse_label (Assembler *Asm, Argument *Arg)
+{
+    if(sscanf (Asm->Cur_line.begin_line, ":%lg", Arg->value) == 1)
     {
-        if(Asm->Label.size + LIMIT_DIFFERENCE > Asm->Label.capacity)
-        {
-            Asm->Label.capacity *= 2;
-
-            Asm->Label.array = (int*) recalloc (Asm->Label.array,
-                                                Asm->Label.capacity,
-                                                Asm->Label.size,
-                                                sizeof (int)         );
-        }
-
         if(Arg->value > Asm->Label.size)
         {
             Asm->Label.size = Arg->value;
@@ -163,23 +152,29 @@ void parse_label (Assembler *Asm, Argument Arg)
 
 //-----------------------------------------------------------------------------
 
-void parse_cmd (Assembler *Asm, Command *Cmd, Argument Arg)
+void parse_cmd (Assembler *Asm, Command *Cmd, Argument *Arg)
 {
-    if(!Arg->flag && sscanf (Asm->Cur_line.begin_line, "%20s", Cmd->name) == 1)
+    char cmd_name[CMD_MAX_LEN] = "";
+
+    if(!Arg->flag && sscanf (Asm->Cur_line.begin_line, "%20s", cmd_name) == 1)
     {
         char *cmd_names[] =
         {
             #define CMD_DEF(cmd, name, code, ...)\
             name,
 
+            //-----------------------------------------------------------------------------
+
             #include "../include/codegen.h"
+
+            //-----------------------------------------------------------------------------
 
             #undef CMD_DEF
         };
 
         for(int num_cmd = 0; num_cmd < NUM_OF_SUP_CMD; num_cmd++)
         {
-            if(stricmp (Cmd.name, cmd_names[num_cmd]) == 0)
+            if(stricmp (cmd_name, cmd_names[num_cmd]) == 0)
             {
                 Cmd->number = num_cmd;
                 Cmd->flag = true;
@@ -191,106 +186,119 @@ void parse_cmd (Assembler *Asm, Command *Cmd, Argument Arg)
 
         if(!Cmd->flag) Asm->Info.code_sgntr = SIGNATURE_DESTROYED;
     }
-
-    //Asm->Code.array[Asm->cur_pos] = num_cmd | Cmd.mask;
-    //Asm->cur_pos += (Asm->offset + BASIC_OFFSET);
 }
 
 //-----------------------------------------------------------------------------
 
-void parse_arg (Assembler *Asm, Command *Cmd)
+void parse_arg (Assembler *Asm, Command *Cmd, Argument *Arg)
 {
-    Cmd->mask     = 0;
-    Asm->offset   = 0;
+    #define DOUBLE_PASS (Asm->Info.double_pass)
 
-    int    label   = 0;
-    char   reg_sym = 0;
-    double arg_val = 0;
-
-    if(sscanf (Asm->Cur_line.begin_line, "%20s", Cmd->name) == 1)
+    if(Cmd->flag)
     {
-        Cmd->flag_cmd++;
-    }
-
-    parse_jmp (Asm, Arg);
-
-    else if(sscanf (Asm->Cur_line.begin_line, "%*s [r%cx + %lg]", &reg_sym, &arg_val) == 2)
-    {
-        write_in_arg (Asm, Cmd, reg_sym - 'a', 0);
-        write_in_arg (Asm, Cmd, arg_val, MASK_RAM | MASK_REG | MASK_IMM);
-    }
-
-    else if(sscanf (Asm->Cur_line.begin_line, "%*s [%lg]", &arg_val) == 1)
-    {
-        write_in_arg (Asm, Cmd, arg_val, MASK_RAM | MASK_IMM);
-    }
-
-    else if(sscanf (Asm->Cur_line.begin_line, "%*s [r%cx]", &reg_sym) == 1)
-    {
-        write_in_arg (Asm, Cmd, reg_sym - 'a', MASK_RAM | MASK_REG);
-    }
-
-    else if(sscanf (Asm->Cur_line.begin_line, "%*s r%cx", &reg_sym) == 1)
-    {
-        write_in_arg (Asm, Cmd, reg_sym - 'a', MASK_REG);
-    }
-
-    else if(sscanf (Asm->Cur_line.begin_line, "%*s %lg", &arg_val) == 1)
-    {
-        write_in_arg (Asm, Cmd, arg_val, MASK_IMM);
-    }
-
-    else
-    {
-        // error
-    }
-}
-
-//-----------------------------------------------------------------------------
-
-void parse_jmp (Assembler *Asm, Command *Cmd, int label)
-{
-    if(Cmd->flag && strchr (Asm->Cur_line.begin_line, ':') != NULL)
-    {
-        if(sscanf (Asm->Cur_line.begin_line, "%*s %d", &label) == 1)
+        if(strchr (Asm->Cur_line.begin_line, ':') != NULL)
         {
-            if(label <= Asm->Label.size && Asm->Label.array[label] > 0)
+            if(sscanf (Asm->Cur_line.begin_line, "%*s %lg", &Arg->value) == 1)
             {
-                write_in_arg (Asm, Cmd, Asm->Label.array[label], MASK_IMM);
+                Cmd->mask |= MASK_IMM;
+
+                if(Arg->value > Asm->Label.size || Asm->Label.array[(int) Arg->value] <= 0)
+                {
+                    Arg->value = -1;
+
+                    DOUBLE_PASS = true;
+                }
+
+                else
+                {
+                    Arg->value = Asm->Label.array[(int) Arg->value];
+                }
             }
 
             else
             {
-                write_in_arg (Asm, Cmd, -1, MASK_IMM);
-
-                Asm->Info.double_pass = true;
+                Asm->Info.code_sgntr = SIGNATURE_DESTROYED;
             }
         }
+
+        #define PARSE_ARG(num, name_msk, format, ...)                                        \
+            else if(sscanf (Asm->Cur_line.begin_line, format,  __VA_ARGS__) == num)      \
+            {                                                                            \
+                Cmd->mask |= name_msk;                                                       \
+            }                                                                            \
+
+        //-----------------------------------------------------------------------------
+
+        #include "../include/asm_codegen.h"
+
+        //-----------------------------------------------------------------------------
+
+        #undef PARSE_ARG
 
         else
         {
             Asm->Info.code_sgntr = SIGNATURE_DESTROYED;
         }
     }
+
+    #undef DOUBLE_PASS
 }
 
 //-----------------------------------------------------------------------------
 
-void write_in_arg (Assembler *Asm, Command *Cmd, double arg_val, int mask)
+void write_in_code (Assembler *Asm, Command Cmd, Argument Arg)
 {
-    if(Asm->cur_pos + LIMIT_DIFFERENCE > Asm->code_arr_capct)
+    if(!Cmd.flag)
     {
-        Asm->code_arr_capct *= 2;
+        if(Arg.flag)
+        {
+            if(Asm->Label.size + LIMIT_DIFFERENCE > Asm->Label.capacity)
+            {
+                Asm->Label.capacity *= 2;
 
-        Asm->Code.array = (double*) recalloc (Asm->Code.array,
-                                              Asm->code_arr_capct,
-                                              Asm->cur_pos,
-                                              sizeof (double)     );
+                Asm->Label.array = (int*) recalloc (Asm->Label.array,
+                                                    Asm->Label.capacity,
+                                                    Asm->Label.size,
+                                                    sizeof (int)         );
+            }
+
+            if(Arg.value > Asm->Label.size)
+            {
+                Asm->Label.size = Arg.value;
+            }
+
+            Asm->Label.array[(int) Arg.value] = Asm->cur_pos;
+        }
     }
 
-    Asm->Code.array[Asm->cur_pos + 1] = arg_val;
-    Cmd->mask |= mask;
-    Asm->offset++;
+    else
+    {
+        Asm->Code.array[Asm->cur_pos++] = Cmd.number |= Cmd.mask;
+
+        if(Asm->cur_pos + LIMIT_DIFFERENCE > Asm->Code.capacity)
+        {
+            Asm->Code.capacity *= 2;
+
+            Asm->Code.array = (char*) recalloc (Asm->Code.array,
+                                                Asm->Code.capacity,
+                                                Asm->cur_pos,
+                                                sizeof (char)       );
+        }
+
+        if(Cmd.number & MASK_REG)
+        {
+            Asm->Code.array[Asm->cur_pos] = Arg.reg_sym - 'a';
+            Asm->cur_pos += sizeof (double);
+        }
+
+        if(Cmd.number & MASK_IMM)
+        {
+            Asm->Code.array[Asm->cur_pos] = Arg.value;
+            Asm->cur_pos += sizeof (double);
+        }
+
+        Asm->Code.size = Asm->cur_pos;
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -300,12 +308,11 @@ void assembler_dtor (Assembler *Asm)
     free (Asm->Code.array);
     free (Asm->Label.array);
 
-    Asm->Code.size   = -1;
-    Asm->code_arr_capct  = -1;
-    Asm->Label.size  = -1;
+    Asm->Code.size      = -1;
+    Asm->Code.capacity  = -1;
+    Asm->Label.size     = -1;
     Asm->Label.capacity = -1;
 
-    // SIGNATURE_DESTROYED
     Asm->Info.code_sgntr = SIGNATURE_DESTROYED;
 
     asm_info_dtor (&Asm->Info);
@@ -325,9 +332,9 @@ void asm_info_dtor (Asm_info *Info)
 
 void write_res_sums (Assembler *Asm)
 {
-    Asm->Code.array[0]  = Asm->Code.size;
-    Asm->Code.array[1]  = Asm->Info.code_sgntr;
-    Asm->Label.array[0] = Asm->Label.size;
+    Asm->Code.array[0]                = Asm->Code.size;
+    Asm->Code.array[sizeof (double)]  = Asm->Info.code_sgntr;
+    Asm->Label.array[0]               = Asm->Label.size;
 }
 
 //-----------------------------------------------------------------------------

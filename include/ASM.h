@@ -37,10 +37,10 @@ enum Sizes
 
 
     // ??
-    CMD_MAX_LEN     = 20,
-    CODE_SIZE_INIT  = 100,
-    LABEL_SIZE_INIT = 50,
-    LIMIT_DIFFERENCE    = 10,
+    CMD_MAX_LEN      = 20,
+    CODE_SIZE_INIT   = 100,
+    LABEL_SIZE_INIT  = 50,
+    LIMIT_DIFFERENCE = 10,
 };
 
 //-----------------------------------------------------------------------------
@@ -80,7 +80,8 @@ typedef struct Argument
 {
     bool   flag;
     double value;
-    int    num_of_args;
+    char   reg_sym;
+    int    amount;
 } Argument;
 
 //-----------------------------------------------------------------------------
@@ -115,13 +116,23 @@ typedef struct Assembler
 
 //-----------------------------------------------------------------------------
 
-void assembling     (Assembler *Asm);
-
 int  assembler_ctor (Assembler *Asm, char *argv[]);
 
 int  asm_info_ctor  (Asm_info *Info, char *argv[]);
 
-void handle_line    (Assembler *Asm);
+void assembling     (Assembler *Asm);
+
+void handle_text    (Assembler *Asm, Line *Text, File *File_input);
+
+void parse_line     (Assembler *Asm, Command *Cmd, Argument *Arg);
+
+void parse_label    (Assembler *Asm, Argument *Arg);
+
+void parse_cmd      (Assembler *Asm, Command *Cmd, Argument *Arg);
+
+void parse_arg      (Assembler *Asm, Command *Cmd, Argument *Arg);
+
+void write_in_code  (Assembler *Asm, Command Cmd, Argument Arg);
 
 void assembler_dtor (Assembler *Asm);
 
@@ -129,19 +140,8 @@ void asm_info_dtor  (Asm_info *Info);
 
 void write_res_sums (Assembler *Asm);
 
-void parse_label    (Assembler *Asm, int label);
-
-void parse_arg      (Assembler *Asm, Command *Cmd);
-
-void parse_cmd      (Assembler *Asm, Command Cmd);
-
-void parse_jmp      (Assembler *Asm, Command *Cmd, int label);
-
-void parse_text    (Assembler *Asm, Line *Text, File *File_input);
-
-void write_in_arg   (Assembler *Asm, Command *Cmd, double arg_val, int mask);
-
 void asm_dump       (Assembler *Asm);
+
 
 //-----------------------------------------------------------------------------
 

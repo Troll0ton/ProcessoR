@@ -52,7 +52,7 @@ typedef struct Processor
     // char* videomem;
     //  [993]
     //
-    double  *code;
+    char    *code;
     int      code_size;
     Stack    Stk;
     void (*func) (CMD_FUNCT);
