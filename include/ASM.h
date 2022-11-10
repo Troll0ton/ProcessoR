@@ -88,7 +88,7 @@ typedef struct Argument
 
 typedef struct Code_array
 {
-    char   *array;
+    double *array;
     int     size;
     int     capacity;
 } Code_array;

@@ -13,7 +13,7 @@ int main (int argc, char *argv[])
 
     assembling (&Asm);
 
-    //asm_dump (&Asm);
+    asm_dump (&Asm);
 
     assembler_dtor (&Asm);
 
@@ -24,8 +24,8 @@ int main (int argc, char *argv[])
 
 int assembler_ctor (Assembler *Asm, char *argv[])
 {
-    Asm->Code.array  = (char*) calloc (CODE_SIZE_INIT,  sizeof (char));
-    Asm->Label.array = (int*)  calloc (LABEL_SIZE_INIT, sizeof (int));
+    Asm->Code.array  = (double*) calloc (CODE_SIZE_INIT,  sizeof (double));
+    Asm->Label.array = (int*)    calloc (LABEL_SIZE_INIT, sizeof (int));
 
     if(Asm->Code.array == NULL)
     {
@@ -39,7 +39,7 @@ int assembler_ctor (Assembler *Asm, char *argv[])
         return ERR_CTOR;
     }
 
-    Asm->Code.size      = 2 * sizeof (double);
+    Asm->Code.size      = NUM_FRST_EL_CD;
     Asm->Code.capacity  = CODE_SIZE_INIT;
 
     Asm->Label.size     = NUM_FRST_EL_LB;
@@ -116,8 +116,7 @@ void handle_text (Assembler *Asm, Line *Text, File *File_input)
         write_in_code (Asm, Cmd, Arg);
     }
 
-    Asm->Code.size = Asm->cur_pos;
-    Asm->cur_pos = 2 * sizeof (double);
+    Asm->Code.size = Asm->cur_pos = NUM_FRST_EL_CD;
 
     if(DOUBLE_PASS) handle_text (Asm, Text, File_input);
 
@@ -139,11 +138,11 @@ void parse_line (Assembler *Asm, Command *Cmd, Argument *Arg)
 
 void parse_label (Assembler *Asm, Argument *Arg)
 {
-    if(sscanf (Asm->Cur_line.begin_line, ":%lg", Arg->value) == 1)
+    if(sscanf (Asm->Cur_line.begin_line, ":%lg", &Arg->value) == 1)
     {
         if(Arg->value > Asm->Label.size)
         {
-            Asm->Label.size = Arg->value;
+            Asm->Label.size = (int) Arg->value;
         }
 
         Arg->flag = true;
@@ -221,11 +220,11 @@ void parse_arg (Assembler *Asm, Command *Cmd, Argument *Arg)
             }
         }
 
-        #define PARSE_ARG(num, name_msk, format, ...)                                        \
-            else if(sscanf (Asm->Cur_line.begin_line, format,  __VA_ARGS__) == num)      \
-            {                                                                            \
-                Cmd->mask |= name_msk;                                                       \
-            }                                                                            \
+        #define PARSE_ARG(num, name_msk, format, ...)                                \
+        else if(sscanf (Asm->Cur_line.begin_line, format,  __VA_ARGS__) == num)      \
+        {                                                                            \
+            Cmd->mask |= name_msk;                                                   \
+        }                                                                            \
 
         //-----------------------------------------------------------------------------
 
@@ -264,7 +263,7 @@ void write_in_code (Assembler *Asm, Command Cmd, Argument Arg)
 
             if(Arg.value > Asm->Label.size)
             {
-                Asm->Label.size = Arg.value;
+                Asm->Label.size = (int) Arg.value;
             }
 
             Asm->Label.array[(int) Arg.value] = Asm->cur_pos;
@@ -279,22 +278,20 @@ void write_in_code (Assembler *Asm, Command Cmd, Argument Arg)
         {
             Asm->Code.capacity *= 2;
 
-            Asm->Code.array = (char*) recalloc (Asm->Code.array,
-                                                Asm->Code.capacity,
-                                                Asm->cur_pos,
-                                                sizeof (char)       );
+            Asm->Code.array = (double*) recalloc (Asm->Code.array,
+                                                  Asm->Code.capacity,
+                                                  Asm->cur_pos,
+                                                  sizeof (double)    );
         }
 
         if(Cmd.number & MASK_REG)
         {
-            Asm->Code.array[Asm->cur_pos] = Arg.reg_sym - 'a';
-            Asm->cur_pos += sizeof (double);
+            Asm->Code.array[Asm->cur_pos++] = Arg.reg_sym - 'a';
         }
 
         if(Cmd.number & MASK_IMM)
         {
-            Asm->Code.array[Asm->cur_pos] = Arg.value;
-            Asm->cur_pos += sizeof (double);
+            Asm->Code.array[Asm->cur_pos++] = Arg.value;
         }
 
         Asm->Code.size = Asm->cur_pos;
@@ -332,9 +329,9 @@ void asm_info_dtor (Asm_info *Info)
 
 void write_res_sums (Assembler *Asm)
 {
-    Asm->Code.array[0]                = Asm->Code.size;
-    Asm->Code.array[sizeof (double)]  = Asm->Info.code_sgntr;
-    Asm->Label.array[0]               = Asm->Label.size;
+    Asm->Code.array[0]  = Asm->Code.size;
+    Asm->Code.array[1]  = Asm->Info.code_sgntr;
+    Asm->Label.array[0] = Asm->Label.size;
 }
 
 //-----------------------------------------------------------------------------
