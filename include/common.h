@@ -36,8 +36,8 @@ enum Offsets
 
 enum Signatures
 {
-    CORCT_SIGN = 0xBACAFE,
-    WRONG_SIGN = 0xDEADAC,
+    SIGNATURE           = 0xBACAFE,
+    SIGNATURE_DESTROYED = 0xDEADAC,
 };
 
 //-----------------------------------------------------------------------------

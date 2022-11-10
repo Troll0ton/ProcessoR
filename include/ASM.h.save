@@ -40,7 +40,7 @@ enum Sizes
     CMD_MAX_LEN     = 20,
     CODE_SIZE_INIT  = 100,
     LABEL_SIZE_INIT = 50,
-    LIMIT_DIFRCE    = 10,
+    LIMIT_DIFFERENCE    = 10,
 };
 
 //-----------------------------------------------------------------------------
@@ -69,17 +69,25 @@ typedef struct Asm_info
 
 typedef struct Command
 {
-    int   flag_cmd;
+    bool  flag;
     int   mask;
-    char  name[CMD_MAX_LEN];
+    int   number;
 } Command;
 
+//-----------------------------------------------------------------------------
+
+typedef struct Argument
+{
+    bool   flag;
+    double value;
+    int    num_of_args;
+} Argument;
 
 //-----------------------------------------------------------------------------
 
 typedef struct Code_array
 {
-    double *array;
+    char   *array;
     int     size;
     int     capacity;
 } Code_array;
@@ -129,7 +137,7 @@ void parse_cmd      (Assembler *Asm, Command Cmd);
 
 void parse_jmp      (Assembler *Asm, Command *Cmd, int label);
 
-void handle_text    (Assembler *Asm, Line *Text, File *File_input);
+void parse_text    (Assembler *Asm, Line *Text, File *File_input);
 
 void write_in_arg   (Assembler *Asm, Command *Cmd, double arg_val, int mask);
 
