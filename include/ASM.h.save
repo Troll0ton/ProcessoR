@@ -17,42 +17,37 @@
 
 //-----------------------------------------------------------------------------
 
-// N(SUPPORTED_CMD)
+#define N(suffix)  NUM_OF_##suffix
 
-#define N(suffix) NUM_OF_##suffix
-// enum CMD_INFO
-// {
-//     NUM_OF_SUPPORTED_CMD = 15;
-//     ...
-// }
+#define SG(suffix) SIGNATURE_##suffix
 
+#define SZ(suffix) SIZE_##suffix
 
-enum Sizes
+#define L(suffix)  LIMIT_##suffix
+
+//-----------------------------------------------------------------------------
+
+enum CMD_INFO
 {
-    // ??
-    NUM_OF_SUP_CMD  = 15,
-    NUM_OF_JMPS     = 6,
-    NUM_OF_CMDS_RAM = 2,
-    NUM_OF_CMDS_RGS = 2,
-
-
-    // ??
-    CMD_MAX_LEN      = 20,
-    CODE_SIZE_INIT   = 100,
-    LABEL_SIZE_INIT  = 50,
-    LIMIT_DIFFERENCE = 10,
+    N(SUPPORTED_CMD) = 17,
+    L(MAX_LEN)       = 20,
 };
 
 //-----------------------------------------------------------------------------
 
-enum Numbers
+enum CODE_INFO
 {
-    CMD_REG_NUM    = 1,
-    CMD_RAM_NUM    = 1,
-    CMD_JMP_NUM    = 9,
-    // OFFSET_SIGNATURE
-    NUM_FRST_EL_CD = 2,
-    NUM_FRST_EL_LB = 1,
+    L(SIZE_DIFF)    = 10,
+    SZ(CODE_INIT)   = 100,
+    SG(CODE_OFFSET) = 2,
+};
+
+//-----------------------------------------------------------------------------
+
+enum LABEL_INFO
+{
+    SZ(LABEL_INIT)   = 50,
+    SG(LABEL_OFFSET) = 1,
 };
 
 //-----------------------------------------------------------------------------
@@ -88,9 +83,11 @@ typedef struct Argument
 
 typedef struct Code_array
 {
-    char   *array;
+    double *array;
     int     size;
     int     capacity;
+    
+    FILE *code_dmp_file;
 } Code_array;
 
 //-----------------------------------------------------------------------------
@@ -100,6 +97,8 @@ typedef struct Label_array
     int *array;
     int  size;
     int  capacity;
+    
+    FILE *label_dmp_file;
 } Label_array;
 
 //-----------------------------------------------------------------------------

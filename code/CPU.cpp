@@ -6,7 +6,7 @@ int main (int argc, char *argv[])
 {
     Processor Cpu = { 0 };
 
-    if(processor_ctor (&Cpu, calculator) == ERR_CTOR)
+    if(processor_ctor (&Cpu, execute_cmd) == ERR_CTOR)
     {
         return ERR_CPU;
     }
@@ -33,10 +33,13 @@ int processor_ctor (Processor *Cpu, void (*funct) (CMD_FUNCT))
     Cpu->Stk = { 0 };
     stack_ctor (&Cpu->Stk, 2);
 
+    Cpu->Stk_call = { 0 };
+    stack_ctor (&Cpu->Stk_call, 2);
+
     // N(REGS)
     // 300
-    Cpu->regs = (double*) calloc (5, sizeof (double));
-    Cpu->ram  = (double*) calloc (3, sizeof (double));
+    Cpu->regs = (double*) calloc (5,   sizeof (double));
+    Cpu->ram  = (double*) calloc (300, sizeof (double));
 
     if(Cpu->regs == NULL || Cpu->ram == NULL)
     {
@@ -67,6 +70,7 @@ int cpu_info_ctor (Cpu_info *Info)
 void processor_dtor (Processor *Cpu)
 {
     stack_dtor (&Cpu->Stk);
+    stack_dtor (&Cpu->Stk_call);
 
     free (Cpu->regs);
     free (Cpu->ram);
@@ -163,6 +167,8 @@ void handle_cmds (Processor *Cpu)
 
         Cpu->func (curr_cmd, curr_arg, &curr_pos, Cpu);
         curr_pos += offset;
+
+        if(F(STOP)) break;
     }
 }
 
@@ -176,9 +182,8 @@ bool is_equal (double a, double b)
 }
 
 //-----------------------------------------------------------------------------
-// execute_cmd
 
-void calculator (int curr_cmd, double curr_arg, int *curr_ptr, Processor *Cpu)
+void execute_cmd (int curr_cmd, double curr_arg, int *curr_ptr, Processor *Cpu)
 {
     int curr_pos = *curr_ptr;
 

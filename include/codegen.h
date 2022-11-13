@@ -2,7 +2,7 @@
 
 CMD_DEF(HLT, "hlt",
 {
-    stack_push (&Cpu->Stk, STOP);
+    F(STOP) = true;
 })
 
 // CMD_DEF(PUSH | MASK_RAM, "push",
@@ -61,7 +61,17 @@ CMD_DEF(DIV, "div",
 
 CMD_DEF(OUT, "out",
 {
-    printf ("result: %lg\n", stack_pop (&Cpu->Stk));
+    double value = stack_pop (&Cpu->Stk);
+
+    if(value == POISON_STK)
+    {
+        printf ("error\n");
+    }
+
+    else
+    {
+        printf ("result: %lg\n", value);
+    }
 })
 
 CMD_DEF(DUMP, "dump",
@@ -160,4 +170,39 @@ CMD_DEF(JNE, "jne",
     else curr_pos++;
     stack_push (&Cpu->Stk, first_number);
     stack_push (&Cpu->Stk, second_number);
+})
+
+
+CMD_DEF(JMP, "jmp",
+{
+    int pos_ch = curr_arg;
+    curr_pos = pos_ch - 2;
+})
+
+CMD_DEF(CALL, "call",
+{
+    stack_push (&Cpu->Stk_call, ++curr_pos);
+
+    int pos_ch = curr_arg;
+    curr_pos = pos_ch - 2;
+})
+
+CMD_DEF(RET, "ret",
+{
+    curr_pos = stack_pop (&Cpu->Stk_call);
+})
+
+CMD_DEF(SQRT, "sqrt",
+{
+    double value = stack_pop (&Cpu->Stk);
+
+    if(value >= 0)
+    {
+        stack_push (&Cpu->Stk, sqrt (value));
+    }
+
+    else
+    {
+        printf ("ERROR - sqrt below zero!\n");
+    }
 })

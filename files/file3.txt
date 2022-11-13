@@ -1,12 +1,15 @@
-push 200
-
-:2
-push 100
-je 2:
-
-add
+call 13:
 
 out
 
 hlt
 
+:13
+
+push 100
+
+push 200
+
+add
+
+ret

@@ -7,6 +7,7 @@
 
 #include "../include/stack.h"
 #include "../include/common.h"
+#include <math.h>
 
 //-----------------------------------------------------------------------------
 
@@ -15,11 +16,15 @@
 
 //-----------------------------------------------------------------------------
 
+#define F(suffix) Cpu->FLAG_##suffix
+#define N(suffix) Cpu->NUM_OF_##suffix
+
+//-----------------------------------------------------------------------------
+
 enum Nums
 {
     NUM_OF_REGS = 5,
-    RAM_SIZE    = 3,
-    STOP        = -1,
+    RAM_SIZE    = 300,
 };
 
 //-----------------------------------------------------------------------------
@@ -32,6 +37,8 @@ enum Regs
     RDX,
     REX,
 };
+
+#define RET_POS 33
 
 //-----------------------------------------------------------------------------
 
@@ -52,9 +59,11 @@ typedef struct Processor
     // char* videomem;
     //  [993]
     //
-    double    *code;
+    double  *code;
+    bool     FLAG_STOP;
     int      code_size;
     Stack    Stk;
+    Stack    Stk_call;
     void (*func) (CMD_FUNCT);
 } Processor;
 
@@ -74,7 +83,7 @@ void handle_cmds     (Processor *Cpu);
 
 bool is_equal        (double a, double b);
 
-void calculator      (int curr_cmd, double curr_arg, int *curr_ptr, Processor *Cpu);
+void execute_cmd      (int curr_cmd, double curr_arg, int *curr_ptr, Processor *Cpu);
 
 void cpu_dump        (Processor *Cpu);
 
