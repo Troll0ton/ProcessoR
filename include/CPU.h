@@ -16,29 +16,17 @@
 
 //-----------------------------------------------------------------------------
 
-#define F(suffix) Cpu->FLAG_##suffix
-#define N(suffix) Cpu->NUM_OF_##suffix
-
-//-----------------------------------------------------------------------------
-
-enum Nums
+enum REG_INFO
 {
-    NUM_OF_REGS = 5,
-    RAM_SIZE    = 300,
+    N(REGS) = 5,
 };
 
 //-----------------------------------------------------------------------------
 
-enum Regs
+enum RAM_INFO
 {
-    RAX,
-    RBX,
-    RCX,
-    RDX,
-    REX,
+    SZ(RAM) = 300,
 };
-
-#define RET_POS 33
 
 //-----------------------------------------------------------------------------
 
@@ -55,21 +43,16 @@ typedef struct Processor
     Cpu_info Info;
     double  *regs;
     double  *ram;
-
-    // char* videomem;
-    //  [993]
-    //
     double  *code;
-    bool     FLAG_STOP;
+    bool     F(STOP);
     int      code_size;
     Stack    Stk;
     Stack    Stk_call;
-    void (*func) (CMD_FUNCT);
 } Processor;
 
 //-----------------------------------------------------------------------------
 
-int  processor_ctor  (Processor *Cpu, void (*funct) (CMD_FUNCT));
+int  processor_ctor  (Processor *Cpu);
 
 int  cpu_info_ctor   (Cpu_info *Info);
 
@@ -83,7 +66,7 @@ void handle_cmds     (Processor *Cpu);
 
 bool is_equal        (double a, double b);
 
-void execute_cmd      (int curr_cmd, double curr_arg, int *curr_ptr, Processor *Cpu);
+void execute_cmd     (int curr_cmd, double curr_arg, int *curr_ptr, Processor *Cpu);
 
 void cpu_dump        (Processor *Cpu);
 

@@ -2,7 +2,7 @@
 
 CMD_DEF(HLT, "hlt",
 {
-    F(STOP) = true;
+    Cpu->F(STOP) = true;
 })
 
 // CMD_DEF(PUSH | MASK_RAM, "push",
@@ -81,95 +81,32 @@ CMD_DEF(DUMP, "dump",
 
 CMD_DEF(JBE, "jbe",
 {
-    double second_number = stack_pop (&Cpu->Stk);
-    double first_number  = stack_pop (&Cpu->Stk);
-
-    if(first_number <= second_number)
-    {
-        int pos_ch = curr_arg;
-        curr_pos = pos_ch - 2;
-    }
-
-    else curr_pos++;
-
-    stack_push (&Cpu->Stk, first_number);
-    stack_push (&Cpu->Stk, second_number);
+    CJMP(first_number <= second_number);
 })
 
 CMD_DEF(JAE, "jae",
 {
-    double second_number = stack_pop (&Cpu->Stk);
-    double first_number  = stack_pop (&Cpu->Stk);
-    if(first_number >= second_number)
-    {
-        int pos_ch = curr_arg;
-        curr_pos = pos_ch - 2;
-    }
-    else curr_pos++;
-    stack_push (&Cpu->Stk, first_number);
-    stack_push (&Cpu->Stk, second_number);
+    CJMP(first_number >= second_number);
 })
 
 CMD_DEF(JA, "ja",
 {
-    double second_number = stack_pop (&Cpu->Stk);
-    double first_number  = stack_pop (&Cpu->Stk);
-    if(first_number > second_number)
-    {
-        int pos_ch = curr_arg;
-        curr_pos = pos_ch- 2;
-    }
-    else curr_pos++;
-    stack_push (&Cpu->Stk, first_number);
-    stack_push (&Cpu->Stk, second_number);
+    CJMP(first_number > second_number);
 })
 
 CMD_DEF(JB, "jb",
 {
-    double second_number = stack_pop (&Cpu->Stk);
-    double first_number  = stack_pop (&Cpu->Stk);
-    if(first_number < second_number)
-    {
-        int pos_ch = curr_arg;
-        curr_pos = pos_ch - 2;
-    }
-    else curr_pos++;
-    stack_push (&Cpu->Stk, first_number);
-    stack_push (&Cpu->Stk, second_number);
+    CJMP(first_number < second_number);
 })
 
 CMD_DEF(JE, "je",
 {
-    double second_number = stack_pop (&Cpu->Stk);
-    double first_number  = stack_pop (&Cpu->Stk);
-
-    if(is_equal(first_number,second_number))
-    {
-        int pos_ch = curr_arg;
-        curr_pos = pos_ch - 2;
-    }
-
-    else
-    {
-    curr_pos++;
-    }
-
-    stack_push (&Cpu->Stk, first_number);
-    stack_push (&Cpu->Stk, second_number);
+    CJMP(is_equal(first_number,second_number));
 })
 
 CMD_DEF(JNE, "jne",
 {
-    double second_number = stack_pop (&Cpu->Stk);
-    double first_number  = stack_pop (&Cpu->Stk);
-    if(!is_equal(first_number,second_number))
-    {
-        int pos_ch = curr_arg;
-        curr_pos = pos_ch - 2;
-    }
-    else curr_pos++;
-    stack_push (&Cpu->Stk, first_number);
-    stack_push (&Cpu->Stk, second_number);
+    CJMP(!is_equal(first_number,second_number));
 })
 
 

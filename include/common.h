@@ -7,14 +7,22 @@
 
 //-----------------------------------------------------------------------------
 
-#define CMD_FUNCT int curr_cmd,          \
-                      double curr_arg,   \
-                      int *curr_ptr,     \
-                      Struct *Name
+#define POISON_STK 12340
+
+#define DELETED_PAR -1
+#define NOT_FOUND   -1
 
 //-----------------------------------------------------------------------------
 
-#define POISON_STK 12340
+#define N(suffix)  NUM_OF_##suffix
+
+#define SG(suffix) SIGNATURE_##suffix
+
+#define SZ(suffix) SIZE_OF_##suffix
+
+#define L(suffix)  LIMIT_##suffix
+
+#define F(suffix)  FLAG_##suffix
 
 //-----------------------------------------------------------------------------
 
@@ -27,6 +35,23 @@ enum Cmd_codes
 
     #undef CMD_DEF
 };
+
+//-----------------------------------------------------------------------------
+
+#define CJMP(...)                                   \
+    double second_number = stack_pop (&Cpu->Stk);   \
+    double first_number  = stack_pop (&Cpu->Stk);   \
+                                                    \
+    if(__VA_ARGS__)                                 \
+    {                                               \
+        int pos_ch = curr_arg;                      \
+        curr_pos = pos_ch - 2;                      \
+    }                                               \
+                                                    \
+    else curr_pos++;                                \
+                                                    \
+    stack_push (&Cpu->Stk, first_number);           \
+    stack_push (&Cpu->Stk, second_number);
 
 //-----------------------------------------------------------------------------
 

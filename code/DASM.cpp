@@ -6,7 +6,7 @@ int main ()
 {
     Disassember Dasm = { 0 };
 
-    if(disassember_ctor (&Dasm, disassembling) == ERR_CTOR)
+    if(disassember_ctor (&Dasm) == ERR_CTOR)
     {
         return ERR_DASM;
     }

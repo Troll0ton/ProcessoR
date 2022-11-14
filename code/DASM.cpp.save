@@ -6,7 +6,7 @@ int main ()
 {
     Disassember Dasm = { 0 };
 
-    if(disassember_ctor (&Dasm, disassembling) == ERR_CTOR)
+    if(disassember_ctor (&Dasm) == ERR_CTOR)
     {
         return ERR_DASM;
     }
@@ -18,8 +18,6 @@ int main ()
     disassember_dtor (&Dasm);
 
     return 0;
-
-    return 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -28,11 +26,11 @@ void disassembling (int curr_cmd, double curr_arg, int *curr_ptr, Disassember *D
 {
     int cur_pos = *curr_ptr;
 
-    #define CMD_DEF(cmd, name, ...)                    \
-        case cmd:                                      \
-        {                                              \
+    #define CMD_DEF(cmd, name, ...)                     \
+        case cmd:                                       \
+        {                                               \
             fprintf (Dasm->Info.file_out, "%s ", name); \
-            break;                                     \
+            break;                                      \
         }
 
     switch (curr_cmd & MASK_CMD)
@@ -61,8 +59,7 @@ void disassembling (int curr_cmd, double curr_arg, int *curr_ptr, Disassember *D
         cur_pos += BASIC_OFFSET;
     }
 
-    else if(curr_cmd & MASK_IMM &&
-            curr_cmd & MASK_RAM   )
+    else if(curr_cmd & (MASK_IMM | MASK_RAM))
     {
         fprintf (Dasm->Info.file_out, "[%d]", (int) Dasm->code[cur_pos + 1]);
         cur_pos += BASIC_OFFSET;
@@ -79,6 +76,7 @@ void disassembling (int curr_cmd, double curr_arg, int *curr_ptr, Disassember *D
         fprintf (Dasm->Info.file_out, "r%cx", (int) Dasm->code[cur_pos + 1] + 'a');
         cur_pos += BASIC_OFFSET;
     }
+    // else
 
     fprintf (Dasm->Info.file_out, "\n");
 
@@ -104,7 +102,7 @@ int disassember_ctor (Disassember *Dasm, void (*funct) (CMD_FUNCT))
         return ERR_CTOR;
     }
 
-    return (Dasm_info_ctor (&Dasm->Info));
+    return (dasm_info_ctor (&Dasm->Info));
 }
 
 //-----------------------------------------------------------------------------
@@ -112,7 +110,7 @@ int disassember_ctor (Disassember *Dasm, void (*funct) (CMD_FUNCT))
 int dasm_info_ctor (Dasm_info *Info)
 {
     Info->code_file  = fopen ("../files/code.bin",   "rb");
-    Info->file_out   = fopen ("../dump/log.txt",     "w+");
+    Info->file_out   = fopen ("../dump/dasm_file.txt",     "w+");
 
     if(Info->code_file  == NULL ||
        Info->file_out   == NULL   )
@@ -133,12 +131,12 @@ void disassember_dtor (Disassember *Dasm)
     free (Dasm->ram);
     free (Dasm->code);
 
-    Dasm_info_dtor (&Dasm->Info);
+    dasm_info_dtor (&Dasm->Info);
 }
 
 //-----------------------------------------------------------------------------
 
-void Dasm_info_dtor (Dasm_info *Info)
+void dasm_info_dtor (Dasm_info *Info)
 {
     fclose (Info->code_file);
     fclose (Info->file_out);

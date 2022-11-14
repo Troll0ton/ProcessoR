@@ -17,19 +17,9 @@
 
 //-----------------------------------------------------------------------------
 
-#define N(suffix)  NUM_OF_##suffix
-
-#define SG(suffix) SIGNATURE_##suffix
-
-#define SZ(suffix) SIZE_##suffix
-
-#define L(suffix)  LIMIT_##suffix
-
-//-----------------------------------------------------------------------------
-
 enum CMD_INFO
 {
-    N(SUPPORTED_CMD) = 17,
+    N(SUPPORTED_CMD) = 19,
     L(MAX_LEN)       = 20,
 };
 
@@ -86,8 +76,8 @@ typedef struct Code_array
     double *array;
     int     size;
     int     capacity;
-    
-    FILE *code_dmp_file;
+
+    FILE *dmp_file;
 } Code_array;
 
 //-----------------------------------------------------------------------------
@@ -97,8 +87,8 @@ typedef struct Label_array
     int *array;
     int  size;
     int  capacity;
-    
-    FILE *label_dmp_file;
+
+    FILE *dmp_file;
 } Label_array;
 
 //-----------------------------------------------------------------------------
@@ -127,11 +117,13 @@ void parse_line     (Assembler *Asm, Command *Cmd, Argument *Arg);
 
 void parse_label    (Assembler *Asm, Argument *Arg);
 
+void write_in_label (Assembler *Asm, Argument *Arg);
+
 void parse_cmd      (Assembler *Asm, Command *Cmd, Argument *Arg);
 
 void parse_arg      (Assembler *Asm, Command *Cmd, Argument *Arg);
 
-void write_in_code  (Assembler *Asm, Command Cmd, Argument Arg);
+void write_in_code  (Assembler *Asm, Command Cmd,  Argument Arg);
 
 void assembler_dtor (Assembler *Asm);
 

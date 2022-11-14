@@ -6,7 +6,7 @@ int main (int argc, char *argv[])
 {
     Processor Cpu = { 0 };
 
-    if(processor_ctor (&Cpu, execute_cmd) == ERR_CTOR)
+    if(processor_ctor (&Cpu) == ERR_CTOR)
     {
         return ERR_CPU;
     }
@@ -24,22 +24,19 @@ int main (int argc, char *argv[])
 
 //-----------------------------------------------------------------------------
 
-int processor_ctor (Processor *Cpu, void (*funct) (CMD_FUNCT))
+int processor_ctor (Processor *Cpu)
 {
     Cpu->Info = { 0 };
 
-    Cpu->func = funct;
-
     Cpu->Stk = { 0 };
+
     stack_ctor (&Cpu->Stk, 2);
 
     Cpu->Stk_call = { 0 };
     stack_ctor (&Cpu->Stk_call, 2);
 
-    // N(REGS)
-    // 300
-    Cpu->regs = (double*) calloc (5,   sizeof (double));
-    Cpu->ram  = (double*) calloc (300, sizeof (double));
+    Cpu->regs = (double*) calloc (N(REGS), sizeof (double));
+    Cpu->ram  = (double*) calloc (SZ(RAM), sizeof (double));
 
     if(Cpu->regs == NULL || Cpu->ram == NULL)
     {
@@ -87,24 +84,12 @@ void cpu_info_dtor (Cpu_info *Info)
     fclose (Info->file_out);
 }
 
-
-// call :123 [300]
-// push 5.5  [308]
-
-
-// :123  [1300]
-// ...
-// ret   [1400]
-//
-//
-
-
 //-----------------------------------------------------------------------------
 
 void read_code_file (Processor *Cpu)
 {
-    double res_sum = -1;
-    double code_sgntr = -1;
+    double res_sum    = 0;
+    double code_sgntr = 0;
 
     fread (&res_sum, sizeof(double), 1, Cpu->Info.code_file);
     Cpu->code_size = res_sum - 1;
@@ -165,10 +150,11 @@ void handle_cmds (Processor *Cpu)
 
         else offset = 0;
 
-        Cpu->func (curr_cmd, curr_arg, &curr_pos, Cpu);
+        execute_cmd (curr_cmd, curr_arg, &curr_pos, Cpu);
+
         curr_pos += offset;
 
-        if(F(STOP)) break;
+        if(Cpu->F(STOP)) break;
     }
 }
 

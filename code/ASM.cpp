@@ -139,7 +139,7 @@ void parse_line (Assembler *Asm, Command *Cmd, Argument *Arg)
 
 void parse_label (Assembler *Asm, Argument *Arg)
 {
-    if(sscanf (Asm->Cur_line.begin_line, ":%lg", &Arg->value) == 1)
+    if(lscan(":%lg", &Arg->value) == 1)
     {
         if(Arg->value > Asm->Label.size)
         {
@@ -156,7 +156,7 @@ void parse_cmd (Assembler *Asm, Command *Cmd, Argument *Arg)
 {
     char cmd_name[L(MAX_LEN)] = "";
 
-    if(!Arg->flag && sscanf (Asm->Cur_line.begin_line, "%20s", cmd_name) == 1)
+    if(!Arg->flag && lscan("%20s", cmd_name) == 1)
     {
         char *cmd_names[] =
         {
@@ -176,7 +176,7 @@ void parse_cmd (Assembler *Asm, Command *Cmd, Argument *Arg)
         {
             if(stricmp (cmd_name, cmd_names[num_cmd]) == 0)
             {
-                Cmd->number = num_cmd;
+                Cmd->code = num_cmd;
                 Cmd->flag = true;
 
                 break;
@@ -196,23 +196,15 @@ void parse_arg (Assembler *Asm, Command *Cmd, Argument *Arg)
 {
     if(Cmd->flag)
     {
+        char unexpected_line[L(MAX_LEN)] = "";
+
         if(strchr (Asm->Cur_line.begin_line, ':') != NULL)
         {
-            if(sscanf (Asm->Cur_line.begin_line, "%*s %lg", &Arg->value) == 1)
+            if(lscan("%*s %lg", &Arg->value) == 1)
             {
                 Cmd->mask |= MASK_IMM;
 
-                if(Arg->value > Asm->Label.size || Asm->Label.array[(int) Arg->value] <= 0)
-                {
-                    Arg->value = -1;
-
-                    DOUBLE_PASS = true;
-                }
-
-                else
-                {
-                    Arg->value = Asm->Label.array[(int) Arg->value];
-                }
+                find_label (Asm, Arg);
             }
 
             else
@@ -222,7 +214,7 @@ void parse_arg (Assembler *Asm, Command *Cmd, Argument *Arg)
         }
 
         #define PARSE_ARG(num, name_msk, format, ...)                                \
-        else if(sscanf (Asm->Cur_line.begin_line, format, __VA_ARGS__) == num)      \
+        else if(lscan(format, __VA_ARGS__) == num)      \
         {                                                                            \
             Cmd->mask |= name_msk;                                                   \
         }                                                                            \
@@ -234,6 +226,34 @@ void parse_arg (Assembler *Asm, Command *Cmd, Argument *Arg)
         //-----------------------------------------------------------------------------
 
         #undef PARSE_ARG
+
+        else if(lscan("%*s %20s", unexpected_line) == 1)
+        {
+            printf ("ERROR - UNEXPECTED LINE!\n");
+
+            Asm->Info.code_sgntr = SIGNATURE_DESTROYED;
+        }
+    }
+}
+
+#undef DOUBLE_PASS
+
+//-----------------------------------------------------------------------------
+
+#define DOUBLE_PASS (Asm->Info.double_pass)
+
+void find_label (Assembler *Asm, Argument *Arg)
+{
+    if(Arg->value > Asm->Label.size || Asm->Label.array[(int) Arg->value] <= 0)
+    {
+        Arg->value = NOT_FOUND;
+
+        DOUBLE_PASS = true;
+    }
+
+    else
+    {
+        Arg->value = Asm->Label.array[(int) Arg->value];
     }
 }
 
@@ -243,52 +263,16 @@ void parse_arg (Assembler *Asm, Command *Cmd, Argument *Arg)
 
 void write_in_code (Assembler *Asm, Command Cmd, Argument Arg)
 {
-    if(!Cmd.flag)
+    if(!Cmd.flag && Arg.flag)
     {
-        if(Arg.flag)
-        {
-            if(Asm->Label.size + L(SIZE_DIFF) > Asm->Label.capacity)
-            {
-                Asm->Label.capacity *= 2;
-
-                Asm->Label.array = (int*) recalloc (Asm->Label.array,
-                                                    Asm->Label.capacity,
-                                                    Asm->Label.size,
-                                                    sizeof (int)         );
-            }
-
-            if(Arg.value > Asm->Label.size)
-            {
-                Asm->Label.size = (int) Arg.value;
-            }
-
-            Asm->Label.array[(int) Arg.value] = Asm->cur_pos;
-        }
+        write_in_label (Asm, Arg);
     }
 
-    else
+    else if(Cmd.flag)
     {
-        Asm->Code.array[Asm->cur_pos++] = Cmd.number |= Cmd.mask;
+        Asm->Code.array[Asm->cur_pos++] = Cmd.code |= Cmd.mask;
 
-        if(Asm->cur_pos + L(SIZE_DIFF) > Asm->Code.capacity)
-        {
-            Asm->Code.capacity *= 2;
-
-            Asm->Code.array = (double*) recalloc (Asm->Code.array,
-                                                  Asm->Code.capacity,
-                                                  Asm->cur_pos,
-                                                  sizeof (double)    );
-        }
-
-        if(Cmd.number & MASK_REG)
-        {
-            Asm->Code.array[Asm->cur_pos++] = Arg.reg_sym - 'a';
-        }
-
-        if(Cmd.number & MASK_IMM)
-        {
-            Asm->Code.array[Asm->cur_pos++] = Arg.value;
-        }
+        write_in_arg (Asm, Cmd, Arg);
     }
 
     Asm->Code.array[0] = Asm->Code.size;
@@ -299,15 +283,62 @@ void write_in_code (Assembler *Asm, Command Cmd, Argument Arg)
 
 //-----------------------------------------------------------------------------
 
+void write_in_label (Assembler *Asm, Argument Arg)
+{
+    if(Asm->Label.size + L(SIZE_DIFF) > Asm->Label.capacity)
+    {
+        Asm->Label.capacity *= 2;
+
+        Asm->Label.array = (int*) recalloc (Asm->Label.array,
+                                            Asm->Label.capacity,
+                                            Asm->Label.size,
+                                            sizeof (int)         );
+    }
+
+    if(Arg.value > Asm->Label.size)
+    {
+        Asm->Label.size = (int) Arg.value;
+    }
+
+    Asm->Label.array[(int) Arg.value] = Asm->cur_pos;
+}
+
+//-----------------------------------------------------------------------------
+
+void write_in_arg (Assembler *Asm, Command Cmd, Argument Arg)
+{
+    if(Asm->cur_pos + L(SIZE_DIFF) > Asm->Code.capacity)
+    {
+        Asm->Code.capacity *= 2;
+
+        Asm->Code.array = (double*) recalloc (Asm->Code.array,
+                                                Asm->Code.capacity,
+                                                Asm->cur_pos,
+                                                sizeof (double)    );
+    }
+
+    if(Cmd.code & MASK_REG)
+    {
+        Asm->Code.array[Asm->cur_pos++] = Arg.reg_sym - 'a';
+    }
+
+    if(Cmd.code & MASK_IMM)
+    {
+        Asm->Code.array[Asm->cur_pos++] = Arg.value;
+    }
+}
+
+//-----------------------------------------------------------------------------
+
 void assembler_dtor (Assembler *Asm)
 {
     free (Asm->Code.array);
     free (Asm->Label.array);
 
-    Asm->Code.size      = -1;
-    Asm->Code.capacity  = -1;
-    Asm->Label.size     = -1;
-    Asm->Label.capacity = -1;
+    Asm->Code.size      = DELETED_PAR;
+    Asm->Code.capacity  = DELETED_PAR;
+    Asm->Label.size     = DELETED_PAR;
+    Asm->Label.capacity = DELETED_PAR;
 
     fclose (Asm->Code.dmp_file);
     fclose (Asm->Label.dmp_file);
@@ -338,9 +369,10 @@ void write_res_sums (Assembler *Asm)
 
 void asm_dump (Assembler *Asm)
 {
-    fprintf (Asm->Code.dmp_file, "_______________________________________________________________________________\n"
-                                 "size: %d sign: %x\n",
-                                 (int) Asm->Code.array[0], (int) Asm->Code.array[1]);
+    fprintf (Asm->Code.dmp_file,
+             "________________________________________________________________________\n"
+             "size: %d sign: %x\n",
+             (int) Asm->Code.array[0], (int) Asm->Code.array[1]);
 
     for(int i = 2; i < Asm->Code.size; i++)
     {
@@ -349,9 +381,10 @@ void asm_dump (Assembler *Asm)
 
     for(int i = 0; i <= Asm->Label.size; i++)
     {
-        fprintf (Asm->Label.dmp_file, "_______________________________________________________________________________\n"
-                                      "%06d || %d\n",
-                                      i, Asm->Label.array[i]);
+        fprintf (Asm->Label.dmp_file,
+                 "________________________________________________________________________\n"
+                 "%06d || %d\n",
+                 i, Asm->Label.array[i]);
     }
 }
 

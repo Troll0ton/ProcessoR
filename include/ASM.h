@@ -12,18 +12,12 @@
 
 //-----------------------------------------------------------------------------
 
-#define SUCCESS_READ 1
-#define EMPTY_LINE   0
+#define lscan(...) sscanf (Asm->Cur_line.begin_line, __VA_ARGS__)
 
 //-----------------------------------------------------------------------------
 
-#define N(suffix)  NUM_OF_##suffix
-
-#define SG(suffix) SIGNATURE_##suffix
-
-#define SZ(suffix) SIZE_##suffix
-
-#define L(suffix)  LIMIT_##suffix
+#define SUCCESS_READ 1
+#define EMPTY_LINE   0
 
 //-----------------------------------------------------------------------------
 
@@ -66,7 +60,7 @@ typedef struct Command
 {
     bool  flag;
     int   mask;
-    int   number;
+    int   code;
 } Command;
 
 //-----------------------------------------------------------------------------
@@ -127,11 +121,17 @@ void parse_line     (Assembler *Asm, Command *Cmd, Argument *Arg);
 
 void parse_label    (Assembler *Asm, Argument *Arg);
 
+void find_label     (Assembler *Asm, Argument *Arg);
+
 void parse_cmd      (Assembler *Asm, Command *Cmd, Argument *Arg);
 
 void parse_arg      (Assembler *Asm, Command *Cmd, Argument *Arg);
 
-void write_in_code  (Assembler *Asm, Command Cmd, Argument Arg);
+void write_in_code  (Assembler *Asm, Command Cmd,  Argument Arg);
+
+void write_in_arg   (Assembler *Asm, Command Cmd,  Argument Arg);
+
+void write_in_label (Assembler *Asm, Argument Arg);
 
 void assembler_dtor (Assembler *Asm);
 
