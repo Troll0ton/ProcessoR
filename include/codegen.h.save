@@ -1,42 +1,17 @@
- // #define PUSH_DOUBLE ...
 
 CMD_DEF(HLT, "hlt",
 {
     Cpu->F(STOP) = true;
 })
 
-// CMD_DEF(PUSH | MASK_RAM, "push",
-
 CMD_DEF(PUSH, "push",
 {
-    stack_push (&Cpu->Stk, curr_arg);
-    curr_pos++;
+    stack_push (&Cpu->Stk, arg_value);
 })
 
 CMD_DEF(POP, "pop",
 {
-    if((int) Cpu->code[curr_pos] & MASK_RAM && (int) Cpu->code[curr_pos] & MASK_REG)
-    {
-        Cpu->ram[(int) Cpu->regs[(int) Cpu->code[curr_pos + 1]]] = stack_pop (&Cpu->Stk);
-    }
-
-    else if((int) Cpu->code[curr_pos] & MASK_REG)
-    {
-        Cpu->regs[(int) Cpu->code[curr_pos + 1]] = stack_pop (&Cpu->Stk);
-    }
-
-    else if((int) Cpu->code[curr_pos] & MASK_RAM)
-    {
-        Cpu->ram[(int) Cpu->code[curr_pos + 1]]  = stack_pop (&Cpu->Stk);
-    }
-
-    else
-    {
-        stack_pop (&Cpu->Stk);
-        curr_pos--;
-    }
-
-    curr_pos++;
+    *curr_arg = stack_pop (&Cpu->Stk);
 })
 
 CMD_DEF(ADD, "add",
@@ -65,7 +40,7 @@ CMD_DEF(OUT, "out",
 
     if(value == POISON_STK)
     {
-        printf ("error\n");
+        printf ("not existed\n");
     }
 
     else
@@ -112,7 +87,7 @@ CMD_DEF(JNE, "jne",
 
 CMD_DEF(JMP, "jmp",
 {
-    int pos_ch = curr_arg;
+    int pos_ch = arg_value;
     curr_pos = pos_ch - 2;
 })
 
@@ -120,7 +95,7 @@ CMD_DEF(CALL, "call",
 {
     stack_push (&Cpu->Stk_call, ++curr_pos);
 
-    int pos_ch = curr_arg;
+    int pos_ch = arg_value;
     curr_pos = pos_ch - 2;
 })
 

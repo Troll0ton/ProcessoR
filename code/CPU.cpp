@@ -88,16 +88,16 @@ void cpu_info_dtor (Cpu_info *Info)
 
 void read_code_file (Processor *Cpu)
 {
-    double res_sum    = 0;
-    double code_sgntr = 0;
+    double res_sum        = 0;
+    double code_signature = 0;
 
     fread (&res_sum, sizeof(double), 1, Cpu->Info.code_file);
     Cpu->code_size = res_sum - 1;
 
-    fread (&code_sgntr, sizeof(double), 1, Cpu->Info.code_file);
+    fread (&code_signature, sizeof(double), 1, Cpu->Info.code_file);
     // one fread ...
 
-    if(code_sgntr == SIGNATURE)
+    if(code_signature == SIGNATURE)
     {
         Cpu->code = (double*) calloc (res_sum, sizeof (double));
 
@@ -123,36 +123,36 @@ void handle_cmds (Processor *Cpu)
 {
     for(int curr_pos = 1; curr_pos < Cpu->code_size; curr_pos++)
     {
-        int    curr_cmd = Cpu->code[curr_pos];
-        int    offset   = 0;
-        double curr_arg = 0;
+        int     curr_cmd   = Cpu->code[curr_pos];
+        int     offset     = 1;
+        double *curr_arg;
+        double  arg_value  = 0;
 
         if(curr_cmd & MASK_REG)
         {
-            curr_arg += Cpu->regs[(int) Cpu->code[curr_pos + 1]];
+            curr_arg = &Cpu->regs[(int) Cpu->code[curr_pos]];
+            arg_value += *curr_arg;
+
             offset++;
         }
 
         if(curr_cmd & MASK_IMM)
         {
-            curr_arg += Cpu->code[curr_pos + 1 + offset];
+            curr_arg = &Cpu->code[curr_pos + offset];
+            arg_value += *curr_arg;
+
+            offset++;
         }
 
         if(curr_cmd & MASK_RAM)
         {
-            curr_arg = Cpu->ram[(int) curr_arg];
+            curr_arg = &Cpu->ram[(int) arg_value];
+            arg_value = *curr_arg;
         }
 
-        if(curr_cmd & MASK_RAM &&
-           curr_cmd & MASK_IMM &&
-           curr_cmd & MASK_REG   )
-            offset = 1;
-
-        else offset = 0;
-
-        execute_cmd (curr_cmd, curr_arg, &curr_pos, Cpu);
-
         curr_pos += offset;
+
+        execute_cmd (curr_cmd, curr_arg, arg_value, &curr_pos, Cpu);
 
         if(Cpu->F(STOP)) break;
     }
@@ -169,7 +169,8 @@ bool is_equal (double a, double b)
 
 //-----------------------------------------------------------------------------
 
-void execute_cmd (int curr_cmd, double curr_arg, int *curr_ptr, Processor *Cpu)
+void execute_cmd (int curr_cmd,  double    *curr_arg, double arg_value,
+                  int *curr_ptr, Processor *Cpu                        )
 {
     int curr_pos = *curr_ptr;
 

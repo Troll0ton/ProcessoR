@@ -147,14 +147,14 @@ void dasm_info_dtor (Dasm_info *Info)
 void read_code_file (Disassember *Dasm)
 {
     double res_sum = -1;
-    double code_sgntr = -1;
+    double code_signature = -1;
 
     fread (&res_sum, sizeof(double), 1, Dasm->Info.code_file);
     Dasm->code_size = res_sum - 1;
 
-    fread (&code_sgntr, sizeof(double), 1, Dasm->Info.code_file);
+    fread (&code_signature, sizeof(double), 1, Dasm->Info.code_file);
 
-    if(code_sgntr == CORCT_SIGN)
+    if(code_signature == CORCT_SIGN)
     {
         Dasm->code = (double*) calloc (res_sum, sizeof (double));
 

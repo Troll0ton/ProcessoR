@@ -66,7 +66,8 @@ void handle_cmds     (Processor *Cpu);
 
 bool is_equal        (double a, double b);
 
-void execute_cmd     (int curr_cmd, double curr_arg, int *curr_ptr, Processor *Cpu);
+void execute_cmd     (int curr_cmd,  double    *curr_arg, double arg_value,
+                      int *curr_ptr, Processor *Cpu                        );
 
 void cpu_dump        (Processor *Cpu);
 

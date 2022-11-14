@@ -61,7 +61,7 @@ int assembler_ctor (Assembler *Asm, char *argv[])
 
 int asm_info_ctor (Asm_info *Info, char *argv[])
 {
-    Info->code_sgntr = SIGNATURE;
+    Info->code_signature = SIGNATURE;
 
     Info->file_in   = fopen ((char*) argv[1],       "rb");
     Info->code_file = fopen ("../files/code.bin",   "wb");
@@ -184,7 +184,7 @@ void parse_cmd (Assembler *Asm, Command *Cmd, Argument *Arg)
 
         }
 
-        if(!Cmd->flag) Asm->Info.code_sgntr = SIGNATURE_DESTROYED;
+        if(!Cmd->flag) Asm->Info.code_signature = SIGNATURE_DESTROYED;
     }
 }
 
@@ -209,7 +209,7 @@ void parse_arg (Assembler *Asm, Command *Cmd, Argument *Arg)
 
             else
             {
-                Asm->Info.code_sgntr = SIGNATURE_DESTROYED;
+                Asm->Info.code_signature = SIGNATURE_DESTROYED;
             }
         }
 
@@ -231,7 +231,7 @@ void parse_arg (Assembler *Asm, Command *Cmd, Argument *Arg)
         {
             printf ("ERROR - UNEXPECTED LINE!\n");
 
-            Asm->Info.code_sgntr = SIGNATURE_DESTROYED;
+            Asm->Info.code_signature = SIGNATURE_DESTROYED;
         }
     }
 }
@@ -276,7 +276,7 @@ void write_in_code (Assembler *Asm, Command Cmd, Argument Arg)
     }
 
     Asm->Code.array[0] = Asm->Code.size;
-    Asm->Code.array[1] = Asm->Info.code_sgntr;
+    Asm->Code.array[1] = Asm->Info.code_signature;
 
     asm_dump (Asm);
 }
@@ -350,7 +350,7 @@ void assembler_dtor (Assembler *Asm)
 
 void asm_info_dtor (Asm_info *Info)
 {
-    Info->code_sgntr = SIGNATURE_DESTROYED;
+    Info->code_signature = SIGNATURE_DESTROYED;
 
     fclose (Info->file_in);
     fclose (Info->code_file);
@@ -361,7 +361,7 @@ void asm_info_dtor (Asm_info *Info)
 void write_res_sums (Assembler *Asm)
 {
     Asm->Code.array[0]  = Asm->Code.size;
-    Asm->Code.array[1]  = Asm->Info.code_sgntr;
+    Asm->Code.array[1]  = Asm->Info.code_signature;
     Asm->Label.array[0] = Asm->Label.size;
 }
 
@@ -376,7 +376,9 @@ void asm_dump (Assembler *Asm)
 
     for(int i = 2; i < Asm->Code.size; i++)
     {
-        fprintf (Asm->Code.dmp_file, "%06d || %lg\n", i, Asm->Code.array[i]);
+        fprintf (Asm->Code.dmp_file,
+                 "%06d || %lg\n",
+                 i, Asm->Code.array[i]);
     }
 
     for(int i = 0; i <= Asm->Label.size; i++)

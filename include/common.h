@@ -44,14 +44,21 @@ enum Cmd_codes
                                                     \
     if(__VA_ARGS__)                                 \
     {                                               \
-        int pos_ch = curr_arg;                      \
+        int pos_ch = arg_value;                     \
         curr_pos = pos_ch - 2;                      \
     }                                               \
                                                     \
-    else curr_pos++;                                \
                                                     \
     stack_push (&Cpu->Stk, first_number);           \
     stack_push (&Cpu->Stk, second_number);
+
+//-----------------------------------------------------------------------------
+
+#define PARSE_ARG(num, name_msk, format, ...)                                \
+        else if(lscan(format, __VA_ARGS__) == num)                           \
+        {                                                                    \
+            Cmd->mask |= name_msk;                                           \
+        }
 
 //-----------------------------------------------------------------------------
 

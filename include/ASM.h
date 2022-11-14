@@ -50,7 +50,7 @@ typedef struct Asm_info
 {
     FILE   *file_in;
     FILE   *code_file;
-    int     code_sgntr;
+    int     code_signature;
     bool    double_pass;
 } Asm_info;
 
