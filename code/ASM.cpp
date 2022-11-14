@@ -116,6 +116,7 @@ void handle_text (Assembler *Asm, Line *Text, File *File_input)
 
         write_in_code (Asm, Cmd, Arg);
     }
+
     Asm->Code.size = Asm->cur_pos;
     Asm->cur_pos = SG(CODE_OFFSET);
 
@@ -312,9 +313,9 @@ void write_in_arg (Assembler *Asm, Command Cmd, Argument Arg)
         Asm->Code.capacity *= 2;
 
         Asm->Code.array = (double*) recalloc (Asm->Code.array,
-                                                Asm->Code.capacity,
-                                                Asm->cur_pos,
-                                                sizeof (double)    );
+                                              Asm->Code.capacity,
+                                              Asm->cur_pos,
+                                              sizeof (double)    );
     }
 
     if(Cmd.code & MASK_REG)
@@ -374,7 +375,7 @@ void asm_dump (Assembler *Asm)
              "size: %d sign: %x\n",
              (int) Asm->Code.array[0], (int) Asm->Code.array[1]);
 
-    for(int i = 2; i < Asm->Code.size; i++)
+    for(int i = 2; i < Asm->cur_pos; i++)
     {
         fprintf (Asm->Code.dmp_file,
                  "%06d || %lg\n",

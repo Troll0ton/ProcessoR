@@ -48,7 +48,6 @@ enum Cmd_codes
         curr_pos = pos_ch - 2;                      \
     }                                               \
                                                     \
-                                                    \
     stack_push (&Cpu->Stk, first_number);           \
     stack_push (&Cpu->Stk, second_number);
 

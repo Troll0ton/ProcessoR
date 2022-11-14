@@ -124,13 +124,14 @@ void handle_cmds (Processor *Cpu)
     for(int curr_pos = 1; curr_pos < Cpu->code_size; curr_pos++)
     {
         int     curr_cmd   = Cpu->code[curr_pos];
-        int     offset     = 1;
-        double *curr_arg;
+        int     offset     = 0;
+        double  basic_val  = 0;
+        double *curr_arg   = &basic_val;
         double  arg_value  = 0;
 
         if(curr_cmd & MASK_REG)
         {
-            curr_arg = &Cpu->regs[(int) Cpu->code[curr_pos]];
+            curr_arg = Cpu->regs + (int) Cpu->code[curr_pos + BASIC_OFFSET];
             arg_value += *curr_arg;
 
             offset++;
@@ -138,7 +139,7 @@ void handle_cmds (Processor *Cpu)
 
         if(curr_cmd & MASK_IMM)
         {
-            curr_arg = &Cpu->code[curr_pos + offset];
+            curr_arg = Cpu->code + curr_pos + offset + BASIC_OFFSET;
             arg_value += *curr_arg;
 
             offset++;
@@ -146,7 +147,7 @@ void handle_cmds (Processor *Cpu)
 
         if(curr_cmd & MASK_RAM)
         {
-            curr_arg = &Cpu->ram[(int) arg_value];
+            curr_arg = Cpu->ram + (int) arg_value;
             arg_value = *curr_arg;
         }
 
