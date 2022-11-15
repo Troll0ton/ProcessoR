@@ -6,9 +6,9 @@ int main (int argc, char *argv[])
 {
     Processor Cpu = { 0 };
 
-    if(processor_ctor (&Cpu) == ERR_CTOR)
+    if(processor_ctor (&Cpu) == E(CTOR)
     {
-        return ERR_CPU;
+        return E(CPU;
     }
 
     read_code_file (&Cpu);
@@ -40,7 +40,7 @@ int processor_ctor (Processor *Cpu)
 
     if(Cpu->regs == NULL || Cpu->ram == NULL)
     {
-        return ERR_CTOR;
+        return E(CTOR;
     }
 
     return (cpu_info_ctor (&Cpu->Info));
@@ -56,7 +56,7 @@ int cpu_info_ctor (Cpu_info *Info)
     if(Info->code_file == NULL ||
        Info->file_out  == NULL   )
     {
-        return ERR_CTOR;
+        return E(CTOR;
     }
 
     return 0;
@@ -125,8 +125,8 @@ void handle_cmds (Processor *Cpu)
     {
         int     curr_cmd   = Cpu->code[curr_pos];
         int     offset     = 0;
-        double  basic_val  = 0;
-        double *curr_arg   = &basic_val;
+        double  pop_value  = 0;
+        double *curr_arg   = &pop_value;
         double  arg_value  = 0;
 
         if(curr_cmd & MASK_REG)

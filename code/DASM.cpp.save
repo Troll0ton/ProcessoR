@@ -6,9 +6,9 @@ int main ()
 {
     Disassember Dasm = { 0 };
 
-    if(disassember_ctor (&Dasm) == ERR_CTOR)
+    if(disassember_ctor (&Dasm) == E(CTOR)
     {
-        return ERR_DASM;
+        return E(DASM;
     }
 
     read_code_file (&Dasm);
@@ -62,9 +62,7 @@ void disassembling (Disassember *Dasm)
 
         #undef PRINT_ARG
 
-        else if()
-
-        print_file("\n");
+        /*else*/print_file("\n");
     }
 }
 
@@ -90,7 +88,7 @@ int dasm_info_ctor (Dasm_info *Info)
     if(Info->code_file == NULL ||
        Info->file_out  == NULL   )
     {
-        return ERR_CTOR;
+        return E(CTOR;
     }
 
     return 0;
@@ -119,8 +117,8 @@ void dasm_info_dtor (Dasm_info *Info)
 
 void read_code_file (Disassember *Dasm)
 {
-    double res_sum = -1;
-    double code_signature = -1;
+    double res_sum        = 0;
+    double code_signature = 0;
 
     fread (&res_sum, sizeof(double), 1, Dasm->Info.code_file);
     Dasm->code_size = res_sum - 1;

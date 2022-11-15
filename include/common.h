@@ -53,7 +53,7 @@ enum Cmd_codes
 
 //-----------------------------------------------------------------------------
 
-enum Offsets
+enum OFFSETS
 {
     BASIC_OFFSET    = 1,
     TWO_ARGS_OFFSET = 2,
@@ -61,7 +61,7 @@ enum Offsets
 
 //-----------------------------------------------------------------------------
 
-enum Signatures
+enum SIGNATURES
 {
     SIGNATURE           = 0xBACAFE,
     SIGNATURE_DESTROYED = 0xDEADAC,
@@ -69,7 +69,7 @@ enum Signatures
 
 //-----------------------------------------------------------------------------
 
-enum Bit_masks
+enum BIT_MASKS
 {
     MASK_IMM = 0x20,
     MASK_REG = 0x40,
@@ -79,12 +79,12 @@ enum Bit_masks
 
 //-----------------------------------------------------------------------------
 
-enum Error_codes
+enum CODES_OF_ERROR
 {
-    ERR_CTOR  = 1,
-    ERR_ASM   = 2,
-    ERR_CPU   = 3,
-    ERR_DASM  = 4,
+    E(CTOR  = 1,
+    E(ASM   = 2,
+    E(CPU   = 3,
+    E(DASM  = 4,
 };
 
 //-----------------------------------------------------------------------------

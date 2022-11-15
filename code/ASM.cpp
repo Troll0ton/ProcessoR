@@ -6,7 +6,7 @@ int main (int argc, char *argv[])
 {
     Assembler Asm = { 0 };
 
-    if(assembler_ctor (&Asm, argv) == ERR_CTOR)
+    if(assembler_ctor (&Asm, argv) == E(CTOR)
     {
         printf ("----ERROR ASM----");
     }
@@ -28,13 +28,13 @@ int assembler_ctor (Assembler *Asm, char *argv[])
     if(Asm->Code.array == NULL)
     {
         printf ("|ERROR - Null pointer, code array|\n");
-        return ERR_CTOR;
+        return E(CTOR;
     }
 
     if(Asm->Label.array == NULL)
     {
         printf ("|ERROR - Null pointer, label array|\n");
-        return ERR_CTOR;
+        return E(CTOR;
     }
 
     Asm->Code.size      = SG(CODE_OFFSET);
@@ -68,12 +68,12 @@ int asm_info_ctor (Asm_info *Info, char *argv[])
 
     DOUBLE_PASS = false;
 
-    if(Info->file_in    == NULL ||
-       Info->code_file  == NULL   )
+    if(Info->file_in   == NULL ||
+       Info->code_file == NULL   )
     {
         printf ("|ERROR - file opening|\n");
 
-        return ERR_CTOR;
+        return E(CTOR;
     }
 
     return 0;
@@ -118,7 +118,7 @@ void handle_text (Assembler *Asm, Line *Text, File *File_input)
     }
 
     Asm->Code.size = Asm->cur_pos;
-    Asm->cur_pos = SG(CODE_OFFSET);
+    Asm->cur_pos   = SG(CODE_OFFSET);
 
     if(DOUBLE_PASS) handle_text (Asm, Text, File_input);
 }
@@ -182,7 +182,6 @@ void parse_cmd (Assembler *Asm, Command *Cmd, Argument *Arg)
 
                 break;
             }
-
         }
 
         if(!Cmd->flag) Asm->Info.code_signature = SIGNATURE_DESTROYED;
