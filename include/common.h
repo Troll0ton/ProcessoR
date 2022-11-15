@@ -53,14 +53,6 @@ enum Cmd_codes
 
 //-----------------------------------------------------------------------------
 
-#define PARSE_ARG(num, name_msk, format, ...)                                \
-        else if(lscan(format, __VA_ARGS__) == num)                           \
-        {                                                                    \
-            Cmd->mask |= name_msk;                                           \
-        }
-
-//-----------------------------------------------------------------------------
-
 enum Offsets
 {
     BASIC_OFFSET    = 1,

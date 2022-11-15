@@ -10,8 +10,7 @@
 
 //-----------------------------------------------------------------------------
 
-#define Struct Disassember
-#define Name   Dasm
+#define print_file(...) fprintf (Dasm->Info.file_out, __VA_ARGS__)
 
 //-----------------------------------------------------------------------------
 
@@ -26,21 +25,16 @@ typedef struct Dasm_info
 typedef struct Disassember
 {
     Dasm_info Info;
-    double   *regs;
-    double   *ram;
     double   *code;
     int       code_size;
     Stack     Stk;
-    void (*func) (CMD_FUNCT);
 } Disassember;
 
 //-----------------------------------------------------------------------------
 
-void disassembling    (int curr_cmd, double curr_arg, int *curr_ptr, Disassember *Cpu);
-
 void read_code_file   (Disassember *Cpu);
 
-int  disassember_ctor (Disassember *Dasm, void (*funct) (CMD_FUNCT));
+int  disassember_ctor (Disassember *Dasm);
 
 int  dasm_info_ctor   (Dasm_info *Info);
 
@@ -48,7 +42,7 @@ void disassember_dtor (Disassember *Dasm);
 
 void dasm_info_dtor   (Dasm_info *Info);
 
-void handle_cmds      (Disassember *Dasm);
+void disassembling    (Disassember *Dasm);
 
 bool is_equal         (double a, double b);
 

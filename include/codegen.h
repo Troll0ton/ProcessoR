@@ -76,19 +76,19 @@ CMD_DEF(JB, "jb",
 
 CMD_DEF(JE, "je",
 {
-    CJMP(is_equal(first_number,second_number));
+    CJMP(is_equal(first_number, second_number));
 })
 
 CMD_DEF(JNE, "jne",
 {
-    CJMP(!is_equal(first_number,second_number));
+    CJMP(!is_equal(first_number, second_number));
 })
 
 
 CMD_DEF(JMP, "jmp",
 {
     int pos_ch = arg_value;
-    curr_pos = pos_ch - 2;
+    curr_pos = pos_ch - TWO_ARGS_OFFSET;
 })
 
 CMD_DEF(CALL, "call",
@@ -96,12 +96,12 @@ CMD_DEF(CALL, "call",
     stack_push (&Cpu->Stk_call, ++curr_pos);
 
     int pos_ch = arg_value;
-    curr_pos = pos_ch - 2;
+    curr_pos   = pos_ch - TWO_ARGS_OFFSET;
 })
 
 CMD_DEF(RET, "ret",
 {
-    curr_pos = stack_pop (&Cpu->Stk_call);
+    curr_pos = stack_pop (&Cpu->Stk_call) - BASIC_OFFSET;
 })
 
 CMD_DEF(SQRT, "sqrt",
