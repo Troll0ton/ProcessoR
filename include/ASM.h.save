@@ -12,6 +12,10 @@
 
 //-----------------------------------------------------------------------------
 
+#define lscan(...) sscanf (Asm->Cur_line.begin_line, __VA_ARGS__)
+
+//-----------------------------------------------------------------------------
+
 #define SUCCESS_READ 1
 #define EMPTY_LINE   0
 
@@ -27,9 +31,9 @@ enum CMD_INFO
 
 enum CODE_INFO
 {
-    L(SIZE_DIFF)    = 10,
-    SZ(CODE_INIT)   = 100,
-    SG(CODE_OFFSET) = 2,
+    L(SIZE_DIFF)    = 40,
+    SZ(CODE_INIT)   = 2 * ARG_OFFSET,
+    SG(CODE_OFFSET) = 2 * ARG_OFFSET,
 };
 
 //-----------------------------------------------------------------------------
@@ -46,7 +50,7 @@ typedef struct Asm_info
 {
     FILE   *file_in;
     FILE   *code_file;
-    int     code_sgntr;
+    int     code_signature;
     bool    double_pass;
 } Asm_info;
 
@@ -56,7 +60,7 @@ typedef struct Command
 {
     bool  flag;
     int   mask;
-    int   number;
+    int   code;
 } Command;
 
 //-----------------------------------------------------------------------------
@@ -73,7 +77,7 @@ typedef struct Argument
 
 typedef struct Code_array
 {
-    double *array;
+    char   *array;
     int     size;
     int     capacity;
 
@@ -117,7 +121,7 @@ void parse_line     (Assembler *Asm, Command *Cmd, Argument *Arg);
 
 void parse_label    (Assembler *Asm, Argument *Arg);
 
-void write_in_label (Assembler *Asm, Argument *Arg);
+void find_label     (Assembler *Asm, Argument *Arg);
 
 void parse_cmd      (Assembler *Asm, Command *Cmd, Argument *Arg);
 
@@ -125,14 +129,15 @@ void parse_arg      (Assembler *Asm, Command *Cmd, Argument *Arg);
 
 void write_in_code  (Assembler *Asm, Command Cmd,  Argument Arg);
 
+void write_in_arg   (Assembler *Asm, Command Cmd,  Argument Arg);
+
+void write_in_label (Assembler *Asm, Argument Arg);
+
 void assembler_dtor (Assembler *Asm);
 
 void asm_info_dtor  (Asm_info *Info);
 
 void write_res_sums (Assembler *Asm);
-
-void asm_dump       (Assembler *Asm);
-
 
 //-----------------------------------------------------------------------------
 

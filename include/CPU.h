@@ -16,6 +16,13 @@
 
 //-----------------------------------------------------------------------------
 
+enum CPU_INFO
+{
+    SZ(STACK_INIT) = 2,
+};
+
+//-----------------------------------------------------------------------------
+
 enum REG_INFO
 {
     N(REGS) = 5,
@@ -43,7 +50,7 @@ typedef struct Processor
     Cpu_info Info;
     double  *regs;
     double  *ram;
-    double  *code;
+    char    *code;
     bool     F(STOP);
     int      code_size;
     Stack    Stk;
@@ -68,6 +75,7 @@ bool is_equal        (double a, double b);
 
 void execute_cmd     (int curr_cmd,  double    *curr_arg, double arg_value,
                       int *curr_ptr, Processor *Cpu                        );
+
 
 void cpu_dump        (Processor *Cpu);
 

@@ -6,9 +6,9 @@ int main (int argc, char *argv[])
 {
     Processor Cpu = { 0 };
 
-    if(processor_ctor (&Cpu) == E(CTOR)
+    if(processor_ctor (&Cpu) == E(CTOR))
     {
-        return E(CPU;
+        return E(CPU);
     }
 
     read_code_file (&Cpu);
@@ -29,18 +29,17 @@ int processor_ctor (Processor *Cpu)
     Cpu->Info = { 0 };
 
     Cpu->Stk = { 0 };
-
-    stack_ctor (&Cpu->Stk, 2);
+    stack_ctor (&Cpu->Stk, SZ(STACK_INIT));
 
     Cpu->Stk_call = { 0 };
-    stack_ctor (&Cpu->Stk_call, 2);
+    stack_ctor (&Cpu->Stk_call, SZ(STACK_INIT));
 
     Cpu->regs = (double*) calloc (N(REGS), sizeof (double));
     Cpu->ram  = (double*) calloc (SZ(RAM), sizeof (double));
 
     if(Cpu->regs == NULL || Cpu->ram == NULL)
     {
-        return E(CTOR;
+        return E(CTOR);
     }
 
     return (cpu_info_ctor (&Cpu->Info));
@@ -56,7 +55,7 @@ int cpu_info_ctor (Cpu_info *Info)
     if(Info->code_file == NULL ||
        Info->file_out  == NULL   )
     {
-        return E(CTOR;
+        return E(CTOR);
     }
 
     return 0;
@@ -91,24 +90,23 @@ void read_code_file (Processor *Cpu)
     double res_sum        = 0;
     double code_signature = 0;
 
-    fread (&res_sum, sizeof(double), 1, Cpu->Info.code_file);
-    Cpu->code_size = res_sum - 1;
+    fread (&res_sum, sizeof(elem_t), 1, Cpu->Info.code_file);
+    Cpu->code_size = res_sum - ARG_OFFSET;
 
-    fread (&code_signature, sizeof(double), 1, Cpu->Info.code_file);
-    // one fread ...
+    fread (&code_signature, sizeof(elem_t), 1, Cpu->Info.code_file);
 
     if(code_signature == SIGNATURE)
     {
-        Cpu->code = (double*) calloc (res_sum, sizeof (double));
+        Cpu->code = (char*) calloc (res_sum, sizeof (char));
 
         if(Cpu->code == NULL)
         {
             printf ("__________|ERROR - NULL pointer code|__________\n");
         }
 
-        Cpu->code[0] = res_sum;
+        *(elem_t*)(Cpu->code + 0) = res_sum;
 
-        fread (Cpu->code + 1, sizeof(double), res_sum - 1, Cpu->Info.code_file);
+        fread (Cpu->code + ARG_OFFSET, sizeof(char), res_sum - ARG_OFFSET, Cpu->Info.code_file);
     }
 
     else
@@ -121,7 +119,7 @@ void read_code_file (Processor *Cpu)
 
 void handle_cmds (Processor *Cpu)
 {
-    for(int curr_pos = 1; curr_pos < Cpu->code_size; curr_pos++)
+    for(int curr_pos = ARG_OFFSET; curr_pos < Cpu->code_size; curr_pos++)
     {
         int     curr_cmd   = Cpu->code[curr_pos];
         int     offset     = 0;
@@ -131,18 +129,18 @@ void handle_cmds (Processor *Cpu)
 
         if(curr_cmd & MASK_REG)
         {
-            curr_arg = Cpu->regs + (int) Cpu->code[curr_pos + BASIC_OFFSET];
+            curr_arg = Cpu->regs + (int) *(elem_t*)(Cpu->code + curr_pos + CMD_OFFSET);
             arg_value += *curr_arg;
 
-            offset++;
+            offset += ARG_OFFSET;
         }
 
         if(curr_cmd & MASK_IMM)
         {
-            curr_arg = Cpu->code + curr_pos + offset + BASIC_OFFSET;
+            curr_arg = (elem_t*)(Cpu->code + curr_pos + offset + CMD_OFFSET);
             arg_value += *curr_arg;
 
-            offset++;
+            offset += ARG_OFFSET;
         }
 
         if(curr_cmd & MASK_RAM)
@@ -207,9 +205,30 @@ void cpu_dump (Processor *Cpu)
 {
     FILE *code_dmp_file = fopen ("../dump/code_cpu_dump.txt", "w+");
 
-    for(int i = 0; i < Cpu->code_size; i++)
+    int i = 1;
+
+    for(int curr_pos = ARG_OFFSET; curr_pos < Cpu->code_size; curr_pos++)
     {
-        fprintf (code_dmp_file, "%06d || %lg\n", i, Cpu->code[i]);
+        char curr_cmd = Cpu->code[curr_pos];
+        int  offset   = 0;
+
+        fprintf (code_dmp_file, "%06d || %d\n", i++, (int) Cpu->code[curr_pos]);
+
+        if(curr_cmd & MASK_REG)
+        {
+            fprintf (code_dmp_file, "%06d || %lg\n", i++, *(elem_t*)(Cpu->code + curr_pos + CMD_OFFSET));
+
+            offset += ARG_OFFSET;
+        }
+
+        if(curr_cmd & MASK_IMM)
+        {
+            fprintf (code_dmp_file, "%06d || %lg\n", i++, *(elem_t*)(Cpu->code + curr_pos + CMD_OFFSET));
+
+            offset += ARG_OFFSET;
+        }
+
+        curr_pos += offset;
     }
 
     fclose (code_dmp_file);

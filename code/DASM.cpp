@@ -24,7 +24,7 @@ int main ()
 
 void disassembling (Disassember *Dasm)
 {
-    for(int curr_pos = 1; curr_pos < Dasm->code_size; curr_pos++)
+    for(int curr_pos = ARG_OFFSET; curr_pos < Dasm->code_size; curr_pos++)
     {
         int curr_cmd = Dasm->code[curr_pos];
 
@@ -115,33 +115,35 @@ void dasm_info_dtor (Dasm_info *Info)
 
 //-----------------------------------------------------------------------------
 
-void read_code_file (Disassember *Dasm)
+void read_code_file (Processor *Cpu)
 {
     double res_sum        = 0;
     double code_signature = 0;
 
-    fread (&res_sum, sizeof(double), 1, Dasm->Info.code_file);
-    Dasm->code_size = res_sum - 1;
+    fread (&res_sum, sizeof(elem_t), 1, Cpu->Info.code_file);
+    Cpu->code_size = res_sum - ARG_OFFSET;
 
-    fread (&code_signature, sizeof(double), 1, Dasm->Info.code_file);
+    fread (&code_signature, sizeof(elem_t), 1, Cpu->Info.code_file);
 
     if(code_signature == SIGNATURE)
     {
-        Dasm->code = (double*) calloc (res_sum, sizeof (double));
+        Cpu->code = (char*) calloc (res_sum, sizeof (char));
 
-        if(Dasm->code == NULL)
+        if(Cpu->code == NULL)
         {
             printf ("__________|ERROR - NULL pointer code|__________\n");
         }
 
-        Dasm->code[0] = res_sum;
+        *(elem_t*)(Cpu->code + 0) = res_sum;
 
-        fread (Dasm->code + 1, sizeof(double), res_sum - 1, Dasm->Info.code_file);
+        fread (Cpu->code + ARG_OFFSET, sizeof(char), res_sum - ARG_OFFSET, Cpu->Info.code_file);
     }
 
-    else printf ("__________|WRONG SIGNATURE!|__________\n");
+    else
+    {
+        printf ("__________|WRONG SIGNATURE!|__________\n");
+    }
 }
-
 //-----------------------------------------------------------------------------
 
 bool is_equal (double a, double b)

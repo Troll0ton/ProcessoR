@@ -6,7 +6,7 @@ int main (int argc, char *argv[])
 {
     Assembler Asm = { 0 };
 
-    if(assembler_ctor (&Asm, argv) == E(CTOR)
+    if(assembler_ctor (&Asm, argv) == E(CTOR))
     {
         printf ("----ERROR ASM----");
     }
@@ -22,19 +22,21 @@ int main (int argc, char *argv[])
 
 int assembler_ctor (Assembler *Asm, char *argv[])
 {
-    Asm->Code.array  = (double*) calloc (SZ(CODE_INIT),  sizeof (double));
-    Asm->Label.array = (int*)    calloc (SZ(LABEL_INIT), sizeof (int));
+    Asm->Code.array  = (char*) calloc (SZ(CODE_INIT),  sizeof (char));
+    Asm->Label.array = (int*)  calloc (SZ(LABEL_INIT), sizeof (int));
 
     if(Asm->Code.array == NULL)
     {
         printf ("|ERROR - Null pointer, code array|\n");
-        return E(CTOR;
+
+        return E(CTOR);
     }
 
     if(Asm->Label.array == NULL)
     {
         printf ("|ERROR - Null pointer, label array|\n");
-        return E(CTOR;
+
+        return E(CTOR);
     }
 
     Asm->Code.size      = SG(CODE_OFFSET);
@@ -73,7 +75,7 @@ int asm_info_ctor (Asm_info *Info, char *argv[])
     {
         printf ("|ERROR - file opening|\n");
 
-        return E(CTOR;
+        return E(CTOR);
     }
 
     return 0;
@@ -94,7 +96,7 @@ void assembling (Assembler *Asm)
 
     clear_mem (Text, File_input);
 
-    fwrite (Asm->Code.array, sizeof(double), Asm->Code.size, Asm->Info.code_file);
+    fwrite (Asm->Code.array, sizeof(char), Asm->Code.size, Asm->Info.code_file);
 }
 
 //-----------------------------------------------------------------------------
@@ -155,13 +157,13 @@ void parse_label (Assembler *Asm, Argument *Arg)
 
 void parse_cmd (Assembler *Asm, Command *Cmd, Argument *Arg)
 {
-    char cmd_name[L(MAX_LEN)] = "";
+    char cmd_name[LM(MAX_LEN)] = "";
 
     if(!Arg->flag && lscan("%20s", cmd_name) == 1)
     {
         char *cmd_names[] =
         {
-            #define CMD_DEF(cmd, name, code, ...)\
+            #define CMD_DEF(cmd, name, code, ...) \
             name,
 
             //-----------------------------------------------------------------------------
@@ -196,7 +198,7 @@ void parse_arg (Assembler *Asm, Command *Cmd, Argument *Arg)
 {
     if(Cmd->flag)
     {
-        char unexpected_line[L(MAX_LEN)] = "";
+        char unexpected_line[LM(MAX_LEN)] = "";
 
         if(strchr (Asm->Cur_line.begin_line, ':') != NULL)
         {
@@ -204,7 +206,7 @@ void parse_arg (Assembler *Asm, Command *Cmd, Argument *Arg)
             {
                 Cmd->mask |= MASK_IMM;
 
-                find_label (Asm, Arg);
+                search_label (Asm, Arg);
             }
 
             else
@@ -213,11 +215,11 @@ void parse_arg (Assembler *Asm, Command *Cmd, Argument *Arg)
             }
         }
 
-        #define PARSE_ARG(num, name_msk, format, ...)                                \
-        else if(lscan(format, __VA_ARGS__) == num)      \
-        {                                                                            \
-            Cmd->mask |= name_msk;                                                   \
-        }                                                                            \
+        #define PARSE_ARG(num, name_msk, format, ...) \
+        else if(lscan(format, __VA_ARGS__) == num)    \
+        {                                             \
+            Cmd->mask |= name_msk;                    \
+        }                                             \
 
         //-----------------------------------------------------------------------------
 
@@ -242,7 +244,7 @@ void parse_arg (Assembler *Asm, Command *Cmd, Argument *Arg)
 
 #define DOUBLE_PASS (Asm->Info.double_pass)
 
-void find_label (Assembler *Asm, Argument *Arg)
+void search_label (Assembler *Asm, Argument *Arg)
 {
     if(Arg->value > Asm->Label.size || Asm->Label.array[(int) Arg->value] <= 0)
     {
@@ -276,23 +278,21 @@ void write_in_code (Assembler *Asm, Command Cmd, Argument Arg)
     }
 
     Asm->Code.array[0] = Asm->Code.size;
-    Asm->Code.array[1] = Asm->Info.code_signature;
-
-    asm_dump (Asm);
+    Asm->Code.array[ARG_OFFSET] = Asm->Info.code_signature;
 }
 
 //-----------------------------------------------------------------------------
 
 void write_in_label (Assembler *Asm, Argument Arg)
 {
-    if(Asm->Label.size + L(SIZE_DIFF) > Asm->Label.capacity)
+    if(Asm->Label.size + LM(SIZE_DIFF) > Asm->Label.capacity)
     {
         Asm->Label.capacity *= 2;
 
         Asm->Label.array = (int*) recalloc (Asm->Label.array,
                                             Asm->Label.capacity,
                                             Asm->Label.size,
-                                            sizeof (int)         );
+                                            sizeof (int)        );
     }
 
     if(Arg.value > Asm->Label.size)
@@ -307,24 +307,26 @@ void write_in_label (Assembler *Asm, Argument Arg)
 
 void write_in_arg (Assembler *Asm, Command Cmd, Argument Arg)
 {
-    if(Asm->cur_pos + L(SIZE_DIFF) > Asm->Code.capacity)
+    if(Asm->cur_pos + LM(SIZE_DIFF) > Asm->Code.capacity)
     {
         Asm->Code.capacity *= 2;
 
-        Asm->Code.array = (double*) recalloc (Asm->Code.array,
-                                              Asm->Code.capacity,
-                                              Asm->cur_pos,
-                                              sizeof (double)    );
+        Asm->Code.array = (char*) recalloc (Asm->Code.array,
+                                            Asm->Code.capacity,
+                                            Asm->cur_pos,
+                                            sizeof (char)      );
     }
 
     if(Cmd.code & MASK_REG)
     {
-        Asm->Code.array[Asm->cur_pos++] = Arg.reg_sym - 'a';
+        *(elem_t*)(Asm->Code.array + Asm->cur_pos) = (elem_t) (Arg.reg_sym - 'a');
+        Asm->cur_pos += ARG_OFFSET;
     }
 
     if(Cmd.code & MASK_IMM)
     {
-        Asm->Code.array[Asm->cur_pos++] = Arg.value;
+        *(elem_t*)(Asm->Code.array + Asm->cur_pos) = (elem_t) Arg.value;
+        Asm->cur_pos += ARG_OFFSET;
     }
 }
 
@@ -360,37 +362,12 @@ void asm_info_dtor (Asm_info *Info)
 
 void write_res_sums (Assembler *Asm)
 {
-    Asm->Code.array[0]  = Asm->Code.size;
-    Asm->Code.array[1]  = Asm->Info.code_signature;
+    *(elem_t*)(Asm->Code.array + 0)          = Asm->Code.size;
+    *(elem_t*)(Asm->Code.array + ARG_OFFSET) = Asm->Info.code_signature;
+
     Asm->Label.array[0] = Asm->Label.size;
 }
 
 //-----------------------------------------------------------------------------
-
-void asm_dump (Assembler *Asm)
-{
-    fprintf (Asm->Code.dmp_file,
-             "________________________________________________________________________\n"
-             "size: %d sign: %x\n",
-             (int) Asm->Code.array[0], (int) Asm->Code.array[1]);
-
-    for(int i = 2; i < Asm->cur_pos; i++)
-    {
-        fprintf (Asm->Code.dmp_file,
-                 "%06d || %lg\n",
-                 i, Asm->Code.array[i]);
-    }
-
-    for(int i = 0; i <= Asm->Label.size; i++)
-    {
-        fprintf (Asm->Label.dmp_file,
-                 "________________________________________________________________________\n"
-                 "%06d || %d\n",
-                 i, Asm->Label.array[i]);
-    }
-}
-
-//-----------------------------------------------------------------------------
-
 
 

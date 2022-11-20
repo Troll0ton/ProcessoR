@@ -7,8 +7,6 @@
 
 //-----------------------------------------------------------------------------
 
-#define POISON_STK 12340
-
 #define DELETED_PAR -1
 #define NOT_FOUND   -1
 
@@ -20,9 +18,11 @@
 
 #define SZ(suffix) SIZE_OF_##suffix
 
-#define L(suffix)  LIMIT_##suffix
+#define LM(suffix)  LIMIT_##suffix
 
 #define F(suffix)  FLAG_##suffix
+
+#define E(suffix)  ERROR_##suffix
 
 //-----------------------------------------------------------------------------
 
@@ -38,25 +38,29 @@ enum Cmd_codes
 
 //-----------------------------------------------------------------------------
 
-#define CJMP(...)                                   \
-    double second_number = stack_pop (&Cpu->Stk);   \
-    double first_number  = stack_pop (&Cpu->Stk);   \
-                                                    \
-    if(__VA_ARGS__)                                 \
-    {                                               \
-        int pos_ch = arg_value;                     \
-        curr_pos = pos_ch - 2;                      \
-    }                                               \
-                                                    \
-    stack_push (&Cpu->Stk, first_number);           \
+#define CJMP(...)                                    \
+    double second_number = stack_pop (&Cpu->Stk);    \
+    double first_number  = stack_pop (&Cpu->Stk);    \
+                                                     \
+    if(__VA_ARGS__)                                  \
+    {                                                \
+        int pos_ch = arg_value;                      \
+        curr_pos = pos_ch - CMD_OFFSET - ARG_OFFSET; \
+    }                                                \
+                                                     \
+    stack_push (&Cpu->Stk, first_number);            \
     stack_push (&Cpu->Stk, second_number);
+
+//-----------------------------------------------------------------------------
+
+typedef double elem_t;
 
 //-----------------------------------------------------------------------------
 
 enum OFFSETS
 {
-    BASIC_OFFSET    = 1,
-    TWO_ARGS_OFFSET = 2,
+    CMD_OFFSET = 1,
+    ARG_OFFSET = sizeof(elem_t),
 };
 
 //-----------------------------------------------------------------------------
@@ -79,12 +83,19 @@ enum BIT_MASKS
 
 //-----------------------------------------------------------------------------
 
+enum POISONS
+{
+    POISON_STK = 0xBADADD,
+};
+
+//-----------------------------------------------------------------------------
+
 enum CODES_OF_ERROR
 {
-    E(CTOR  = 1,
-    E(ASM   = 2,
-    E(CPU   = 3,
-    E(DASM  = 4,
+    E(CTOR)  = 1,
+    E(ASM)   = 2,
+    E(CPU)   = 3,
+    E(DASM)  = 4,
 };
 
 //-----------------------------------------------------------------------------

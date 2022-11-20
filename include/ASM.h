@@ -24,16 +24,16 @@
 enum CMD_INFO
 {
     N(SUPPORTED_CMD) = 19,
-    L(MAX_LEN)       = 20,
+    LM(MAX_LEN)       = 20,
 };
 
 //-----------------------------------------------------------------------------
 
 enum CODE_INFO
 {
-    L(SIZE_DIFF)    = 10,
-    SZ(CODE_INIT)   = 100,
-    SG(CODE_OFFSET) = 2,
+    LM(SIZE_DIFF)    = 40,
+    SZ(CODE_INIT)   = 2 * ARG_OFFSET,
+    SG(CODE_OFFSET) = 2 * ARG_OFFSET,
 };
 
 //-----------------------------------------------------------------------------
@@ -77,7 +77,7 @@ typedef struct Argument
 
 typedef struct Code_array
 {
-    double *array;
+    char   *array;
     int     size;
     int     capacity;
 
@@ -121,7 +121,7 @@ void parse_line     (Assembler *Asm, Command *Cmd, Argument *Arg);
 
 void parse_label    (Assembler *Asm, Argument *Arg);
 
-void find_label     (Assembler *Asm, Argument *Arg);
+void search_label     (Assembler *Asm, Argument *Arg);
 
 void parse_cmd      (Assembler *Asm, Command *Cmd, Argument *Arg);
 
@@ -138,9 +138,6 @@ void assembler_dtor (Assembler *Asm);
 void asm_info_dtor  (Asm_info *Info);
 
 void write_res_sums (Assembler *Asm);
-
-void asm_dump       (Assembler *Asm);
-
 
 //-----------------------------------------------------------------------------
 

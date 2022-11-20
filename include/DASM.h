@@ -25,7 +25,7 @@ typedef struct Dasm_info
 typedef struct Disassember
 {
     Dasm_info Info;
-    double   *code;
+    char     *code;
     int       code_size;
     Stack     Stk;
 } Disassember;
