@@ -1,5 +1,9 @@
 push 100
 push 100
+push 100
+
+push 100
+
 
 add
 

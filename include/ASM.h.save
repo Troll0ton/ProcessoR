@@ -24,14 +24,14 @@
 enum CMD_INFO
 {
     N(SUPPORTED_CMD) = 19,
-    L(MAX_LEN)       = 20,
+    LM(MAX_LEN)      = 20,
 };
 
 //-----------------------------------------------------------------------------
 
 enum CODE_INFO
 {
-    L(SIZE_DIFF)    = 40,
+    LM(SIZE_DIFF)   = 40,
     SZ(CODE_INIT)   = 2 * ARG_OFFSET,
     SG(CODE_OFFSET) = 2 * ARG_OFFSET,
 };
@@ -121,7 +121,7 @@ void parse_line     (Assembler *Asm, Command *Cmd, Argument *Arg);
 
 void parse_label    (Assembler *Asm, Argument *Arg);
 
-void find_label     (Assembler *Asm, Argument *Arg);
+void search_label     (Assembler *Asm, Argument *Arg);
 
 void parse_cmd      (Assembler *Asm, Command *Cmd, Argument *Arg);
 

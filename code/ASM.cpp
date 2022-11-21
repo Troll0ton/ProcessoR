@@ -13,6 +13,8 @@ int main (int argc, char *argv[])
 
     assembling (&Asm);
 
+    asm_dump (&Asm);
+
     assembler_dtor (&Asm);
 
     return 0;
@@ -65,8 +67,8 @@ int asm_info_ctor (Asm_info *Info, char *argv[])
 {
     Info->code_signature = SIGNATURE;
 
-    Info->file_in   = fopen ((char*) argv[1],       "rb");
-    Info->code_file = fopen ("../files/code.bin",   "wb");
+    Info->file_in   = fopen ((char*) argv[1],     "rb");
+    Info->code_file = fopen ("../files/code.bin", "wb");
 
     DOUBLE_PASS = false;
 
@@ -272,13 +274,13 @@ void write_in_code (Assembler *Asm, Command Cmd, Argument Arg)
 
     else if(Cmd.flag)
     {
-        Asm->Code.array[Asm->cur_pos++] = Cmd.code |= Cmd.mask;
-
+        Asm->Code.array[Asm->cur_pos] = (char) (Cmd.code |= Cmd.mask);
+        Asm->cur_pos += CMD_OFFSET;
         write_in_arg (Asm, Cmd, Arg);
     }
 
-    Asm->Code.array[0] = Asm->Code.size;
-    Asm->Code.array[ARG_OFFSET] = Asm->Info.code_signature;
+    *(elem_t*)(Asm->Code.array + 0) = Asm->Code.size;
+    *(elem_t*)(Asm->Code.array + ARG_OFFSET) = Asm->Info.code_signature;
 }
 
 //-----------------------------------------------------------------------------
@@ -307,6 +309,8 @@ void write_in_label (Assembler *Asm, Argument Arg)
 
 void write_in_arg (Assembler *Asm, Command Cmd, Argument Arg)
 {
+    char first_elem = Asm->Code.array[2*ARG_OFFSET];
+
     if(Asm->cur_pos + LM(SIZE_DIFF) > Asm->Code.capacity)
     {
         Asm->Code.capacity *= 2;
@@ -315,6 +319,8 @@ void write_in_arg (Assembler *Asm, Command Cmd, Argument Arg)
                                             Asm->Code.capacity,
                                             Asm->cur_pos,
                                             sizeof (char)      );
+
+        Asm->Code.array[2*ARG_OFFSET] = first_elem;
     }
 
     if(Cmd.code & MASK_REG)
@@ -366,6 +372,44 @@ void write_res_sums (Assembler *Asm)
     *(elem_t*)(Asm->Code.array + ARG_OFFSET) = Asm->Info.code_signature;
 
     Asm->Label.array[0] = Asm->Label.size;
+}
+
+//-----------------------------------------------------------------------------
+
+void asm_dump (Assembler *Asm)
+{
+    FILE *code_dmp_file = fopen ("../dump/code_asm_dump.txt", "w+");
+
+    int i = 1;
+
+    fprintf (code_dmp_file, "%d - size, %x - signature\n", (int) *(elem_t*)(Asm->Code.array + 0),
+                                                           (int) *(elem_t*)(Asm->Code.array + ARG_OFFSET));
+
+    for(int curr_pos = 2 * ARG_OFFSET; curr_pos < Asm->Code.size; curr_pos++)
+    {
+        char curr_cmd = *(Asm->Code.array + curr_pos);
+        int  offset   = 0;
+
+        fprintf (code_dmp_file, "%06d || %d\n", i++, (int) Asm->Code.array[curr_pos]);
+
+        if(curr_cmd & MASK_REG)
+        {
+            fprintf (code_dmp_file, "%06d || %lg\n", i++, *(elem_t*)(Asm->Code.array + curr_pos + CMD_OFFSET));
+
+            offset += ARG_OFFSET;
+        }
+
+        if(curr_cmd & MASK_IMM)
+        {
+            fprintf (code_dmp_file, "%06d || %lg\n", i++, *(elem_t*)(Asm->Code.array + curr_pos + CMD_OFFSET + offset));
+
+            offset += ARG_OFFSET;
+        }
+
+        curr_pos += offset;
+    }
+
+    fclose (code_dmp_file);
 }
 
 //-----------------------------------------------------------------------------

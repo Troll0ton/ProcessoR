@@ -91,22 +91,20 @@ void read_code_file (Processor *Cpu)
     double code_signature = 0;
 
     fread (&res_sum, sizeof(elem_t), 1, Cpu->Info.code_file);
-    Cpu->code_size = res_sum - ARG_OFFSET;
+    Cpu->code_size = res_sum - 2 * ARG_OFFSET;
 
     fread (&code_signature, sizeof(elem_t), 1, Cpu->Info.code_file);
 
     if(code_signature == SIGNATURE)
     {
-        Cpu->code = (char*) calloc (res_sum, sizeof (char));
+        Cpu->code = (char*) calloc (Cpu->code_size, sizeof (char));
 
         if(Cpu->code == NULL)
         {
             printf ("__________|ERROR - NULL pointer code|__________\n");
         }
 
-        *(elem_t*)(Cpu->code + 0) = res_sum;
-
-        fread (Cpu->code + ARG_OFFSET, sizeof(char), res_sum - ARG_OFFSET, Cpu->Info.code_file);
+        fread (Cpu->code, sizeof(char), Cpu->code_size, Cpu->Info.code_file);
     }
 
     else
@@ -119,7 +117,7 @@ void read_code_file (Processor *Cpu)
 
 void handle_cmds (Processor *Cpu)
 {
-    for(int curr_pos = ARG_OFFSET; curr_pos < Cpu->code_size; curr_pos++)
+    for(int curr_pos = 0; curr_pos < Cpu->code_size; curr_pos++)
     {
         int     curr_cmd   = Cpu->code[curr_pos];
         int     offset     = 0;
@@ -207,7 +205,7 @@ void cpu_dump (Processor *Cpu)
 
     int i = 1;
 
-    for(int curr_pos = ARG_OFFSET; curr_pos < Cpu->code_size; curr_pos++)
+    for(int curr_pos = 0; curr_pos < Cpu->code_size; curr_pos++)
     {
         char curr_cmd = Cpu->code[curr_pos];
         int  offset   = 0;
@@ -223,7 +221,7 @@ void cpu_dump (Processor *Cpu)
 
         if(curr_cmd & MASK_IMM)
         {
-            fprintf (code_dmp_file, "%06d || %lg\n", i++, *(elem_t*)(Cpu->code + curr_pos + CMD_OFFSET));
+            fprintf (code_dmp_file, "%06d || %lg\n", i++, *(elem_t*)(Cpu->code + curr_pos + CMD_OFFSET + offset));
 
             offset += ARG_OFFSET;
         }

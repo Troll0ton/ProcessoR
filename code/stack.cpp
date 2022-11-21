@@ -271,7 +271,7 @@ void *recalloc (void *buffer, int capacity, int size, int size_of_type)
 
     if(capacity > size)
     {
-        memset (pointer + size * size_of_type, '\0', (capacity - size) * size_of_type);
+        memset (pointer + size * size_of_type, 0, (capacity - size) * size_of_type);
     }
 
     return (void*) pointer;

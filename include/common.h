@@ -18,7 +18,7 @@
 
 #define SZ(suffix) SIZE_OF_##suffix
 
-#define LM(suffix)  LIMIT_##suffix
+#define LM(suffix) LIMIT_##suffix
 
 #define F(suffix)  FLAG_##suffix
 
