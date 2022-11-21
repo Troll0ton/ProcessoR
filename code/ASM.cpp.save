@@ -276,7 +276,7 @@ void write_in_code (Assembler *Asm, Command Cmd, Argument Arg)
     {
         Asm->Code.array[Asm->cur_pos] = (char) (Cmd.code |= Cmd.mask);
         Asm->cur_pos += CMD_OFFSET;
-        printf ("|-%d- ", Asm->Code.array[2*ARG_OFFSET]);
+        
         write_in_arg (Asm, Cmd, Arg);
     }
 
@@ -310,7 +310,8 @@ void write_in_label (Assembler *Asm, Argument Arg)
 
 void write_in_arg (Assembler *Asm, Command Cmd, Argument Arg)
 {
-    Asm->Code.array[2*ARG_OFFSET] 
+    char first_elem = *(Asm->Code.array + SG(CODE_OFFSET));
+
     if(Asm->cur_pos + LM(SIZE_DIFF) > Asm->Code.capacity)
     {
         Asm->Code.capacity *= 2;
@@ -320,18 +321,20 @@ void write_in_arg (Assembler *Asm, Command Cmd, Argument Arg)
                                             Asm->cur_pos,
                                             sizeof (char)      );
 
-        printf ("-%d- ", );
+        *(Asm->Code.array + SG(CODE_OFFSET)) = first_elem;
     }
 
     if(Cmd.code & MASK_REG)
     {
         *(elem_t*)(Asm->Code.array + Asm->cur_pos) = (elem_t) (Arg.reg_sym - 'a');
+        
         Asm->cur_pos += ARG_OFFSET;
     }
 
     if(Cmd.code & MASK_IMM)
     {
         *(elem_t*)(Asm->Code.array + Asm->cur_pos) = (elem_t) Arg.value;
+        
         Asm->cur_pos += ARG_OFFSET;
     }
 }
@@ -382,26 +385,32 @@ void asm_dump (Assembler *Asm)
 
     int i = 1;
 
-    fprintf (code_dmp_file, "%d - size, %x - signature\n", (int) *(elem_t*)(Asm->Code.array + 0),
-                                                           (int) *(elem_t*)(Asm->Code.array + ARG_OFFSET));
+    fprintf (code_dmp_file, "%d - size, %x - signature\n",
+                            (int) *(elem_t*)(Asm->Code.array + 0),
+                            (int) *(elem_t*)(Asm->Code.array + ARG_OFFSET));
 
-    for(int curr_pos = 2 * ARG_OFFSET; curr_pos < Asm->Code.size; curr_pos++)
+    for(int curr_pos = SG(CODE_OFFSET); curr_pos < Asm->Code.size; curr_pos++)
     {
         char curr_cmd = *(Asm->Code.array + curr_pos);
         int  offset   = 0;
 
-        fprintf (code_dmp_file, "%06d || %d\n", i++, (int) Asm->Code.array[curr_pos]);
+        fprintf (code_dmp_file, "%06d - logic pos, %06d - phys pos || %d\n",
+                                i++, curr_pos, (int) Asm->Code.array[curr_pos]);
 
         if(curr_cmd & MASK_REG)
         {
-            fprintf (code_dmp_file, "%06d || %lg\n", i++, *(elem_t*)(Asm->Code.array + curr_pos + CMD_OFFSET));
+            fprintf (code_dmp_file, "%06d - logic pos, %06d - phys pos || %lg\n",
+                                    i++, curr_pos + CMD_OFFSET,
+                                    *(elem_t*)(Asm->Code.array + curr_pos + CMD_OFFSET));
 
             offset += ARG_OFFSET;
         }
 
         if(curr_cmd & MASK_IMM)
         {
-            fprintf (code_dmp_file, "%06d || %lg\n", i++, *(elem_t*)(Asm->Code.array + curr_pos + CMD_OFFSET + offset));
+            fprintf (code_dmp_file, "%06d - logic pos, %06d - phys pos || %lg\n",
+                                    i++, curr_pos + CMD_OFFSET + offset, 
+                                    *(elem_t*)(Asm->Code.array + curr_pos + CMD_OFFSET + offset));
 
             offset += ARG_OFFSET;
         }

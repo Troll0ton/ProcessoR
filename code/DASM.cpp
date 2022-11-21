@@ -6,9 +6,9 @@ int main ()
 {
     Disassember Dasm = { 0 };
 
-    if(disassember_ctor (&Dasm) == E(CTOR)
+    if(disassember_ctor (&Dasm) == E(CTOR))
     {
-        return E(DASM;
+        return E(DASM);
     }
 
     read_code_file (&Dasm);
@@ -24,8 +24,10 @@ int main ()
 
 void disassembling (Disassember *Dasm)
 {
-    for(int curr_pos = ARG_OFFSET; curr_pos < Dasm->code_size; curr_pos++)
+    for(int curr_pos = SG(CODE_OFFSET); curr_pos < Dasm->code_size; curr_pos++)
     {
+        print_file("%07d | ", curr_pos);
+
         int curr_cmd = Dasm->code[curr_pos];
 
         #define CMD_DEF(cmd, name, ...)  \
@@ -88,7 +90,7 @@ int dasm_info_ctor (Dasm_info *Info)
     if(Info->code_file == NULL ||
        Info->file_out  == NULL   )
     {
-        return E(CTOR;
+        return E(CTOR);
     }
 
     return 0;
@@ -115,28 +117,29 @@ void dasm_info_dtor (Dasm_info *Info)
 
 //-----------------------------------------------------------------------------
 
-void read_code_file (Processor *Cpu)
+void read_code_file (Disassember *Dasm)
 {
-    double res_sum        = 0;
     double code_signature = 0;
+    double res_sum        = 0;
 
-    fread (&res_sum, sizeof(elem_t), 1, Cpu->Info.code_file);
-    Cpu->code_size = res_sum - ARG_OFFSET;
+    fread (&res_sum,        sizeof(char), ARG_OFFSET, Dasm->Info.code_file);
+    fread (&code_signature, sizeof(char), ARG_OFFSET, Dasm->Info.code_file);
 
-    fread (&code_signature, sizeof(elem_t), 1, Cpu->Info.code_file);
+    Dasm->code_size = res_sum;
 
     if(code_signature == SIGNATURE)
     {
-        Cpu->code = (char*) calloc (res_sum, sizeof (char));
+        Dasm->code = (char*) calloc (Dasm->code_size, sizeof (char));
 
-        if(Cpu->code == NULL)
+        *(elem_t*)(Dasm->code + 0) = res_sum;
+        *(elem_t*)(Dasm->code + ARG_OFFSET) = code_signature;
+
+        if(Dasm->code == NULL)
         {
             printf ("__________|ERROR - NULL pointer code|__________\n");
         }
 
-        *(elem_t*)(Cpu->code + 0) = res_sum;
-
-        fread (Cpu->code + ARG_OFFSET, sizeof(char), res_sum - ARG_OFFSET, Cpu->Info.code_file);
+        fread (Dasm->code + SG(CODE_OFFSET), sizeof(char), Dasm->code_size - SG(CODE_OFFSET), Dasm->Info.code_file);
     }
 
     else
@@ -144,6 +147,7 @@ void read_code_file (Processor *Cpu)
         printf ("__________|WRONG SIGNATURE!|__________\n");
     }
 }
+
 //-----------------------------------------------------------------------------
 
 bool is_equal (double a, double b)
@@ -154,9 +158,3 @@ bool is_equal (double a, double b)
 }
 
 //-----------------------------------------------------------------------------
-
-
-
-
-
-

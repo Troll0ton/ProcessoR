@@ -1,10 +1,14 @@
 push 100
-push 100
-push 100
+push 1
 
-push 100
+jae 19:
 
+push 777
 
+:19
+
+push 10
+push 10
 add
 
 

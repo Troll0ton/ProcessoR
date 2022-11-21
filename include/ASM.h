@@ -29,15 +29,6 @@ enum CMD_INFO
 
 //-----------------------------------------------------------------------------
 
-enum CODE_INFO
-{
-    LM(SIZE_DIFF)   = 40,
-    SZ(CODE_INIT)   = 2 * ARG_OFFSET,
-    SG(CODE_OFFSET) = 2 * ARG_OFFSET,
-};
-
-//-----------------------------------------------------------------------------
-
 enum LABEL_INFO
 {
     SZ(LABEL_INIT)   = 50,

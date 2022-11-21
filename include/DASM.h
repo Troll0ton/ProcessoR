@@ -32,7 +32,7 @@ typedef struct Disassember
 
 //-----------------------------------------------------------------------------
 
-void read_code_file   (Disassember *Cpu);
+void read_code_file   (Disassember *Dasm);
 
 int  disassember_ctor (Disassember *Dasm);
 

@@ -1,22 +1,108 @@
-93 - size, bacafe - signature
-000001 || 33
-000002 || 17
-000003 || 33
-000004 || 1
-000005 || 33
-000006 || 1
-000007 || 3
-000008 || 42
-000009 || 89
-000010 || 33
-000011 || 10
-000012 || 33
-000013 || 10
-000014 || 33
-000015 || 10
-000016 || 33
-000017 || 10
-000018 || 8
-000019 || 3
-000020 || 7
-000021 || 0
+410 - size, bacafe - signature
+000001 - logic pos, 000016 - phys pos || 33
+000002 - logic pos, 000017 - phys pos || 1
+000003 - logic pos, 000025 - phys pos || 33
+000004 - logic pos, 000026 - phys pos || -2
+000005 - logic pos, 000034 - phys pos || 33
+000006 - logic pos, 000035 - phys pos || 1
+000007 - logic pos, 000043 - phys pos || 48
+000008 - logic pos, 000044 - phys pos || 53
+000009 - logic pos, 000052 - phys pos || 0
+000010 - logic pos, 000053 - phys pos || 66
+000011 - logic pos, 000054 - phys pos || 2
+000012 - logic pos, 000062 - phys pos || 66
+000013 - logic pos, 000063 - phys pos || 1
+000014 - logic pos, 000071 - phys pos || 66
+000015 - logic pos, 000072 - phys pos || 0
+000016 - logic pos, 000080 - phys pos || 33
+000017 - logic pos, 000081 - phys pos || 0
+000018 - logic pos, 000089 - phys pos || 65
+000019 - logic pos, 000090 - phys pos || 0
+000020 - logic pos, 000098 - phys pos || 46
+000021 - logic pos, 000099 - phys pos || 125
+000022 - logic pos, 000107 - phys pos || 48
+000023 - logic pos, 000108 - phys pos || 135
+000024 - logic pos, 000116 - phys pos || 47
+000025 - logic pos, 000117 - phys pos || 134
+000026 - logic pos, 000125 - phys pos || 48
+000027 - logic pos, 000126 - phys pos || 249
+000028 - logic pos, 000134 - phys pos || 17
+000029 - logic pos, 000135 - phys pos || 65
+000030 - logic pos, 000136 - phys pos || 1
+000031 - logic pos, 000144 - phys pos || 33
+000032 - logic pos, 000145 - phys pos || 0
+000033 - logic pos, 000153 - phys pos || 46
+000034 - logic pos, 000154 - phys pos || 218
+000035 - logic pos, 000162 - phys pos || 65
+000036 - logic pos, 000163 - phys pos || 2
+000037 - logic pos, 000171 - phys pos || 33
+000038 - logic pos, 000172 - phys pos || 0
+000039 - logic pos, 000180 - phys pos || 46
+000040 - logic pos, 000181 - phys pos || 199
+000041 - logic pos, 000189 - phys pos || 7
+000042 - logic pos, 000190 - phys pos || 47
+000043 - logic pos, 000191 - phys pos || 209
+000044 - logic pos, 000199 - phys pos || 33
+000045 - logic pos, 000200 - phys pos || 12340
+000046 - logic pos, 000208 - phys pos || 7
+000047 - logic pos, 000209 - phys pos || 47
+000048 - logic pos, 000210 - phys pos || 248
+000049 - logic pos, 000218 - phys pos || 65
+000050 - logic pos, 000219 - phys pos || 2
+000051 - logic pos, 000227 - phys pos || 33
+000052 - logic pos, 000228 - phys pos || -1
+000053 - logic pos, 000236 - phys pos || 5
+000054 - logic pos, 000237 - phys pos || 65
+000055 - logic pos, 000238 - phys pos || 1
+000056 - logic pos, 000246 - phys pos || 6
+000057 - logic pos, 000247 - phys pos || 7
+000058 - logic pos, 000248 - phys pos || 17
+000059 - logic pos, 000249 - phys pos || 65
+000060 - logic pos, 000250 - phys pos || 1
+000061 - logic pos, 000258 - phys pos || 65
+000062 - logic pos, 000259 - phys pos || 1
+000063 - logic pos, 000267 - phys pos || 5
+000064 - logic pos, 000268 - phys pos || 33
+000065 - logic pos, 000269 - phys pos || 4
+000066 - logic pos, 000277 - phys pos || 65
+000067 - logic pos, 000278 - phys pos || 0
+000068 - logic pos, 000286 - phys pos || 65
+000069 - logic pos, 000287 - phys pos || 2
+000070 - logic pos, 000295 - phys pos || 5
+000071 - logic pos, 000296 - phys pos || 5
+000072 - logic pos, 000297 - phys pos || 4
+000073 - logic pos, 000298 - phys pos || 66
+000074 - logic pos, 000299 - phys pos || 3
+000075 - logic pos, 000307 - phys pos || 65
+000076 - logic pos, 000308 - phys pos || 1
+000077 - logic pos, 000316 - phys pos || 33
+000078 - logic pos, 000317 - phys pos || -1
+000079 - logic pos, 000325 - phys pos || 5
+000080 - logic pos, 000326 - phys pos || 65
+000081 - logic pos, 000327 - phys pos || 3
+000082 - logic pos, 000335 - phys pos || 18
+000083 - logic pos, 000336 - phys pos || 4
+000084 - logic pos, 000337 - phys pos || 33
+000085 - logic pos, 000338 - phys pos || 2
+000086 - logic pos, 000346 - phys pos || 65
+000087 - logic pos, 000347 - phys pos || 0
+000088 - logic pos, 000355 - phys pos || 5
+000089 - logic pos, 000356 - phys pos || 6
+000090 - logic pos, 000357 - phys pos || 7
+000091 - logic pos, 000358 - phys pos || 65
+000092 - logic pos, 000359 - phys pos || 1
+000093 - logic pos, 000367 - phys pos || 33
+000094 - logic pos, 000368 - phys pos || -1
+000095 - logic pos, 000376 - phys pos || 5
+000096 - logic pos, 000377 - phys pos || 65
+000097 - logic pos, 000378 - phys pos || 3
+000098 - logic pos, 000386 - phys pos || 18
+000099 - logic pos, 000387 - phys pos || 3
+000100 - logic pos, 000388 - phys pos || 33
+000101 - logic pos, 000389 - phys pos || 2
+000102 - logic pos, 000397 - phys pos || 65
+000103 - logic pos, 000398 - phys pos || 0
+000104 - logic pos, 000406 - phys pos || 5
+000105 - logic pos, 000407 - phys pos || 6
+000106 - logic pos, 000408 - phys pos || 7
+000107 - logic pos, 000409 - phys pos || 17

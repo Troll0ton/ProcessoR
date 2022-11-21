@@ -88,7 +88,7 @@ CMD_DEF(JNE, "jne",
 CMD_DEF(JMP, "jmp",
 {
     int pos_ch = arg_value;
-    curr_pos = pos_ch - CMD_OFFSET - ARG_OFFSET;
+    curr_pos = pos_ch - 1;
 })
 
 CMD_DEF(CALL, "call",
@@ -96,12 +96,12 @@ CMD_DEF(CALL, "call",
     stack_push (&Cpu->Stk_call, ++curr_pos);
 
     int pos_ch = arg_value;
-    curr_pos   = pos_ch - CMD_OFFSET - ARG_OFFSET;
+    curr_pos   = pos_ch - 1;
 })
 
 CMD_DEF(RET, "ret",
 {
-    curr_pos = stack_pop (&Cpu->Stk_call) - CMD_OFFSET;
+    curr_pos = stack_pop (&Cpu->Stk_call) - 1;
 })
 
 CMD_DEF(SQRT, "sqrt",

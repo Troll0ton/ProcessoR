@@ -1,23 +1,66 @@
-push 6
-pop rax
-push 1
-pop rbx
-call 16
-push rbx
-out 
-hlt 
-push rax
-push rbx
-mul 
-pop rbx
-push rax
-push 1
-sub 
-pop rax
-push 1
-push rax
-jae 40
-pop 
-pop 
-call 16
-ret 
+phys pos: 0000016 | push 1
+phys pos: 0000025 | push -2
+phys pos: 0000034 | push 1
+phys pos: 0000043 | call 53
+phys pos: 0000052 | hlt 
+phys pos: 0000053 | pop rcx
+phys pos: 0000062 | pop rbx
+phys pos: 0000071 | pop rax
+phys pos: 0000080 | push 0
+phys pos: 0000089 | push rax
+phys pos: 0000098 | jne 125
+phys pos: 0000107 | call 135
+phys pos: 0000116 | jmp 134
+phys pos: 0000125 | call 249
+phys pos: 0000134 | ret 
+phys pos: 0000135 | push rbx
+phys pos: 0000144 | push 0
+phys pos: 0000153 | jne 218
+phys pos: 0000162 | push rcx
+phys pos: 0000171 | push 0
+phys pos: 0000180 | jne 199
+phys pos: 0000189 | out 
+phys pos: 0000190 | jmp 209
+phys pos: 0000199 | push 12340
+phys pos: 0000208 | out 
+phys pos: 0000209 | jmp 248
+phys pos: 0000218 | push rcx
+phys pos: 0000227 | push -1
+phys pos: 0000236 | mul 
+phys pos: 0000237 | push rbx
+phys pos: 0000246 | div 
+phys pos: 0000247 | out 
+phys pos: 0000248 | ret 
+phys pos: 0000249 | push rbx
+phys pos: 0000258 | push rbx
+phys pos: 0000267 | mul 
+phys pos: 0000268 | push 4
+phys pos: 0000277 | push rax
+phys pos: 0000286 | push rcx
+phys pos: 0000295 | mul 
+phys pos: 0000296 | mul 
+phys pos: 0000297 | sub 
+phys pos: 0000298 | pop rdx
+phys pos: 0000307 | push rbx
+phys pos: 0000316 | push -1
+phys pos: 0000325 | mul 
+phys pos: 0000326 | push rdx
+phys pos: 0000335 | sqrt 
+phys pos: 0000336 | sub 
+phys pos: 0000337 | push 2
+phys pos: 0000346 | push rax
+phys pos: 0000355 | mul 
+phys pos: 0000356 | div 
+phys pos: 0000357 | out 
+phys pos: 0000358 | push rbx
+phys pos: 0000367 | push -1
+phys pos: 0000376 | mul 
+phys pos: 0000377 | push rdx
+phys pos: 0000386 | sqrt 
+phys pos: 0000387 | add 
+phys pos: 0000388 | push 2
+phys pos: 0000397 | push rax
+phys pos: 0000406 | mul 
+phys pos: 0000407 | div 
+phys pos: 0000408 | out 
+phys pos: 0000409 | ret 

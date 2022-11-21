@@ -87,24 +87,27 @@ void cpu_info_dtor (Cpu_info *Info)
 
 void read_code_file (Processor *Cpu)
 {
-    double res_sum        = 0;
     double code_signature = 0;
+    double res_sum        = 0;
 
-    fread (&res_sum, sizeof(elem_t), 1, Cpu->Info.code_file);
-    Cpu->code_size = res_sum - 2 * ARG_OFFSET;
+    fread (&res_sum,        sizeof(char), ARG_OFFSET, Cpu->Info.code_file);
+    fread (&code_signature, sizeof(char), ARG_OFFSET, Cpu->Info.code_file);
 
-    fread (&code_signature, sizeof(elem_t), 1, Cpu->Info.code_file);
+    Cpu->code_size = res_sum;
 
     if(code_signature == SIGNATURE)
     {
         Cpu->code = (char*) calloc (Cpu->code_size, sizeof (char));
+
+        *(elem_t*)(Cpu->code + 0) = res_sum;
+        *(elem_t*)(Cpu->code + ARG_OFFSET) = code_signature;
 
         if(Cpu->code == NULL)
         {
             printf ("__________|ERROR - NULL pointer code|__________\n");
         }
 
-        fread (Cpu->code, sizeof(char), Cpu->code_size, Cpu->Info.code_file);
+        fread (Cpu->code + SG(CODE_OFFSET), sizeof(char), Cpu->code_size - SG(CODE_OFFSET), Cpu->Info.code_file);
     }
 
     else
@@ -117,7 +120,7 @@ void read_code_file (Processor *Cpu)
 
 void handle_cmds (Processor *Cpu)
 {
-    for(int curr_pos = 0; curr_pos < Cpu->code_size; curr_pos++)
+    for(int curr_pos = 2 * ARG_OFFSET; curr_pos < Cpu->code_size; curr_pos++)
     {
         int     curr_cmd   = Cpu->code[curr_pos];
         int     offset     = 0;
@@ -203,9 +206,11 @@ void cpu_dump (Processor *Cpu)
 {
     FILE *code_dmp_file = fopen ("../dump/code_cpu_dump.txt", "w+");
 
+    fprintf (code_dmp_file, "%d - size, %x - signature\n", (int) *(elem_t*)(Cpu->code + 0),
+                                                           (int) *(elem_t*)(Cpu->code + ARG_OFFSET));
     int i = 1;
 
-    for(int curr_pos = 0; curr_pos < Cpu->code_size; curr_pos++)
+    for(int curr_pos = SG(CODE_OFFSET); curr_pos < Cpu->code_size; curr_pos++)
     {
         char curr_cmd = Cpu->code[curr_pos];
         int  offset   = 0;

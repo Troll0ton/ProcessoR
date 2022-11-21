@@ -45,7 +45,7 @@ enum Cmd_codes
     if(__VA_ARGS__)                                  \
     {                                                \
         int pos_ch = arg_value;                      \
-        curr_pos = pos_ch - CMD_OFFSET - ARG_OFFSET; \
+        curr_pos = pos_ch - 1;                       \
     }                                                \
                                                      \
     stack_push (&Cpu->Stk, first_number);            \
@@ -69,6 +69,15 @@ enum SIGNATURES
 {
     SIGNATURE           = 0xBACAFE,
     SIGNATURE_DESTROYED = 0xDEADAC,
+};
+
+//-----------------------------------------------------------------------------
+
+enum CODE_INFO
+{
+    LM(SIZE_DIFF)   = 40,
+    SZ(CODE_INIT)   = 2 * ARG_OFFSET,
+    SG(CODE_OFFSET) = 2 * ARG_OFFSET,
 };
 
 //-----------------------------------------------------------------------------
