@@ -118,3 +118,6 @@ CMD_DEF(SQRT, "sqrt",
         printf ("ERROR - sqrt below zero!\n");
     }
 })
+
+
+// #undef CJMP()

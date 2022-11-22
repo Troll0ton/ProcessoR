@@ -1,6 +1,7 @@
 #include "../include/ASM.h"
 
 //-----------------------------------------------------------------------------
+// main.cpp
 
 int main (int argc, char *argv[])
 {
@@ -159,6 +160,7 @@ void parse_label (Assembler *Asm, Argument *Arg)
 
 void parse_cmd (Assembler *Asm, Command *Cmd, Argument *Arg)
 {
+    // MAX_LEN
     char cmd_name[LM(MAX_LEN)] = "";
 
     if(!Arg->flag && lscan("%20s", cmd_name) == 1)
@@ -221,7 +223,7 @@ void parse_arg (Assembler *Asm, Command *Cmd, Argument *Arg)
         else if(lscan(format, __VA_ARGS__) == num)    \
         {                                             \
             Cmd->mask |= name_msk;                    \
-        }                                             \
+        }
 
         //-----------------------------------------------------------------------------
 
@@ -267,6 +269,7 @@ void search_label (Assembler *Asm, Argument *Arg)
 
 void write_in_code (Assembler *Asm, Command Cmd, Argument Arg)
 {
+    // LM
     if(Asm->cur_pos + LM(SIZE_DIFF) > Asm->Code.capacity)
     {
         Asm->Code.capacity *= PAR_INCREASE;
@@ -404,8 +407,11 @@ void asm_dump (Assembler *Asm)
 
         if(curr_cmd & MASK_IMM)
         {
+            // UB
+            i++;
+
             fprintf (code_dmp_file, "%06d - logic pos, %06d - phys pos || %lg\n",
-                                    i++, curr_pos + CMD_OFFSET + offset,
+                                    i, curr_pos + CMD_OFFSET + offset,
                                     *(elem_t*)(Asm->Code.array + curr_pos + CMD_OFFSET + offset));
 
             offset += ARG_OFFSET;

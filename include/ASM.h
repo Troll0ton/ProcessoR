@@ -50,7 +50,7 @@ typedef struct Asm_info
 
 typedef struct Command
 {
-    bool  flag;
+    bool  flag; // is_label
     int   mask;
     int   code;
 } Command;
@@ -59,8 +59,11 @@ typedef struct Command
 
 typedef struct Argument
 {
-    bool   flag;
-    double value;
+    bool   flag; //
+    double value; // union value {
+                //   double d_value;
+                //   int i_value;
+                //   }
     char   reg_sym;
     int    amount;
 } Argument;
