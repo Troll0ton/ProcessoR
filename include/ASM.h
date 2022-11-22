@@ -33,6 +33,7 @@ enum LABEL_INFO
 {
     SZ(LABEL_INIT)   = 50,
     SG(LABEL_OFFSET) = 1,
+    PAR_INCREASE     = 40,
 };
 
 //-----------------------------------------------------------------------------
@@ -106,7 +107,7 @@ int  asm_info_ctor  (Asm_info *Info, char *argv[]);
 
 void assembling     (Assembler *Asm);
 
-void handle_text    (Assembler *Asm, Line *Text, File *File_input);
+void parse_text     (Assembler *Asm, Line *Text, File *File_input);
 
 void parse_line     (Assembler *Asm, Command *Cmd, Argument *Arg);
 
@@ -126,7 +127,7 @@ void write_in_label (Assembler *Asm, Argument Arg);
 
 void assembler_dtor (Assembler *Asm);
 
-void asm_info_dtor  (Asm_info *Info);
+void asm_info_dtor  (Asm_info * Info);
 
 void write_res_sums (Assembler *Asm);
 

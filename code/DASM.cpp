@@ -64,7 +64,7 @@ void disassembling (Disassember *Dasm)
 
         #undef PRINT_ARG
 
-        /*else*/print_file("\n");
+        /*else*/ print_file("\n");
     }
 }
 

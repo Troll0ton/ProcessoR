@@ -92,7 +92,7 @@ void assembling (Assembler *Asm)
     File *File_input = file_reader (Asm->Info.file_in);
     Line *Text = lines_separator (File_input);
 
-    handle_text (Asm, Text, File_input);
+    parse_text (Asm, Text, File_input);
 
     write_res_sums (Asm);
 
@@ -105,7 +105,7 @@ void assembling (Assembler *Asm)
 
 #define DOUBLE_PASS (Asm->Info.double_pass)
 
-void handle_text (Assembler *Asm, Line *Text, File *File_input)
+void parse_text (Assembler *Asm, Line *Text, File *File_input)
 {
     DOUBLE_PASS = false;
 
@@ -124,7 +124,7 @@ void handle_text (Assembler *Asm, Line *Text, File *File_input)
     Asm->Code.size = Asm->cur_pos;
     Asm->cur_pos   = SG(CODE_OFFSET);
 
-    if(DOUBLE_PASS) handle_text (Asm, Text, File_input);
+    if(DOUBLE_PASS) parse_text (Asm, Text, File_input);
 }
 
 #undef DOUBLE_PASS
@@ -267,6 +267,16 @@ void search_label (Assembler *Asm, Argument *Arg)
 
 void write_in_code (Assembler *Asm, Command Cmd, Argument Arg)
 {
+    if(Asm->cur_pos + LM(SIZE_DIFF) > Asm->Code.capacity)
+    {
+        Asm->Code.capacity *= PAR_INCREASE;
+
+        Asm->Code.array = (char*) recalloc (Asm->Code.array,
+                                            Asm->Code.capacity,
+                                            Asm->cur_pos,
+                                            sizeof (char)      );
+    }
+
     if(!Cmd.flag && Arg.flag)
     {
         write_in_label (Asm, Arg);
@@ -280,7 +290,7 @@ void write_in_code (Assembler *Asm, Command Cmd, Argument Arg)
         write_in_arg (Asm, Cmd, Arg);
     }
 
-    *(elem_t*)(Asm->Code.array + 0) = Asm->Code.size;
+    *(elem_t*)(Asm->Code.array) = Asm->Code.size;
     *(elem_t*)(Asm->Code.array + ARG_OFFSET) = Asm->Info.code_signature;
 }
 
@@ -310,20 +320,6 @@ void write_in_label (Assembler *Asm, Argument Arg)
 
 void write_in_arg (Assembler *Asm, Command Cmd, Argument Arg)
 {
-    char first_elem = *(Asm->Code.array + SG(CODE_OFFSET));
-
-    if(Asm->cur_pos + LM(SIZE_DIFF) > Asm->Code.capacity)
-    {
-        Asm->Code.capacity *= 2;
-
-        Asm->Code.array = (char*) recalloc (Asm->Code.array,
-                                            Asm->Code.capacity,
-                                            Asm->cur_pos,
-                                            sizeof (char)      );
-
-        *(Asm->Code.array + SG(CODE_OFFSET)) = first_elem;
-    }
-
     if(Cmd.code & MASK_REG)
     {
         *(elem_t*)(Asm->Code.array + Asm->cur_pos) = (elem_t) (Arg.reg_sym - 'a');

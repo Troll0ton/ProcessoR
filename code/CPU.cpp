@@ -99,7 +99,7 @@ void read_code_file (Processor *Cpu)
     {
         Cpu->code = (char*) calloc (Cpu->code_size, sizeof (char));
 
-        *(elem_t*)(Cpu->code + 0) = res_sum;
+        *(elem_t*)(Cpu->code) = res_sum;
         *(elem_t*)(Cpu->code + ARG_OFFSET) = code_signature;
 
         if(Cpu->code == NULL)
@@ -125,8 +125,8 @@ void handle_cmds (Processor *Cpu)
         int     curr_cmd   = Cpu->code[curr_pos];
         int     offset     = 0;
         double  pop_value  = 0;
-        double *curr_arg   = &pop_value;
         double  arg_value  = 0;
+        double *curr_arg   = &pop_value;
 
         if(curr_cmd & MASK_REG)
         {
