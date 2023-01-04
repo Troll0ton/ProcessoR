@@ -1,0 +1,26 @@
+#include "../include/CPU.h"
+
+//-----------------------------------------------------------------------------
+
+int main (int argc, char *argv[])
+{
+    Processor Cpu = { 0 };
+
+    if(processor_ctor (&Cpu) == ERROR_CTOR)
+    {
+        return ERROR_CPU;
+    }
+
+    read_code_file (&Cpu);
+
+    cpu_dump (&Cpu);
+
+    handle_cmds (&Cpu);
+
+    processor_dtor (&Cpu);
+
+    return 0;
+}
+
+//-----------------------------------------------------------------------------
+

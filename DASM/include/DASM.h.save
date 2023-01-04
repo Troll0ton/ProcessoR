@@ -1,64 +1,52 @@
-//! @file DASM.h
+//! @file dasm.h
 
-#ifndef   DASM_H
-#define   DASM_H
+#ifndef   dasm_H
+#define   dasm_H
 
 //-----------------------------------------------------------------------------
 
 #include "../include/stack.h"
-#include "../include/common.h"
+#include "../../COMMON/include/common.h"
 
 //-----------------------------------------------------------------------------
 
-#define print_file(...) fprintf (Dasm->Info.file_out, __VA_ARGS__)
+#define print_file(...) fprintf (dasm->info.file_out, __VA_ARGS__)
 
 //-----------------------------------------------------------------------------
 
-#define PRINT_ARG(name_msk, format, ...)     \
-        if(curr_cmd & name_msk)              \
-        {                                    \
-            print_file(format, __VA_ARGS__); \
-        }                                    \
-        else                                  
-
-//-----------------------------------------------------------------------------
-
-typedef struct Dasm_info
+typedef struct dasm_info
 {
     FILE *code_file;
     FILE *file_out;
-} Dasm_info;
+} dasm_info;
 
 //-----------------------------------------------------------------------------
 
 typedef struct Disassember
 {
-    Dasm_info Info;
-    double   *code;
-    int       code_size;
+    dasm_info info;
+    char     *code;
+    int       CODE_SIZE;
     Stack     Stk;
-    void (*func) (CMD_FUNCT);
 } Disassember;
 
 //-----------------------------------------------------------------------------
 
-void disassembling    (int curr_cmd, double curr_arg, int *curr_ptr, Disassember *Cpu);
+void read_code_file   (Disassember *dasm);
 
-void read_code_file   (Disassember *Cpu);
+int  disassember_ctor (Disassember *dasm);
 
-int  disassember_ctor (Disassember *Dasm, void (*funct) (CMD_FUNCT));
+int  dasm_info_ctor   (dasm_info *info);
 
-int  dasm_info_ctor   (Dasm_info *Info);
+void disassember_dtor (Disassember *dasm);
 
-void disassember_dtor (Disassember *Dasm);
+void dasm_info_dtor   (dasm_info *info);
 
-void dasm_info_dtor   (Dasm_info *Info);
-
-void handle_cmds      (Disassember *Dasm);
+void disassembling    (Disassember *dasm);
 
 bool is_equal         (double a, double b);
 
 //-----------------------------------------------------------------------------
 
-#endif //DASM_H
+#endif //dasm_H
 

@@ -1,7 +1,7 @@
-//! @file DASM.h
+//! @file dasm.h
 
-#ifndef   DASM_H
-#define   DASM_H
+#ifndef   dasm_H
+#define   dasm_H
 
 //-----------------------------------------------------------------------------
 
@@ -10,7 +10,7 @@
 
 //-----------------------------------------------------------------------------
 
-#define print_file(...) fprintf (Dasm->Info.file_out, __VA_ARGS__)
+#define print_file(...) fprintf (dasm->info.file_out, __VA_ARGS__)
 
 //-----------------------------------------------------------------------------
 
@@ -24,7 +24,7 @@ typedef struct Dasm_info
 
 typedef struct Disassember
 {
-    Dasm_info Info;
+    Dasm_info info;
     char     *code;
     int       code_size;
     Stack     Stk;
@@ -32,21 +32,21 @@ typedef struct Disassember
 
 //-----------------------------------------------------------------------------
 
-void read_code_file   (Disassember *Dasm);
+void read_code_file   (Disassember *dasm);
 
-int  disassember_ctor (Disassember *Dasm);
+int  disassember_ctor (Disassember *dasm);
 
-int  dasm_info_ctor   (Dasm_info *Info);
+int  Dasm_info_ctor   (Dasm_info *info);
 
-void disassember_dtor (Disassember *Dasm);
+void disassember_dtor (Disassember *dasm);
 
-void dasm_info_dtor   (Dasm_info *Info);
+void Dasm_info_dtor   (Dasm_info *info);
 
-void disassembling    (Disassember *Dasm);
+void disassembling    (Disassember *dasm);
 
 bool is_equal         (double a, double b);
 
 //-----------------------------------------------------------------------------
 
-#endif //DASM_H
+#endif //dasm_H
 

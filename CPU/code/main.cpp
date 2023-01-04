@@ -4,20 +4,20 @@
 
 int main (int argc, char *argv[])
 {
-    Processor Cpu = { 0 };
+    Processor cpu = { 0 };
 
-    if(processor_ctor (&Cpu) == E(CTOR))
+    if(processor_ctor (&cpu) == ERROR_CTOR)
     {
-        return E(CPU);
+        return ERROR_CPU;
     }
 
-    read_code_file (&Cpu);
+    read_code_file (&cpu);
 
-    cpu_dump (&Cpu);
+    cpu_dump (&cpu);
 
-    handle_cmds (&Cpu);
+    handle_cmds (&cpu);
 
-    processor_dtor (&Cpu);
+    processor_dtor (&cpu);
 
     return 0;
 }

@@ -1,0 +1,138 @@
+//! @file asm.h
+
+#ifndef   ASM_H
+#define   ASM_H
+
+//-----------------------------------------------------------------------------
+
+#include "../include/lines_handle.h"
+#include "../include/input_output.h"
+#include "../include/stack.h"
+#include "../../COMMON/include/common.h"
+
+//-----------------------------------------------------------------------------
+
+#define lscan(...) sscanf (asm->curr_line.begin_line, __VA_ARGS__)
+
+//-----------------------------------------------------------------------------
+
+#define SUCCESS_READ 1
+#define EMPTY_LINE   0
+
+//-----------------------------------------------------------------------------
+
+enum CMD_INFO
+{
+    N(SUPPORTED_CMD) = 19,
+    MAX_LEN          = 20,
+};
+
+//-----------------------------------------------------------------------------
+
+enum LABEL_INFO
+{
+    LABEL_SIZE         = 50,
+    O(LABEL_SIGNATURE) = 1,
+    PAR_INCREASE       = 40,
+};
+
+//-----------------------------------------------------------------------------
+
+typedef struct Asm_info
+{
+    FILE   *file_in;
+    FILE   *code_file;
+    int     code_signature;
+    bool    double_pass;
+} Asm_info;
+
+//-----------------------------------------------------------------------------
+
+typedef struct Command
+{
+    bool  is_label;
+    int   mask;
+    int   code;
+} Command;
+
+//-----------------------------------------------------------------------------
+
+typedef struct Argument
+{
+    bool   is_label; 
+    double value; 
+    char   reg_sym;
+    int    amount;
+} Argument;
+
+//-----------------------------------------------------------------------------
+
+typedef struct code_array
+{
+    char *array;
+    int   size;
+    int   capacity;
+
+    FILE *dmp_file;
+} code_array;
+
+//-----------------------------------------------------------------------------
+
+typedef struct Label_array
+{
+    int *array;
+    int  size;
+    int  capacity;
+
+    FILE *dmp_file;
+} Label_array;
+
+//-----------------------------------------------------------------------------
+
+typedef struct Assembler
+{
+    Asm_info    info;
+    Line        curr_line;
+    int         curr_pos;
+    int         offset;
+    code_array  code;
+    Label_array label;
+} Assembler;
+
+//-----------------------------------------------------------------------------
+
+int  assembler_ctor (Assembler *asm, char *argv[]);
+
+int  asm_info_ctor  (Asm_info *info, char *argv[]);
+
+void assembling     (Assembler *asm);
+
+void parse_text     (Assembler *asm, Line *Text, File *File_input);
+
+void parse_line     (Assembler *asm, Command *cmd, Argument *arg);
+
+void parse_label    (Assembler *asm, Argument *arg);
+
+void search_label   (Assembler *asm, Argument *arg);
+
+void parse_cmd      (Assembler *asm, Command *cmd, Argument *arg);
+
+void parse_arg      (Assembler *asm, Command *cmd, Argument *arg);
+
+void write_in_code  (Assembler *asm, Command cmd,  Argument arg);
+
+void write_in_arg   (Assembler *asm, Command cmd,  Argument arg);
+
+void write_in_label (Assembler *asm, Argument arg);
+
+void assembler_dtor (Assembler *asm);
+
+void asm_info_dtor  (Asm_info * info);
+
+void write_res_sums (Assembler *asm);
+
+void asm_dump       (Assembler *asm);
+
+//-----------------------------------------------------------------------------
+
+#endif //ASM_H

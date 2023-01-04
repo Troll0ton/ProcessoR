@@ -1,0 +1,12 @@
+
+parse_arg(2, MASK_RAM | MASK_REG | MASK_IMM, "%*s [r%cx + %lg]", &arg->reg_sym, &arg->value)
+
+parse_arg(1, MASK_RAM | MASK_IMM,            "%*s [%lg]",        &arg->value)
+
+parse_arg(1, MASK_RAM | MASK_REG,            "%*s [r%cx]",       &arg->reg_sym)
+
+parse_arg(1, MASK_REG,                       "%*s r%cx",         &arg->reg_sym)
+
+parse_arg(1, MASK_IMM,                       "%*s %lg",          &arg->value)
+
+

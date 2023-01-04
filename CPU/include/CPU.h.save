@@ -1,0 +1,84 @@
+//! @file cpu.h
+
+#ifndef   cpu_H
+#define   cpu_H
+
+//-----------------------------------------------------------------------------
+
+#include "../include/stack.h"
+#include "../../COMMON/include/common.h"
+#include <math.h>
+
+//-----------------------------------------------------------------------------
+
+#define Struct Processor
+#define Name   cpu
+
+//-----------------------------------------------------------------------------
+
+enum cpu_INFO
+{
+    SIZE_OF_STK = 2,
+};
+
+//-----------------------------------------------------------------------------
+
+enum REG_INFO
+{
+    N(REGS) = 5,
+};
+
+//-----------------------------------------------------------------------------
+
+enum RAM_INFO
+{
+    SZ(RAM) = 300,
+};
+
+//-----------------------------------------------------------------------------
+
+typedef struct cpu_info
+{
+    FILE *code_file;
+    FILE *file_out;
+} cpu_info;
+
+//-----------------------------------------------------------------------------
+
+typedef struct Processor
+{
+    cpu_info info;
+    double  *regs;
+    double  *ram;
+    char    *code;
+    bool     is_stop;
+    int      code_size;
+    Stack    Stk;
+    Stack    Stk_call;
+} Processor;
+
+//-----------------------------------------------------------------------------
+
+int  processor_ctor  (Processor *cpu);
+
+int  cpu_info_ctor   (cpu_info *info);
+
+void processor_dtor  (Processor *cpu);
+
+void cpu_info_dtor   (cpu_info *info);
+
+void read_code_file  (Processor *cpu);
+
+void handle_cmds     (Processor *cpu);
+
+bool is_equal        (double a, double b);
+
+void execute_cmd     (int curr_cmd,  double    *curr_arg, double arg_value,
+                      int *curr_ptr, Processor *cpu                        );
+
+
+void cpu_dump        (Processor *cpu);
+
+//-----------------------------------------------------------------------------
+
+#endif //cpu_H

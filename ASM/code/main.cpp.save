@@ -1,0 +1,24 @@
+#include "../include/ASM.h"
+
+//-----------------------------------------------------------------------------
+
+int main (int argc, char *argv[])
+{
+    Assembler asm = { 0 };
+
+    if(assembler_ctor (&asm, argv) == ERROR_CTOR)
+    {
+        printf ("----ERROR asm----");
+    }
+
+    assembling (&asm);
+
+    asm_dump (&asm);
+
+    assembler_dtor (&asm);
+
+    return 0;
+}
+
+//-----------------------------------------------------------------------------
+

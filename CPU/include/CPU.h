@@ -12,27 +12,27 @@
 //-----------------------------------------------------------------------------
 
 #define Struct Processor
-#define Name   Cpu
+#define Name   cpu
 
 //-----------------------------------------------------------------------------
 
 enum CPU_INFO
 {
-    SZ(STACK_INIT) = 2,
+    SIZE_OF_STK = 2,
 };
 
 //-----------------------------------------------------------------------------
 
 enum REG_INFO
 {
-    N(REGS) = 5,
+    NUM_OF_REGS = 5,
 };
 
 //-----------------------------------------------------------------------------
 
 enum RAM_INFO
 {
-    SZ(RAM) = 300,
+    SIZE_OF_RAM = 300,
 };
 
 //-----------------------------------------------------------------------------
@@ -47,11 +47,11 @@ typedef struct Cpu_info
 
 typedef struct Processor
 {
-    Cpu_info Info;
+    Cpu_info info;
     double  *regs;
     double  *ram;
     char    *code;
-    bool     F(STOP);
+    bool     is_stop;
     int      code_size;
     Stack    Stk;
     Stack    Stk_call;
@@ -59,25 +59,25 @@ typedef struct Processor
 
 //-----------------------------------------------------------------------------
 
-int  processor_ctor  (Processor *Cpu);
+int  processor_ctor  (Processor *cpu);
 
-int  cpu_info_ctor   (Cpu_info *Info);
+int  Cpu_info_ctor   (Cpu_info *info);
 
-void processor_dtor  (Processor *Cpu);
+void processor_dtor  (Processor *cpu);
 
-void cpu_info_dtor   (Cpu_info *Info);
+void Cpu_info_dtor   (Cpu_info *info);
 
-void read_code_file  (Processor *Cpu);
+void read_code_file  (Processor *cpu);
 
-void handle_cmds     (Processor *Cpu);
+void handle_cmds     (Processor *cpu);
 
 bool is_equal        (double a, double b);
 
 void execute_cmd     (int curr_cmd,  double    *curr_arg, double arg_value,
-                      int *curr_ptr, Processor *Cpu                        );
+                      int *curr_ptr, Processor *cpu                        );
 
 
-void cpu_dump        (Processor *Cpu);
+void cpu_dump        (Processor *cpu);
 
 //-----------------------------------------------------------------------------
 

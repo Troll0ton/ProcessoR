@@ -1,14 +1,14 @@
-#include "../include/DASM.h"
+#include "../include/dasm.h"
 
 //-----------------------------------------------------------------------------
 
-void disassembling (Disassember *Dasm)
+void disassembling (Disassember *dasm)
 {
-    for(int curr_pos = SG(CODE_OFFSET); curr_pos < Dasm->code_size; curr_pos++)
+    for(int curr_pos = O(CODE_SIGNATURE); curr_pos < dasm->CODE_SIZE; curr_pos++)
     {
         print_file("%07d | ", curr_pos);
 
-        int curr_cmd = Dasm->code[curr_pos];
+        int curr_cmd = dasm->code[curr_pos];
 
         #define CMD_DEF(cmd, name, ...)  \
             case cmd:                    \
@@ -28,7 +28,7 @@ void disassembling (Disassember *Dasm)
 
         #undef CMD_DEF
 
-        #define PRINT_ARG(offset, name_msk, format, ...) \
+        #define PRINT_arg(offset, name_msk, format, ...) \
             if((curr_cmd & (name_msk)) == (name_msk))    \
             {                                            \
                 print_file(format, __VA_ARGS__);         \
@@ -42,7 +42,7 @@ void disassembling (Disassember *Dasm)
 
         //-----------------------------------------------------------------------------
 
-        #undef PRINT_ARG
+        #undef PRINT_arg
 
         /*else*/ print_file("\n");
     }
@@ -50,27 +50,27 @@ void disassembling (Disassember *Dasm)
 
 //-----------------------------------------------------------------------------
 
-int disassember_ctor (Disassember *Dasm)
+int disassember_ctor (Disassember *dasm)
 {
-    Dasm->Info = { 0 };
+    dasm->info = { 0 };
 
-    Dasm->Stk = { 0 };
-    stack_ctor (&Dasm->Stk, 2);
+    dasm->Stk = { 0 };
+    stack_ctor (&dasm->Stk, 2);
 
-    return (dasm_info_ctor (&Dasm->Info));
+    return (dasm_info_ctor (&dasm->info));
 }
 
 //-----------------------------------------------------------------------------
 
-int dasm_info_ctor (Dasm_info *Info)
+int dasm_info_ctor (dasm_info *info)
 {
-    Info->code_file = fopen ("../files/code.bin",     "rb");
-    Info->file_out  = fopen ("../dump/dasm_file.txt", "w+");
+    info->code_file = fopen ("COMMON/files/code.bin",   "rb");
+    info->file_out  = fopen ("dasm/dump/dasm_file.txt", "w+");
 
-    if(Info->code_file == NULL ||
-       Info->file_out  == NULL   )
+    if(info->code_file == NULL ||
+       info->file_out  == NULL   )
     {
-        return E(CTOR);
+        return ERROR_CTOR;
     }
 
     return 0;
@@ -78,48 +78,48 @@ int dasm_info_ctor (Dasm_info *Info)
 
 //-----------------------------------------------------------------------------
 
-void disassember_dtor (Disassember *Dasm)
+void disassember_dtor (Disassember *dasm)
 {
-    stack_dtor (&Dasm->Stk);
+    stack_dtor (&dasm->Stk);
 
-    free (Dasm->code);
+    free (dasm->code);
 
-    dasm_info_dtor (&Dasm->Info);
+    dasm_info_dtor (&dasm->info);
 }
 
 //-----------------------------------------------------------------------------
 
-void dasm_info_dtor (Dasm_info *Info)
+void dasm_info_dtor (dasm_info *info)
 {
-    fclose (Info->code_file);
-    fclose (Info->file_out);
+    fclose (info->code_file);
+    fclose (info->file_out);
 }
 
 //-----------------------------------------------------------------------------
 
-void read_code_file (Disassember *Dasm)
+void read_code_file (Disassember *dasm)
 {
     double code_signature = 0;
     double res_sum        = 0;
 
-    fread (&res_sum,        sizeof(char), ARG_OFFSET, Dasm->Info.code_file);
-    fread (&code_signature, sizeof(char), ARG_OFFSET, Dasm->Info.code_file);
+    fread (&res_sum,        sizeof(char), O(ARG), dasm->info.code_file);
+    fread (&code_signature, sizeof(char), O(ARG), dasm->info.code_file);
 
-    Dasm->code_size = res_sum;
+    dasm->CODE_SIZE = res_sum;
 
     if(code_signature == SIGNATURE)
     {
-        Dasm->code = (char*) calloc (Dasm->code_size, sizeof (char));
+        dasm->code = (char*) calloc (dasm->CODE_SIZE, sizeof (char));
 
-        *(elem_t*)(Dasm->code + 0) = res_sum;
-        *(elem_t*)(Dasm->code + ARG_OFFSET) = code_signature;
+        *(elem_t*)(dasm->code + 0) = res_sum;
+        *(elem_t*)(dasm->code + O(ARG)) = code_signature;
 
-        if(Dasm->code == NULL)
+        if(dasm->code == NULL)
         {
             printf ("__________|ERROR - NULL pointer code|__________\n");
         }
 
-        fread (Dasm->code + SG(CODE_OFFSET), sizeof(char), Dasm->code_size - SG(CODE_OFFSET), Dasm->Info.code_file);
+        fread (dasm->code + O(CODE_SIGNATURE), sizeof(char), dasm->CODE_SIZE - O(CODE_SIGNATURE), dasm->info.code_file);
     }
 
     else

@@ -1,42 +1,42 @@
 
 CMD_DEF(HLT, "hlt",
 {
-    Cpu->F(STOP) = true;
+    cpu->is_stop = true;
 })
 
 CMD_DEF(PUSH, "push",
 {
-    stack_push (&Cpu->Stk, arg_value);
+    stack_push (&cpu->Stk, arg_value);
 })
 
 CMD_DEF(POP, "pop",
 {
-    *curr_arg = stack_pop (&Cpu->Stk);
+    *curr_arg = stack_pop (&cpu->Stk);
 })
 
 CMD_DEF(ADD, "add",
 {
-    stack_push (&Cpu->Stk, stack_pop (&Cpu->Stk) + stack_pop (&Cpu->Stk));
+    stack_push (&cpu->Stk, stack_pop (&cpu->Stk) + stack_pop (&cpu->Stk));
 })
 
 CMD_DEF(SUB, "sub",
 {
-    stack_push (&Cpu->Stk, -(stack_pop (&Cpu->Stk) - stack_pop (&Cpu->Stk)));
+    stack_push (&cpu->Stk, -(stack_pop (&cpu->Stk) - stack_pop (&cpu->Stk)));
 })
 
 CMD_DEF(MUL, "mul",
 {
-    stack_push (&Cpu->Stk, stack_pop (&Cpu->Stk) * stack_pop (&Cpu->Stk));
+    stack_push (&cpu->Stk, stack_pop (&cpu->Stk) * stack_pop (&cpu->Stk));
 })
 
 CMD_DEF(DIV, "div",
 {
-    stack_push (&Cpu->Stk, 1 / stack_pop (&Cpu->Stk) * stack_pop (&Cpu->Stk));
+    stack_push (&cpu->Stk, 1 / stack_pop (&cpu->Stk) * stack_pop (&cpu->Stk));
 })
 
 CMD_DEF(OUT, "out",
 {
-    double value = stack_pop (&Cpu->Stk);
+    double value = stack_pop (&cpu->Stk);
 
     if(value == POISON_STK)
     {
@@ -51,7 +51,7 @@ CMD_DEF(OUT, "out",
 
 CMD_DEF(DUMP, "dump",
 {
-    stack_dumps (&Cpu->Stk, Cpu->Info.file_out);
+    stack_dumps (&cpu->Stk, cpu->info.file_out);
 })
 
 CMD_DEF(JBE, "jbe",
@@ -93,7 +93,7 @@ CMD_DEF(JMP, "jmp",
 
 CMD_DEF(CALL, "call",
 {
-    stack_push (&Cpu->Stk_call, ++curr_pos);
+    stack_push (&cpu->Stk_call, ++curr_pos);
 
     int pos_ch = arg_value;
     curr_pos   = pos_ch - 1;
@@ -101,16 +101,16 @@ CMD_DEF(CALL, "call",
 
 CMD_DEF(RET, "ret",
 {
-    curr_pos = stack_pop (&Cpu->Stk_call) - 1;
+    curr_pos = stack_pop (&cpu->Stk_call) - 1;
 })
 
 CMD_DEF(SQRT, "sqrt",
 {
-    double value = stack_pop (&Cpu->Stk);
+    double value = stack_pop (&cpu->Stk);
 
     if(value >= 0)
     {
-        stack_push (&Cpu->Stk, sqrt (value));
+        stack_push (&cpu->Stk, sqrt (value));
     }
 
     else
